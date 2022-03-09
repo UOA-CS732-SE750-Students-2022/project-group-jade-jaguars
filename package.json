@@ -1,0 +1,22 @@
+{
+  "name": "root",
+  "private": true,
+  "devDependencies": {
+    "husky": "^7.0.4",
+    "lerna": "^4.0.0",
+    "lint-staged": "^12.3.5",
+    "prettier": "^2.5.1"
+  },
+  "lint-staged": {
+    "*.{js,css,md,ts,jsx,tsx}": "prettier --write"
+  },
+  "scripts": {
+    "build": "lerna run build",
+    "prepare": "husky install",
+    "postinstall": "lerna bootstrap",
+    "start": "lerna run --parallel start",
+    "start:docker": "docker-compose up",
+    "start:db": "docker-compose up mongodb_container",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  }
+}

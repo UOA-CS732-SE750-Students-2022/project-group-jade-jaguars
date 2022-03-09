@@ -1,0 +1,32 @@
+version: '3'
+services:
+  backend:
+    container_name: cmi-backend
+    image: cmi-backend
+    restart: always
+    build: ./packages/backend
+    ports:
+      - '3000:3000'
+    links:
+      - mongodb_container
+    depends_on:
+      - 'mongodb_container'
+  frontend:
+    container_name: cmi-frontend
+    image: cmi-frontend
+    restart: always
+    build: ./packages/frontend
+    ports:
+      - '3001:3001'
+  mongodb_container:
+    image: mongo:latest
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: root
+    ports:
+      - 27017:27017
+    volumes:
+      - mongodb_data_container:/data/db
+
+volumes:
+  mongodb_data_container:

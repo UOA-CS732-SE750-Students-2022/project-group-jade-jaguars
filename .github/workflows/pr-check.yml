@@ -1,0 +1,25 @@
+name: pr
+on:
+  push:
+    branches: [develop]
+  pull_request:
+    types:
+      - opened
+      - synchronize
+      - ready_for_review
+      - reopened
+jobs:
+  Test:
+    runs-on: ubuntu-latest
+    if: ${{ github.event_name == 'push' || !github.event.pull_request.draft }}
+    steps:
+      - uses: actions/checkout@v2
+      - name: use node 16
+        uses: actions/setup-node@v2
+        with:
+          node-version: '16'
+          cache: 'npm'
+      - run: npm ci
+
+      - name: build
+        run: npm run build

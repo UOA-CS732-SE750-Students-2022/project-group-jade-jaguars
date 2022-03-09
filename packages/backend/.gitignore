@@ -1,0 +1,3 @@
+# Environment Files
+.env.*
+!.env.*.template
