@@ -1,19 +1,70 @@
 import express from 'express';
-import { MongoClient } from 'mongodb';
 import dotenv from 'dotenv';
+import swaggerUi from 'swagger-ui-express';
+import swaggerJsdoc from 'swagger-jsdoc';
+import { EVENTS_ROUTER } from './routes/eventsRoute';
+import { PORT, BASE_URL, VERBOSE } from './config';
+import { mongoService } from './services/mongoService';
 
 dotenv.config({ path: `.env.${process.env.NODE_ENV}` });
 
-const app = express();
-const port = 3000;
+const APP = express();
+const ROUTER = express.Router();
 
-app.get('/', async (req, res) => {
-  const url = process.env.DATABASE_URL;
-  const client = new MongoClient(url);
-  await client.connect();
-  res.send('connected successfully to db server');
-});
+// Swagger definition
+const definition = {
+  openapi: '3.0.0',
+  info: {
+    title: 'Count Me In',
+    version: '1.0.0',
+    description: '',
+    license: {
+      name: 'GPL-3.0',
+      url: 'https://choosealicense.com/licenses/gpl-3.0/',
+    },
+  },
+  servers: [
+    {
+      url: `http://localhost:${PORT}/`,
+    },
+  ],
+  host: `localhost:${PORT}`,
+  securityDefinitions: {
+    bearerAuth: {
+      type: 'apiKey',
+      name: 'Authorization',
+      scheme: 'bearer',
+      in: 'header',
+    },
+  },
+};
 
-app.listen(port, () => {
-  console.log(`app listening on port ${port}`);
-});
+const options = {
+  definition,
+  apis: ['**/*.ts'],
+};
+
+function initialize() {
+  APP.use(BASE_URL, ROUTER);
+  APP.use(BASE_URL, EVENTS_ROUTER);
+  APP.use(express.json());
+
+  APP.use(
+    `${BASE_URL}/docs`,
+    swaggerUi.serve,
+    swaggerUi.setup(swaggerJsdoc(options)),
+  );
+
+  // ROUTER.get('/', () => {});
+
+  APP.listen(PORT, () => {
+    if (!VERBOSE) {
+      console.clear();
+    }
+    console.log(`app on - https://localhost:${PORT}`);
+  });
+
+  mongoService.connect();
+}
+
+initialize();
