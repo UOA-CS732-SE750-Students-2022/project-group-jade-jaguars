@@ -1,28 +1,21 @@
 ---
 name: Feature request
-about: Suggest an idea for this project
+about: Request a new feature or task to be completed
 title: ''
 labels: ''
 assignees: ''
+
 ---
 
-**Is your feature request related to a problem? Please describe.**
+**Feature/Task Description**
 
-A clear and concise description of what the problem is. Ex. I'm always frustrated when [...]
+What is the feature/task?
 
-**Describe the solution you'd like**
+**Subtasks**
 
-A clear and concise description of what you want to happen.
+List subtasks that might be required (if any).
 
-**Describe alternatives you've considered**
+**Additional Info**
 
-A clear and concise description of any alternative solutions or features you've considered.
-
-**Additional context**
-
-Add any other context or screenshots about the feature request here.
-
-### Checklist:
-
-- [ ] I have double checked that the issue does not currently exist.
-- [ ] I have added the appropriate labels (e.g. feature, front-end, back-end).
+Include additional info and screenshots here.
+Notion task link: (Paste link to notion task here)
