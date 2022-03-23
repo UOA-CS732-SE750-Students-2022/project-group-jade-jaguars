@@ -1,5 +1,5 @@
-import { mongoService } from '../services/mongoService';
-import { Event } from '../models/eventsModel';
+import { mongoService } from '../services/mongo.service';
+import { Event } from '../models/events.model';
 import { v4 } from 'uuid';
 import express from 'express';
 

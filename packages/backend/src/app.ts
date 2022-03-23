@@ -2,9 +2,9 @@ import express from 'express';
 import dotenv from 'dotenv';
 import swaggerUi from 'swagger-ui-express';
 import swaggerJsdoc from 'swagger-jsdoc';
-import { EVENTS_ROUTER } from './routes/eventsRoute';
+import { EVENTS_ROUTER } from './routes/events.route';
 import { PORT, BASE_URL, VERBOSE } from './config';
-import { mongoService } from './services/mongoService';
+import { mongoService } from './services/mongo.service';
 
 dotenv.config({ path: `.env.${process.env.NODE_ENV}` });
 
