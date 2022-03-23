@@ -1,5 +1,6 @@
-export const DATABASE = 'development';
 // export const DATABASE = 'production';
+export const DATABASE = 'development';
+export const DATABASE_URL = '';
 
 export const PORT = 3000;
 export const BASE_URL = '/api/v1';

@@ -8,9 +8,9 @@
   "scripts": {
     "prebuild": "rimraf dist",
     "build": "tsc",
-    "start": "NODE_ENV=development ts-node ./src/app.ts",
-    "start:dev": "NODE_ENV=development nodemon",
-    "start:prod": "NODE_ENV=production node dist/app",
+    "start": "ts-node ./src/app.ts",
+    "start:dev": "nodemon",
+    "start:prod": "node dist/app",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
@@ -34,7 +34,6 @@
     "eslint": "^8.0.1",
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-prettier": "^4.0.0",
-    "dotenv": "^16.0.0",
     "nodemon": "^2.0.15",
     "prettier": "^2.3.2",
     "ts-node": "^10.7.0",

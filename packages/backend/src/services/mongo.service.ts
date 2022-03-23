@@ -1,8 +1,5 @@
 import { Db, MongoClient } from 'mongodb';
-import { DATABASE } from '../config';
-import dotenv from 'dotenv';
-
-dotenv.config({ path: `.env.${process.env.NODE_ENV}` });
+import { DATABASE, DATABASE_URL } from '../config';
 
 let client: MongoClient | undefined = undefined;
 let database: Db | undefined = undefined;
@@ -17,7 +14,7 @@ class MongoService {
    * @returns {Promise<Db>}
    */
   async connect(): Promise<Db> {
-    const url = process.env.DATABASE_URL;
+    const url = DATABASE_URL;
 
     if (!client) {
       client = new MongoClient(url);
