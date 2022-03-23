@@ -1,61 +1,57 @@
 import { mongoService } from '../services/mongo.service';
-import { Event } from '../models/events.model';
+import { User } from '../models/users.model';
 import { v4 } from 'uuid';
 import { Request, Response, NextFunction } from 'express';
 
-export async function getEvent(
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) {
+export async function getUser(req: Request, res: Response, next: NextFunction) {
   try {
-    const event: Event = await mongoService.findOne('events', {
-      uuid: req.params.eventId,
+    const user: User = await mongoService.findOne('users', {
+      uuid: req.params.userId,
     });
 
-    if (event === null) {
-      res.status(404).send('Event not found');
+    if (user === null) {
+      res.status(404).send('User not found');
     } else {
-      res.status(200).send(event);
+      res.status(200).send(user);
     }
   } catch (err) {
-    console.error(`Error while getting event`, err.message);
+    console.error(`Error while getting user`, err.message);
     next(err);
 
     res.status(501).send('Internal Server Error');
   }
 }
 
-export async function createEvent(
+export async function createUser(
   req: Request,
   res: Response,
   next: NextFunction,
 ) {
   try {
-    const body: Event = req.body;
+    const body: User = req.body;
     body.uuid = v4();
 
-    await mongoService.insertOne('events', body);
+    await mongoService.insertOne('users', body);
 
     res.status(201).send('OK');
   } catch (err) {
-    console.error(`Error while creating event`, err.message);
+    console.error(`Error while creating user`, err.message);
     next(err);
 
     res.status(501).send('Internal Server Error');
   }
 }
 
-export async function updateEvent(
+export async function updateUser(
   req: Request,
   res: Response,
   next: NextFunction,
 ) {
   try {
-    const body: Event = req.body;
+    const body: User = req.body;
 
     await mongoService.updateOne(
-      'events',
+      'users',
       {
         uuid: body.uuid,
       },
@@ -64,26 +60,26 @@ export async function updateEvent(
 
     res.status(204).send('OK');
   } catch (err) {
-    console.error(`Error while updating event`, err.message);
+    console.error(`Error while updating user`, err.message);
     next(err);
 
     res.status(501).send('Internal Server Error');
   }
 }
 
-export async function deleteEvent(
+export async function deleteUser(
   req: Request,
   res: Response,
   next: NextFunction,
 ) {
   try {
-    await mongoService.deleteOne('events', {
-      uuid: req.params.eventId,
+    await mongoService.deleteOne('users', {
+      uuid: req.params.userId,
     });
 
     res.status(204);
   } catch (err) {
-    console.error(`Error while deleting event`, err.message);
+    console.error(`Error while deleting user`, err.message);
     next(err);
 
     res.status(501).send('Internal Server Error');

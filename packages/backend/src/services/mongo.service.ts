@@ -1,5 +1,5 @@
 import { Db, MongoClient } from 'mongodb';
-import { DATABASE, DATABASE_URL } from '../config';
+import { DATABASE, DATABASE_URL } from '../configs/backend.config';
 
 let client: MongoClient | undefined = undefined;
 let database: Db | undefined = undefined;

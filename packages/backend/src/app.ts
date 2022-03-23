@@ -1,12 +1,12 @@
 import express from 'express';
 import swaggerUi from 'swagger-ui-express';
 import swaggerJsdoc from 'swagger-jsdoc';
-import { EVENTS_ROUTER } from './routes/events.route';
-import { PORT, BASE_URL, VERBOSE } from './config';
+import { usersRouter, eventsRouter } from './routes/routes.module';
+import { PORT, BASE_URL, VERBOSE } from './configs/backend.config';
 import { mongoService } from './services/mongo.service';
 
-const APP = express();
-const ROUTER = express.Router();
+const app = express();
+const router = express.Router();
 
 // Swagger definition
 const definition = {
@@ -42,11 +42,12 @@ const options = {
 };
 
 function initialize() {
-  APP.use(BASE_URL, ROUTER);
-  APP.use(BASE_URL, EVENTS_ROUTER);
-  APP.use(express.json());
+  app.use(BASE_URL, router);
+  app.use(BASE_URL, eventsRouter);
+  app.use(BASE_URL, usersRouter);
+  app.use(express.json());
 
-  APP.use(
+  app.use(
     `${BASE_URL}/docs`,
     swaggerUi.serve,
     swaggerUi.setup(swaggerJsdoc(options)),
@@ -54,7 +55,7 @@ function initialize() {
 
   // ROUTER.get('/', () => {});
 
-  APP.listen(PORT, () => {
+  app.listen(PORT, () => {
     if (!VERBOSE) {
       console.clear();
     }
