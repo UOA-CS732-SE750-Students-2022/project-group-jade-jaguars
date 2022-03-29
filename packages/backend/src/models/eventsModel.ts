@@ -1,18 +1,18 @@
+import { TimeBracket } from './sharedModels';
+import { AttendeeAvailability } from './availabilityModel';
+// EVENT
 export interface Event {
   title: string;
-  status: EventStatus;
+  availability: EventAvailability;
+  eventAdmin: string[]; // uuid
 
-  startTime?: number;
-  endTime?: number;
-  attendees?: string[]; //uuid
   description?: string;
   location?: string;
   uuid?: string;
 }
 
-export enum EventStatus {
-  Pending,
-  Accepted,
-  Rejected,
-  Cancelled,
+export interface EventAvailability {
+  potentialTimes: TimeBracket[]; // start and end timestamps
+  finalisedTime?: TimeBracket;
+  attendeeAvailability: AttendeeAvailability;
 }
