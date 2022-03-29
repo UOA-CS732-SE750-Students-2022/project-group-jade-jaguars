@@ -2,8 +2,8 @@ import express from 'express';
 import {
   getEvent,
   createEvent,
-  deleteEvent,
-  updateEvent,
+  // deleteEvent,
+  // updateEvent,
 } from '../controllers/events.controller';
 export const eventsRouter = express.Router();
 
@@ -54,7 +54,7 @@ eventsRouter.post('/event', createEvent);
  *       501:
  *         description: Internal Server Error
  */
-eventsRouter.put('/event', updateEvent);
+// eventsRouter.put('/event', updateEvent);
 
 /**
  * @swagger
@@ -75,4 +75,4 @@ eventsRouter.put('/event', updateEvent);
  *       501:
  *         description: Internal Server Error
  */
-eventsRouter.delete('/event/:eventId', deleteEvent);
+// eventsRouter.delete('/event/:eventId', deleteEvent);

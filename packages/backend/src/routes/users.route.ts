@@ -1,10 +1,9 @@
 import express from 'express';
-import {
-  getUser,
-  createUser,
-  deleteUser,
-  updateUser,
-} from '../controllers/users.controller';
+import // getUser,
+// createUser,
+// deleteUser,
+// updateUser,
+'../controllers/users.controller';
 export const usersRouter = express.Router();
 
 /**
@@ -23,7 +22,7 @@ export const usersRouter = express.Router();
  *       501:
  *         description: Internal Server Error
  */
-usersRouter.get('/user/:userId', getUser);
+// usersRouter.get('/user/:userId', getUser);
 
 /**
  * @swagger
@@ -36,7 +35,7 @@ usersRouter.get('/user/:userId', getUser);
  *       501:
  *         description: Internal Server Error
  */
-usersRouter.post('/user', createUser);
+// usersRouter.post('/user', createUser);
 
 /**
  * @swagger
@@ -54,7 +53,7 @@ usersRouter.post('/user', createUser);
  *       501:
  *         description: Internal Server Error
  */
-usersRouter.put('/user', updateUser);
+// usersRouter.put('/user', updateUser);
 
 /**
  * @swagger
@@ -75,4 +74,4 @@ usersRouter.put('/user', updateUser);
  *       501:
  *         description: Internal Server Error
  */
-usersRouter.delete('/user/:userId', deleteUser);
+// usersRouter.delete('/user/:userId', deleteUser);

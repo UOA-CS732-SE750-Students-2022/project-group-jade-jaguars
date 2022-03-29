@@ -2,8 +2,13 @@ import express from 'express';
 import swaggerUi from 'swagger-ui-express';
 import swaggerJsdoc from 'swagger-jsdoc';
 import { usersRouter, eventsRouter } from './routes/routes.module';
-import { PORT, BASE_URL, VERBOSE } from './configs/backend.config';
-import { mongoService } from './services/mongo.service';
+import {
+  PORT,
+  BASE_URL,
+  VERBOSE,
+  DATABASE_URL,
+} from './configs/backend.config';
+import mongoose from 'mongoose';
 
 const app = express();
 const router = express.Router();
@@ -47,6 +52,7 @@ function initialize() {
   app.use(BASE_URL, usersRouter);
   app.use(express.json());
 
+  console.log(`serving swagger on: https://localhost:${PORT}${BASE_URL}/docs`);
   app.use(
     `${BASE_URL}/docs`,
     swaggerUi.serve,
@@ -55,14 +61,15 @@ function initialize() {
 
   // ROUTER.get('/', () => {});
 
+  mongoose.connect(DATABASE_URL);
+  console.log(`Database connected: ${DATABASE_URL}`);
+
   app.listen(PORT, () => {
     if (!VERBOSE) {
       console.clear();
     }
     console.log(`app on - https://localhost:${PORT}`);
   });
-
-  mongoService.connect();
 }
 
 initialize();
