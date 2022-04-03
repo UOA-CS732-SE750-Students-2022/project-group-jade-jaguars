@@ -9,8 +9,11 @@ import {
   DATABASE_URL,
 } from './configs/backend.config';
 import mongoose from 'mongoose';
+import bodyParser from 'body-parser';
 
 const app = express();
+app.use(bodyParser.json());
+
 const router = express.Router();
 
 // Swagger definition
@@ -27,10 +30,10 @@ const definition = {
   },
   servers: [
     {
-      url: `http://localhost:${PORT}/`,
+      url: `http://localhost:${PORT}${BASE_URL}`,
     },
   ],
-  host: `localhost:${PORT}`,
+  host: `localhost:${PORT}${BASE_URL}`,
   securityDefinitions: {
     bearerAuth: {
       type: 'apiKey',
@@ -46,7 +49,7 @@ const options = {
   apis: ['**/*.ts'],
 };
 
-function initialize() {
+async function initialize() {
   app.use(BASE_URL, router);
   app.use(BASE_URL, eventsRouter);
   app.use(BASE_URL, usersRouter);
@@ -61,8 +64,14 @@ function initialize() {
 
   // ROUTER.get('/', () => {});
 
-  mongoose.connect(DATABASE_URL);
-  console.log(`Database connected: ${DATABASE_URL}`);
+  console.log(`================`);
+  console.log(`NODE_ENV: ${process.env.NODE_ENV}`);
+  console.log(`================`);
+
+  if (process.env.NODE_ENV !== 'testing') {
+    await mongoose.connect(DATABASE_URL);
+    console.log(`Database connected: ${DATABASE_URL}`);
+  }
 
   app.listen(PORT, () => {
     if (!VERBOSE) {
@@ -73,3 +82,5 @@ function initialize() {
 }
 
 initialize();
+
+export default app;

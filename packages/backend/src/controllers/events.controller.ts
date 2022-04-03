@@ -1,86 +1,124 @@
-import { EventModel } from '../schemas/events.schema';
-import { v4 } from 'uuid';
+import { EventModel, EventStatus, IEvent } from '../schemas/events.schema';
 import { Request, Response, NextFunction } from 'express';
+import { StatusCodes } from 'http-status-codes';
+import {
+  convertToObjectId,
+  ServerError,
+  TypedRequestBody,
+} from '../libs/utils.lib';
+import mongoose from 'mongoose';
+import Joi from 'joi';
+import { validate, validators } from '../libs/validate.lib';
 
-export async function getEvent(
+// TODO: Change createdto for optional/generated fields
+interface CreateEventDTO {
+  startTime: number;
+  title: string;
+  status: EventStatus;
+  endTime: number;
+  attendees: mongoose.Types.ObjectId[];
+  description: string[];
+  location: string;
+}
+
+interface EventResponseDTO {
+  id: mongoose.Types.ObjectId;
+  startTime: number;
+  title: string;
+  status: EventStatus;
+  endTime: number;
+  attendees: mongoose.Types.ObjectId[];
+  description: string[];
+  location: string;
+}
+
+interface UpdateEventDTO extends Partial<IEvent> {}
+
+export async function getEventById(
   req: Request,
-  res: Response,
-  next: NextFunction,
+  res: Response<EventResponseDTO>,
 ) {
-  const asdf = EventModel.findOne({ id: req.params.eventId }).exec();
-  console.log(asdf);
-  // try {
-
-  //   const event: Event = await mongoService.findOne('events', {
-  //     uuid: req.params.eventId,
-  //   });
-
-  //   if (event === null) {
-  //     res.status(404).send('Event not found');
-  //   } else {
-  //     res.status(200).send(event);
-  //   }
-  // } catch (err) {
-  //   console.error(`Error while getting event`, err.message);
-  //   next(err);
-
-  //   res.status(501).send('Internal Server Error');
-  // }
+  const eventId = convertToObjectId(req.params.id);
+  const eventDoc = await EventModel.findById(eventId);
+  if (!eventDoc) {
+    throw new ServerError('event not found', StatusCodes.NOT_FOUND);
+  }
+  res.status(StatusCodes.OK).send({
+    id: eventDoc._id,
+    startTime: eventDoc.startTime,
+    title: eventDoc.title,
+    status: eventDoc.status,
+    endTime: eventDoc.endTime,
+    attendees: eventDoc.attendees,
+    description: eventDoc.description,
+    location: eventDoc.location,
+  });
 }
 
 export async function createEvent(
-  req: Request,
-  res: Response,
-  next: NextFunction,
+  req: TypedRequestBody<CreateEventDTO>,
+  res: Response<EventResponseDTO>,
 ) {
-  (await EventModel.create(req.body)).save();
-  // try {
-  //   const body: Event = req.body;
-  //   await mongoService.insertOne('events', body);
+  // TODO: create/use remainder of validation rules
+  const rules = Joi.object<CreateEventDTO>({
+    title: validators.title().required(),
+  });
 
-  //   res.status(201).send('OK');
-  // } catch (err) {
-  //   console.error(`Error while creating event`, err.message);
-  //   next(err);
-
-  //   res.status(501).send('Internal Server Error');
-  // }
+  const formData = validate(rules, req.body);
+  const eventDoc = await EventModel.create(formData);
+  res.status(StatusCodes.CREATED).send({
+    id: eventDoc._id,
+    startTime: eventDoc.startTime,
+    title: eventDoc.title,
+    status: eventDoc.status,
+    endTime: eventDoc.endTime,
+    attendees: eventDoc.attendees,
+    description: eventDoc.description,
+    location: eventDoc.location,
+  });
 }
 
-// export async function updateEvent(
-//   req: Request,
-//   res: Response,
-//   next: NextFunction,
-// ) {
-//   try {
-//     const body: Event = req.body;
+// TODO: Add auth middleware to this
+export async function updateEventById(
+  req: TypedRequestBody<UpdateEventDTO>,
+  res: Response<EventResponseDTO>,
+) {
+  // TODO: create/use remainder of validation rules
+  const rules = Joi.object<CreateEventDTO>({
+    title: validators.title().required(),
+  });
 
-//     // await mongoService.updateOne('events', body);
+  const formData = validate(rules, req.body);
+  const id = convertToObjectId(req.params.id);
+  const eventDoc = await EventModel.findOneAndUpdate(
+    { _id: id },
+    { $set: formData },
+    { new: true },
+  );
 
-//     res.status(204).send('OK');
-//   } catch (err) {
-//     console.error(`Error while updating event`, err.message);
-//     next(err);
+  if (!eventDoc) {
+    throw new ServerError('event not found', StatusCodes.BAD_REQUEST);
+  } else {
+    res.status(StatusCodes.OK).send({
+      id: eventDoc._id,
+      startTime: eventDoc.startTime,
+      title: eventDoc.title,
+      status: eventDoc.status,
+      endTime: eventDoc.endTime,
+      attendees: eventDoc.attendees,
+      description: eventDoc.description,
+      location: eventDoc.location,
+    });
+  }
+}
 
-//     res.status(501).send('Internal Server Error');
-//   }
-// }
-
-// export async function deleteEvent(
-//   req: Request,
-//   res: Response,
-//   next: NextFunction,
-// ) {
-//   try {
-//     await mongoService.deleteOne('events', {
-//       uuid: req.params.eventId,
-//     });
-
-//     res.status(204);
-//   } catch (err) {
-//     console.error(`Error while deleting event`, err.message);
-//     next(err);
-
-//     res.status(501).send('Internal Server Error');
-//   }
-// }
+// TODO: Add auth middleware to this
+export async function deleteEventById(req: Request, res: Response) {
+  const id = convertToObjectId(req.params.id);
+  const result = await EventModel.deleteOne({ _id: id });
+  if (result.deletedCount === 0) {
+    throw new ServerError('event not found', StatusCodes.NOT_FOUND, result);
+  } else {
+    res.status(StatusCodes.NO_CONTENT).send();
+  }
+}

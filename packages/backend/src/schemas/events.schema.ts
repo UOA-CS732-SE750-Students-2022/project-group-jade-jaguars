@@ -8,12 +8,12 @@ export enum EventStatus {
   Cancelled,
 }
 
-interface IEvent {
+export interface IEvent {
   startTime: number;
   title: string;
   status: EventStatus;
   endTime: number;
-  attendees: Schema.Types.ObjectId[];
+  attendees: mongoose.Types.ObjectId[];
   description: string[];
   location: string;
 }
@@ -37,7 +37,7 @@ const eventSchema = new Schema({
     required: true,
   },
   attendees: {
-    type: [Schema.Types.ObjectId],
+    type: [mongoose.Types.ObjectId],
     ref: 'User',
     required: true,
   },

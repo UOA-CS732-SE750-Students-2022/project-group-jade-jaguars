@@ -1,19 +1,19 @@
 import express from 'express';
 import {
-  getEvent,
   createEvent,
-  // deleteEvent,
-  // updateEvent,
+  updateEventById,
+  deleteEventById,
+  getEventById,
 } from '../controllers/events.controller';
 export const eventsRouter = express.Router();
 
 /**
  * @swagger
- * /event/{uuid}:
+ * /event/{id}:
  *   get:
  *     description: Get a single event by UUID
  *     parameters:
- *     - name: "uuid"
+ *     - name: "id"
  *       in: "path"
  *     responses:
  *       200:
@@ -23,7 +23,7 @@ export const eventsRouter = express.Router();
  *       501:
  *         description: Internal Server Error
  */
-eventsRouter.get('/event/:eventId', getEvent);
+eventsRouter.get('/event/:id', getEventById);
 
 /**
  * @swagger
@@ -54,7 +54,7 @@ eventsRouter.post('/event', createEvent);
  *       501:
  *         description: Internal Server Error
  */
-// eventsRouter.put('/event', updateEvent);
+eventsRouter.put('/event/:id', updateEventById);
 
 /**
  * @swagger
@@ -75,4 +75,4 @@ eventsRouter.post('/event', createEvent);
  *       501:
  *         description: Internal Server Error
  */
-// eventsRouter.delete('/event/:eventId', deleteEvent);
+eventsRouter.delete('/event/:id', deleteEventById);
