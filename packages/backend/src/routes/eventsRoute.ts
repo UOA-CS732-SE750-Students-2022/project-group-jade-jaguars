@@ -11,6 +11,7 @@ export const EVENTS_ROUTER = express.Router();
  * @swagger
  * /event/{uuid}:
  *   get:
+ *     tags: [Events]
  *     description: Get a single event by UUID
  *     parameters:
  *     - name: "uuid"
@@ -29,7 +30,30 @@ EVENTS_ROUTER.get('/event/:eventId', getEvent);
  * @swagger
  * /event:
  *   post:
+ *     tags: [Events]
  *     description: Create a new Event
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               title:
+ *                 type: string
+ *                 example: title
+ *               eventAdmin:
+ *                 type: string[]
+ *                 example: ["uuid"]
+ *               description:
+ *                 type: string
+ *                 example: "Description"
+ *               location:
+ *                 type: string
+ *                 example: "Location of the event"
+ *               availability:
+ *                 type: object
+ *                 example: < EventAvailability >
  *     responses:
  *       201:
  *         description: Created
@@ -42,10 +66,33 @@ EVENTS_ROUTER.post('/event', createEvent);
  * @swagger
  * /event/{uuid}:
  *   put:
- *     description: Update an event by UUID
- *     parameters:
- *     - name: "uuid"
- *       in: "path"
+ *     tags: [Events]
+ *     description: Create a new Event
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               title:
+ *                 type: string
+ *                 example: title
+ *               eventAdmin:
+ *                 type: string[]
+ *                 example: ["uuid"]
+ *               uuid:
+ *                 type: string
+ *                 example: "uuid"
+ *               description:
+ *                 type: string
+ *                 example: "Description"
+ *               location:
+ *                 type: string
+ *                 example: "Location of the event"
+ *               availability:
+ *                 type: object
+ *                 example: < EventAvailability >
  *     responses:
  *       204:
  *         description: Updated
@@ -60,6 +107,7 @@ EVENTS_ROUTER.put('/event', updateEvent);
  * @swagger
  * /event/{uuid}:
  *   delete:
+ *     tags: [Events]
  *     description: Delete an event by UUID
  *     parameters:
  *     - name: "uuid"
