@@ -25,10 +25,11 @@ const definition = {
   },
   servers: [
     {
-      url: `http://localhost:${PORT}/`,
+      url: `http://localhost:${PORT}${BASE_URL}`,
     },
   ],
   host: `localhost:${PORT}`,
+
   securityDefinitions: {
     bearerAuth: {
       type: 'apiKey',
@@ -41,13 +42,13 @@ const definition = {
 
 const options = {
   definition,
-  apis: ['**/*.ts'],
+  apis: ['**/*.ts', './swaggerTypes.json'],
 };
 
 function initialize() {
+  APP.use(express.json());
   APP.use(BASE_URL, ROUTER);
   APP.use(BASE_URL, EVENTS_ROUTER);
-  APP.use(express.json());
 
   APP.use(
     `${BASE_URL}/docs`,
