@@ -89,3 +89,37 @@ export async function deleteEvent(
     res.status(501).send('Internal Server Error');
   }
 }
+
+export async function addUser(
+  req: express.Request,
+  res: express.Response,
+  next: express.NextFunction,
+) {
+  try {
+    // TODO: add user to event
+
+    res.status(204);
+  } catch (err) {
+    console.error(`Error while inviting to event`, err.message);
+    next(err);
+
+    res.status(501).send('Internal Server Error');
+  }
+}
+
+export async function removeUser(
+  req: express.Request,
+  res: express.Response,
+  next: express.NextFunction,
+) {
+  try {
+    // TODO: remove user to team
+
+    res.status(204);
+  } catch (err) {
+    console.error(`Error while removing user from event`, err.message);
+    next(err);
+
+    res.status(501).send('Internal Server Error');
+  }
+}

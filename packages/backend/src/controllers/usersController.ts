@@ -33,7 +33,8 @@ export async function createUser(
 ) {
   try {
     const body: User = req.body;
-    body.uuid = v4();
+
+    body.uuid = body.uuid ?? v4();
 
     await mongoService.insertOne('users', body);
 
