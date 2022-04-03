@@ -1,3 +1,5 @@
+import { TEAMS_ROUTER } from './routes/teamsRoute';
+import { USERS_ROUTER } from './routes/usersRoute';
 import express from 'express';
 import dotenv from 'dotenv';
 import swaggerUi from 'swagger-ui-express';
@@ -49,6 +51,8 @@ function initialize() {
   APP.use(express.json());
   APP.use(BASE_URL, ROUTER);
   APP.use(BASE_URL, EVENTS_ROUTER);
+  APP.use(BASE_URL, USERS_ROUTER);
+  APP.use(BASE_URL, TEAMS_ROUTER);
 
   APP.use(
     `${BASE_URL}/docs`,

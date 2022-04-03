@@ -3,14 +3,14 @@ export interface Team {
   title: string;
   description?: string;
 
-  color: Colour; //
+  color: Color; // ENUM
   admin: string; // uuid
   members: string[]; // uuid
   events: string[]; // uuid
   uuid: string;
 }
 
-export enum Colour {
+export enum Color {
   RED,
   GREEN,
   BLUE,

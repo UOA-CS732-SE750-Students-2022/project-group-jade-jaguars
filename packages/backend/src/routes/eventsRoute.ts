@@ -4,6 +4,8 @@ import {
   createEvent,
   deleteEvent,
   updateEvent,
+  addUser,
+  removeUser,
 } from './../controllers/eventsController';
 export const EVENTS_ROUTER = express.Router();
 
@@ -64,7 +66,7 @@ EVENTS_ROUTER.post('/event', createEvent);
 
 /**
  * @swagger
- * /event/{uuid}:
+ * /event:
  *   put:
  *     tags: [Events]
  *     description: Create a new Event
@@ -124,3 +126,61 @@ EVENTS_ROUTER.put('/event', updateEvent);
  *         description: Internal Server Error
  */
 EVENTS_ROUTER.delete('/event/:eventId', deleteEvent);
+
+/**
+ * @swagger
+ * /event/invite-user:
+ *   patch:
+ *     tags: [Events]
+ *     description: invites a user to a Events
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               eventUuid:
+ *                 type: string
+ *                 example: 00000000-0000-0000-0000-000000000000
+ *               userUuid:
+ *                 type: string
+ *                 example: 00000000-0000-0000-0000-000000000000
+ *     responses:
+ *       204:
+ *         description: Updated
+ *       404:
+ *         description: Events or User not found
+ *       501:
+ *         description: Internal Server Error
+ */
+EVENTS_ROUTER.patch('/event/invite-user', addUser);
+
+/**
+ * @swagger
+ * /event/remove-user:
+ *   patch:
+ *     tags: [Events]
+ *     description: removes a user to a Events
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               eventUuid:
+ *                 type: string
+ *                 example: 00000000-0000-0000-0000-000000000000
+ *               userUuid:
+ *                 type: string
+ *                 example: 00000000-0000-0000-0000-000000000000
+ *     responses:
+ *       204:
+ *         description: removed
+ *       404:
+ *         description: Events or User not found
+ *       501:
+ *         description: Internal Server Error
+ */
+EVENTS_ROUTER.patch('/event/remove-user', removeUser);

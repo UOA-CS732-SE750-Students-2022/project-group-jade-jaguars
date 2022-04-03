@@ -33,6 +33,19 @@ USERS_ROUTER.get('/user/:userId', getUser);
  *   post:
  *     tags: [Users]
  *     description: Create a new User
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               Name:
+ *                 type: string
+ *                 example: name
+ *               uuid:
+ *                 type: string
+ *                 example: "Firebase Auth UUID"
  *     responses:
  *       201:
  *         description: Created
@@ -43,7 +56,7 @@ USERS_ROUTER.post('/user', createUser);
 
 /**
  * @swagger
- * /user/{uuid}:
+ * /user/:
  *   put:
  *     tags: [Users]
  *     description: Update an user by UUID
