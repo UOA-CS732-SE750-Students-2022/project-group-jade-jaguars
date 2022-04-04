@@ -27,6 +27,7 @@ const CheckBoxList = () => {
         const inputStyle = `ml-3 border-solid border-black border-2`;
         return (
           <Checkbox
+            key={index}
             color={color}
             label={team}
             classNames={{
