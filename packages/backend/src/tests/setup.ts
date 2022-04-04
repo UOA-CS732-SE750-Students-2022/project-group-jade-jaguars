@@ -4,7 +4,7 @@ import { MongoMemoryServer } from 'mongodb-memory-server';
 let mongoServer, databaseURI;
 
 beforeAll(async () => {
-  jest.setTimeout(10000);
+  jest.setTimeout(100000);
 
   mongoServer = await MongoMemoryServer.create();
   databaseURI = mongoServer.getUri() + 'tests';

@@ -63,8 +63,8 @@ export async function createEvent(
   const rules = Joi.object<CreateEventDTO>({
     title: validators.title().required(),
   });
+  const formData = validate(rules, req.body, { allowUnknown: true });
 
-  const formData = validate(rules, req.body);
   const eventDoc = await EventModel.create(formData);
   res.status(StatusCodes.CREATED).send({
     id: eventDoc._id,

@@ -52,21 +52,18 @@ const options = {
 async function initialize() {
   app.use(BASE_URL, router);
   app.use(BASE_URL, eventsRouter);
-  app.use(BASE_URL, usersRouter);
+  // app.use(BASE_URL, usersRouter);
+
   app.use(express.json());
 
-  console.log(`serving swagger on: https://localhost:${PORT}${BASE_URL}/docs`);
   app.use(
     `${BASE_URL}/docs`,
     swaggerUi.serve,
     swaggerUi.setup(swaggerJsdoc(options)),
   );
+  console.log(`serving swagger on: http://localhost:${PORT}${BASE_URL}/docs`);
 
   // ROUTER.get('/', () => {});
-
-  console.log(`================`);
-  console.log(`NODE_ENV: ${process.env.NODE_ENV}`);
-  console.log(`================`);
 
   if (process.env.NODE_ENV !== 'testing') {
     await mongoose.connect(DATABASE_URL);
