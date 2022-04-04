@@ -84,11 +84,11 @@ export async function updateEventById(
   res: Response<EventResponseDTO>,
 ) {
   // TODO: create/use remainder of validation rules
-  const rules = Joi.object<CreateEventDTO>({
+  const rules = Joi.object<UpdateEventDTO>({
     title: validators.title().required(),
   });
 
-  const formData = validate(rules, req.body);
+  const formData = validate(rules, req.body, { allowUnknown: true });
   const id = convertToObjectId(req.params.id);
   const eventDoc = await EventModel.findOneAndUpdate(
     { _id: id },
