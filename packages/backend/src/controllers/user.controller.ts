@@ -1,14 +1,14 @@
 // import { mongoService } from '../services/mongo.service';
-import { IUser, UserModel } from '../schemas/users.schema';
+import { IUser, UserModel } from '../schemas/user.schema';
 import { Request, Response } from 'express';
 import { Types } from 'mongoose';
 import {
   convertToObjectId,
   ServerError,
   TypedRequestBody,
-} from '..//libs/utils.lib';
+} from '../libs/utils.lib';
 import Joi from 'joi';
-import { validate, validators } from '..//libs/validate.lib';
+import { validate, validators } from '../libs/validate.lib';
 import { StatusCodes } from 'http-status-codes';
 interface CreateUserDTO {
   firstName: string;

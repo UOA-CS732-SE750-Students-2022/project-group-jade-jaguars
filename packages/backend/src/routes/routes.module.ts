@@ -1,2 +1,2 @@
-export * from './events.route';
-export * from './users.route';
+export * from './event.route';
+export * from './user.route';

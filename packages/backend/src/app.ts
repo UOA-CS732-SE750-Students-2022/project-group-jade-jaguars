@@ -10,6 +10,7 @@ import {
 } from './configs/backend.config';
 import mongoose from 'mongoose';
 import bodyParser from 'body-parser';
+import { teamRouter } from './routes/team.route';
 
 const app = express();
 app.use(bodyParser.json());
@@ -50,9 +51,11 @@ const options = {
 };
 
 async function initialize() {
+  // Initialize endpoints
   app.use(BASE_URL, router);
   app.use(BASE_URL, eventsRouter);
   app.use(BASE_URL, usersRouter);
+  app.use(BASE_URL, teamRouter);
 
   app.use(express.json());
 

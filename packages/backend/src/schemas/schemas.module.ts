@@ -1,2 +1,2 @@
-export * from './events.schema';
-export * from './users.schema';
+export * from './event.schema';
+export * from './user.schema';

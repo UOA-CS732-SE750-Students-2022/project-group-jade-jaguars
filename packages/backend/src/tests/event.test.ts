@@ -1,6 +1,6 @@
 import app from '../app';
 import request from 'supertest';
-import { EventStatus } from '../schemas/events.schema';
+import { EventStatus } from '../schemas/event.schema';
 import { StatusCodes } from 'http-status-codes';
 
 describe('Events', () => {

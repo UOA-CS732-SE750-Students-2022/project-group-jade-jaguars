@@ -40,6 +40,7 @@ const eventSchema = new Schema({
     type: [Types.ObjectId],
     ref: 'User',
     required: true,
+    default: [],
   },
   description: {
     type: [String],

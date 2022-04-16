@@ -5,17 +5,21 @@ import { ServerError } from './utils.lib';
 const username = () => Joi.string().min(3).alphanum();
 const password = () => Joi.string().min(6);
 const title = () => Joi.string().min(3);
+const description = () => Joi.string().min(3);
 const firstName = () => Joi.string().min(1);
 const lastName = () => Joi.string().min(1);
 const objectId = () => Joi.string().hex().length(24);
+const objectIds = () => Joi.array().items(Joi.string().hex().length(24));
 
 export const validators = {
   username,
   password,
   title,
+  description,
   firstName,
   lastName,
   objectId,
+  objectIds,
 };
 
 export function validate<T>(

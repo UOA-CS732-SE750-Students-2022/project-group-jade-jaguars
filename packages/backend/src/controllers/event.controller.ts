@@ -1,4 +1,4 @@
-import { EventModel, EventStatus, IEvent } from '../schemas/events.schema';
+import { EventModel, EventStatus, IEvent } from '../schemas/event.schema';
 import { Request, Response, NextFunction } from 'express';
 import { StatusCodes } from 'http-status-codes';
 import {

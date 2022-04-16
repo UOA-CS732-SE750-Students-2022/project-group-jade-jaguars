@@ -1,53 +1,48 @@
 import express from 'express';
-import // getUser,
-// createUser,
-// deleteUser,
-// updateUser,
-'../controllers/users.controller';
 import {
-  createUser,
-  deleteUserById,
-  getUserById,
-  updateUserById,
-} from '../controllers/users.controller';
-export const usersRouter = express.Router();
+  createEvent,
+  updateEventById,
+  deleteEventById,
+  getEventById,
+} from '../controllers/event.controller';
+export const eventsRouter = express.Router();
 
 /**
  * @swagger
- * /user/{uuid}:
+ * /event/{id}:
  *   get:
- *     description: Get a single user by UUID
+ *     description: Get a single event by UUID
  *     parameters:
- *     - name: "uuid"
+ *     - name: "id"
  *       in: "path"
  *     responses:
  *       200:
- *         description: Returns user data
+ *         description: Returns event data
  *       404:
- *         description: User not found
+ *         description: Event not found
  *       501:
  *         description: Internal Server Error
  */
-usersRouter.get('/user/:id', getUserById);
+eventsRouter.get('/event/:id', getEventById);
 
 /**
  * @swagger
- * /user:
+ * /event:
  *   post:
- *     description: Create a new User
+ *     description: Create a new Event
  *     responses:
  *       201:
  *         description: Created
  *       501:
  *         description: Internal Server Error
  */
-usersRouter.post('/user', createUser);
+eventsRouter.post('/event', createEvent);
 
 /**
  * @swagger
- * /user/{uuid}:
+ * /event/{uuid}:
  *   put:
- *     description: Update an user by UUID
+ *     description: Update an event by UUID
  *     parameters:
  *     - name: "uuid"
  *       in: "path"
@@ -55,17 +50,17 @@ usersRouter.post('/user', createUser);
  *       204:
  *         description: Updated
  *       404:
- *         description: User not found
+ *         description: Event not found
  *       501:
  *         description: Internal Server Error
  */
-usersRouter.put('/user/:id', updateUserById);
+eventsRouter.put('/event/:id', updateEventById);
 
 /**
  * @swagger
- * /user/{uuid}:
+ * /event/{uuid}:
  *   delete:
- *     description: Delete an user by UUID
+ *     description: Delete an event by UUID
  *     parameters:
  *     - name: "uuid"
  *       in: "path"
@@ -74,10 +69,10 @@ usersRouter.put('/user/:id', updateUserById);
  *       204:
  *         description: Deleted
  *       404:
- *         description: User not found
+ *         description: Event not found
  *       418:
  *         description: I'm a teapot
  *       501:
  *         description: Internal Server Error
  */
-usersRouter.delete('/user/:id', deleteUserById);
+eventsRouter.delete('/event/:id', deleteEventById);
