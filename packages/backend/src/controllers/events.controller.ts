@@ -6,7 +6,7 @@ import {
   ServerError,
   TypedRequestBody,
 } from '../libs/utils.lib';
-import mongoose from 'mongoose';
+import { Types } from 'mongoose';
 import Joi from 'joi';
 import { validate, validators } from '../libs/validate.lib';
 
@@ -16,18 +16,18 @@ interface CreateEventDTO {
   title: string;
   status: EventStatus;
   endTime: number;
-  attendees: mongoose.Types.ObjectId[];
+  attendees: Types.ObjectId[];
   description: string[];
   location: string;
 }
 
 interface EventResponseDTO {
-  id: mongoose.Types.ObjectId;
+  id: Types.ObjectId;
   startTime: number;
   title: string;
   status: EventStatus;
   endTime: number;
-  attendees: mongoose.Types.ObjectId[];
+  attendees: Types.ObjectId[];
   description: string[];
   location: string;
 }
@@ -89,9 +89,9 @@ export async function updateEventById(
   });
 
   const formData = validate(rules, req.body, { allowUnknown: true });
-  const id = convertToObjectId(req.params.id);
+  const eventId = convertToObjectId(req.params.id);
   const eventDoc = await EventModel.findOneAndUpdate(
-    { _id: id },
+    { _id: eventId },
     { $set: formData },
     { new: true },
   );
@@ -114,8 +114,8 @@ export async function updateEventById(
 
 // TODO: Add auth middleware to this
 export async function deleteEventById(req: Request, res: Response) {
-  const id = convertToObjectId(req.params.id);
-  const result = await EventModel.deleteOne({ _id: id });
+  const eventId = convertToObjectId(req.params.id);
+  const result = await EventModel.deleteOne({ _id: eventId });
   if (result.deletedCount === 0) {
     throw new ServerError('event not found', StatusCodes.NOT_FOUND, result);
   } else {

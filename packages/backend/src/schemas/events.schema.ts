@@ -13,7 +13,7 @@ export interface IEvent {
   title: string;
   status: EventStatus;
   endTime: number;
-  attendees: mongoose.Types.ObjectId[];
+  attendees: Types.ObjectId[];
   description: string[];
   location: string;
 }
@@ -37,7 +37,7 @@ const eventSchema = new Schema({
     required: true,
   },
   attendees: {
-    type: [mongoose.Types.ObjectId],
+    type: [Types.ObjectId],
     ref: 'User',
     required: true,
   },

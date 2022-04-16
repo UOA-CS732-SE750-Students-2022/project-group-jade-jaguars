@@ -11,7 +11,7 @@
     "start": "ts-node ./src/app.ts",
     "start:dev": "nodemon",
     "start:prod": "node dist/app",
-    "test": "cross-env NODE_ENV=testing jest",
+    "test": "cross-env NODE_ENV=testing jest --run-in-band",
     "coverage": "cross-env NODE_ENV=testing nyc npm run test"
   },
   "dependencies": {

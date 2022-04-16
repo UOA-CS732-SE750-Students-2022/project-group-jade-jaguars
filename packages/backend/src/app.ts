@@ -52,7 +52,7 @@ const options = {
 async function initialize() {
   app.use(BASE_URL, router);
   app.use(BASE_URL, eventsRouter);
-  // app.use(BASE_URL, usersRouter);
+  app.use(BASE_URL, usersRouter);
 
   app.use(express.json());
 
@@ -68,14 +68,13 @@ async function initialize() {
   if (process.env.NODE_ENV !== 'testing') {
     await mongoose.connect(DATABASE_URL);
     console.log(`Database connected: ${DATABASE_URL}`);
+    app.listen(PORT, () => {
+      if (!VERBOSE) {
+        console.clear();
+      }
+      console.log(`app on - https://localhost:${PORT}`);
+    });
   }
-
-  app.listen(PORT, () => {
-    if (!VERBOSE) {
-      console.clear();
-    }
-    console.log(`app on - https://localhost:${PORT}`);
-  });
 }
 
 initialize();
