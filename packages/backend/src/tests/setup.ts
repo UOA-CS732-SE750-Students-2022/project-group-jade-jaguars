@@ -9,8 +9,6 @@ beforeAll(async () => {
   mongoServer = await MongoMemoryServer.create();
   databaseURI = mongoServer.getUri() + 'tests';
 
-  console.log(`started mongodb memory server at ${databaseURI}`);
-
   await mongoose.connect(databaseURI, {});
 });
 
@@ -21,5 +19,4 @@ beforeEach(async () => {
 
 afterAll(async () => {
   await mongoServer.stop();
-  console.log('stopped mongodb memory server');
 });

@@ -59,14 +59,13 @@ async function initialize() {
 
   app.use(express.json());
 
-  app.use(
-    `${BASE_URL}/docs`,
-    swaggerUi.serve,
-    swaggerUi.setup(swaggerJsdoc(options)),
-  );
-  console.log(`serving swagger on: http://localhost:${PORT}${BASE_URL}/docs`);
-
   if (process.env.NODE_ENV !== 'testing') {
+    app.use(
+      `${BASE_URL}/docs`,
+      swaggerUi.serve,
+      swaggerUi.setup(swaggerJsdoc(options)),
+    );
+    console.log(`serving swagger on: http://localhost:${PORT}${BASE_URL}/docs`);
     await mongoose.connect(DATABASE_URL);
     console.log(`Database connected: ${DATABASE_URL}`);
     app.listen(PORT, () => {
