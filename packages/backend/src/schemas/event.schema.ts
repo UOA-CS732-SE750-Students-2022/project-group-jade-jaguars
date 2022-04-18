@@ -1,5 +1,4 @@
-import mongoose from 'mongoose';
-import { Model, model, Document, Types, Schema, SchemaType } from 'mongoose';
+import { Model, model, Types, Schema } from 'mongoose';
 
 export enum EventStatus {
   Pending = 'Pending',

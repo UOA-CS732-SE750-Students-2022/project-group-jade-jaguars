@@ -4,8 +4,6 @@ export interface IUser {
   firstName: string;
   lastName: string;
   events: Types.ObjectId[];
-  // TODO: Add this in when we have teams setup
-  // teams: Types.ObjectId[];
 }
 
 const userSchema = new Schema<IUser>({

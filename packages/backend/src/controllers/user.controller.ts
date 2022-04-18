@@ -1,4 +1,3 @@
-// import { mongoService } from '../services/mongo.service';
 import { IUser, UserModel } from '../schemas/user.schema';
 import { Request, Response } from 'express';
 import { Types } from 'mongoose';
