@@ -1,9 +1,14 @@
 import { useState, useEffect, useRef } from 'react';
+import {
+  AvailabilityBlock,
+  AvailabilityStatus,
+} from '../types/AvailabilityBlock';
 import TimeBracket from '../types/TimeBracket';
 
 function AvailabilitySelector(props: {
   potentialTimes: TimeBracket[];
-  availability: TimeBracket[];
+  availability: AvailabilityBlock[];
+  status: AvailabilityStatus;
 }) {
   const firstRender = useRef(true);
   const [selecting, setSelecting] = useState<Boolean>(false);
@@ -12,7 +17,7 @@ function AvailabilitySelector(props: {
     {
       row: number;
       col: number;
-      selected: boolean;
+      status: AvailabilityStatus;
     }[]
   >([]);
 
@@ -20,7 +25,7 @@ function AvailabilitySelector(props: {
     {
       row: number;
       col: number;
-      selected: boolean;
+      status: AvailabilityStatus;
     }[]
   >([]);
 
@@ -45,11 +50,16 @@ function AvailabilitySelector(props: {
     let initialTimeSlots: {
       row: number;
       col: number;
-      selected: boolean;
+      status: AvailabilityStatus;
     }[] = [];
 
+    const numDays =
+      (props.potentialTimes[props.potentialTimes.length - 1].endTime -
+        props.potentialTimes[0].startTime) /
+      (1000 * 3600 * 24);
+
     for (let i = 0; i < halfHours; i++) {
-      for (let j = 0; j < props.potentialTimes.length; j++) {
+      for (let j = 0; j < numDays; j++) {
         const day = new Date(props.potentialTimes[j].startTime);
         let time = startTimeHours + 0.5 * i;
         if (startTimeMins == 30) {
@@ -71,19 +81,23 @@ function AvailabilitySelector(props: {
           hours,
           mins,
         );
-        let isSelected = false;
+        let currentStatus = AvailabilityStatus.Unavailable;
         for (let index in props.availability) {
+          if (
+            props.availability[index].status == AvailabilityStatus.Unavailable
+          )
+            continue;
           const startDT = new Date(props.availability[index].startTime);
           const endDT = new Date(props.availability[index].endTime);
           if (datetime >= startDT && datetime < endDT) {
-            isSelected = true;
+            currentStatus = props.availability[index].status;
             break;
           }
         }
         initialTimeSlots.push({
           row: i,
           col: j,
-          selected: isSelected,
+          status: currentStatus,
         });
       }
     }
@@ -101,10 +115,16 @@ function AvailabilitySelector(props: {
     let newTimeSlots: {
       row: number;
       col: number;
-      selected: boolean;
+      status: AvailabilityStatus;
     }[] = timeSlots.map((object) => ({ ...object }));
     const index = 5 * start[0] + start[1];
-    newTimeSlots[index].selected = !newTimeSlots[index].selected;
+    if (newTimeSlots[index].status === props.status) {
+      newTimeSlots[index].status = AvailabilityStatus.Unavailable;
+    } else if (props.status === AvailabilityStatus.Available) {
+      newTimeSlots[index].status = AvailabilityStatus.Available;
+    } else {
+      newTimeSlots[index].status = AvailabilityStatus.Tentative;
+    }
     setSelection(newTimeSlots);
   }, start);
 
@@ -117,13 +137,19 @@ function AvailabilitySelector(props: {
     let newTimeSlots: {
       row: number;
       col: number;
-      selected: boolean;
+      status: AvailabilityStatus;
     }[] = timeSlots.map((object) => ({ ...object }));
 
     for (let i = row1; i <= row2; i++) {
       for (let j = col1; j <= col2; j++) {
         const index = 5 * i + j;
-        newTimeSlots[index].selected = !timeSlots[index].selected;
+        if (newTimeSlots[index].status === props.status) {
+          newTimeSlots[index].status = AvailabilityStatus.Unavailable;
+        } else if (props.status === AvailabilityStatus.Available) {
+          newTimeSlots[index].status = AvailabilityStatus.Available;
+        } else {
+          newTimeSlots[index].status = AvailabilityStatus.Tentative;
+        }
       }
     }
 
@@ -146,11 +172,19 @@ function AvailabilitySelector(props: {
         <div
           className="timeslot"
           key={index}
-          style={
-            selection[index].selected
-              ? { backgroundColor: 'green' }
-              : { backgroundColor: 'white' }
-          }
+          style={{
+            backgroundColor: (() => {
+              if (selection[index].status === AvailabilityStatus.Available) {
+                return 'green';
+              } else if (
+                selection[index].status === AvailabilityStatus.Tentative
+              ) {
+                return 'yellow';
+              } else {
+                return 'white';
+              }
+            })(),
+          }}
           onPointerDown={() => setStart([timeSlot.row, timeSlot.col])}
           onPointerEnter={() => {
             if (selecting) {
