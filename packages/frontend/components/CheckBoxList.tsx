@@ -1,4 +1,5 @@
 import { Checkbox, ScrollArea } from '@mantine/core';
+import { useHover } from '@mantine/hooks';
 import React from 'react';
 
 const CheckBoxList = () => {
@@ -24,25 +25,30 @@ const CheckBoxList = () => {
       {teamList.map((team, index) => {
         const color = 'teal';
         const inputBackgroundColor = inputBackgroundColorList[index % 5];
-        const inputStyle = `ml-3 border-solid border-black border-2`;
+        const inputStyle = `ml-3 border-solid border-black border-2 cursor-pointer`;
+        const { hovered, ref } = useHover();
         return (
-          <Checkbox
-            key={index}
-            color={color}
-            label={team}
-            classNames={{
-              root: 'hover:bg-[#99C08B] w-full h-full rounded-md',
-              label: 'w-full p-2 ml-3 hover:text-white',
-              input: inputStyle,
-              icon: 'ml-[17px] text-black',
-            }}
-            styles={{
-              input: {
-                backgroundColor: inputBackgroundColor,
-                color: inputBackgroundColor,
-              },
-            }}
-          />
+          <div ref={ref} key={index}>
+            <Checkbox
+              key={index}
+              color={color}
+              label={team}
+              classNames={{
+                root: 'hover:bg-[#99C08B] w-full h-full rounded-md',
+                label: hovered
+                  ? 'w-full p-2 ml-3 text-white cursor-pointer'
+                  : 'w-full p-2 ml-3 text-black cursor-pointer',
+                input: inputStyle,
+                icon: 'ml-[17px] text-black cursor-pointer',
+              }}
+              styles={{
+                input: {
+                  backgroundColor: inputBackgroundColor,
+                  color: inputBackgroundColor,
+                },
+              }}
+            />
+          </div>
         );
       })}
     </ScrollArea>
