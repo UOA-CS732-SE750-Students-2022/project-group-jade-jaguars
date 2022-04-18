@@ -5,6 +5,7 @@ import {
 } from '../types/AvailabilityBlock';
 import TimeBracket from '../types/TimeBracket';
 
+// Assumption: no more than 7 days sent through as potentialTimes.
 function AvailabilitySelector(props: {
   potentialTimes: TimeBracket[];
   availability: AvailabilityBlock[];
@@ -47,20 +48,49 @@ function AvailabilitySelector(props: {
       halfHours--;
     }
 
+    let timeList = props.potentialTimes;
+
+    if (
+      !(
+        endTime.getFullYear() === startTime.getFullYear() &&
+        endTime.getMonth() === startTime.getMonth() &&
+        endTime.getDate() === startTime.getDate()
+      )
+    ) {
+      timeList = [];
+      for (let index in props.potentialTimes) {
+        let myStartTime = new Date(props.potentialTimes[index].startTime);
+        const finalEndTime = new Date(props.potentialTimes[index].endTime);
+        const daysInTB =
+          (finalEndTime.getTime() - myStartTime.getTime()) /
+            (1000 * 3600 * 24) +
+          1;
+
+        for (let i = 0; i < daysInTB; i++) {
+          let myEndTime = new Date(myStartTime);
+          myEndTime.setHours(23);
+          myEndTime.setMinutes(59);
+          timeList.push({
+            startTime: myStartTime.getTime(),
+            endTime: myEndTime.getTime(),
+          });
+          myStartTime = new Date(myEndTime);
+        }
+      }
+      halfHours = 48;
+    }
+
     let initialTimeSlots: {
       row: number;
       col: number;
       status: AvailabilityStatus;
     }[] = [];
 
-    const numDays =
-      (props.potentialTimes[props.potentialTimes.length - 1].endTime -
-        props.potentialTimes[0].startTime) /
-      (1000 * 3600 * 24);
+    const numDays = timeList.length;
 
     for (let i = 0; i < halfHours; i++) {
       for (let j = 0; j < numDays; j++) {
-        const day = new Date(props.potentialTimes[j].startTime);
+        const day = new Date(timeList[j].startTime);
         let time = startTimeHours + 0.5 * i;
         if (startTimeMins == 30) {
           time += 0.5;
@@ -116,7 +146,7 @@ function AvailabilitySelector(props: {
       row: number;
       col: number;
       status: AvailabilityStatus;
-    }[] = timeSlots.map((object) => ({ ...object }));
+    }[] = timeSlots.flatMap((object) => ({ ...object }));
     const index = 5 * start[0] + start[1];
     if (newTimeSlots[index].status === props.status) {
       newTimeSlots[index].status = AvailabilityStatus.Unavailable;
