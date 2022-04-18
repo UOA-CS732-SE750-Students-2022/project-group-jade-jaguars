@@ -12,6 +12,7 @@ function AvailabilitySelector(props: {
   status: AvailabilityStatus;
 }) {
   const firstRender = useRef(true);
+  const [isLoading, setIsLoading] = useState<Boolean>(true);
   const [selecting, setSelecting] = useState<Boolean>(false);
   const [start, setStart] = useState<number[]>([-1, -1]);
   const [timeSlots, setTimeSlots] = useState<
@@ -29,6 +30,8 @@ function AvailabilitySelector(props: {
       status: AvailabilityStatus;
     }[]
   >([]);
+
+  const [numCols, setNumCols] = useState<number>(0);
 
   useEffect(() => {
     const startTime = new Date(props.potentialTimes[0].startTime);
@@ -62,19 +65,16 @@ function AvailabilitySelector(props: {
         let myStartTime = new Date(props.potentialTimes[index].startTime);
         const finalEndTime = new Date(props.potentialTimes[index].endTime);
         const daysInTB =
-          (finalEndTime.getTime() - myStartTime.getTime()) /
-            (1000 * 3600 * 24) +
-          1;
+          (finalEndTime.getTime() - myStartTime.getTime()) / (1000 * 3600 * 24);
 
         for (let i = 0; i < daysInTB; i++) {
           let myEndTime = new Date(myStartTime);
-          myEndTime.setHours(23);
-          myEndTime.setMinutes(59);
+          myEndTime.setDate(myStartTime.getDate() + 1);
           timeList.push({
             startTime: myStartTime.getTime(),
             endTime: myEndTime.getTime(),
           });
-          myStartTime = new Date(myEndTime);
+          myStartTime.setTime(myEndTime.getTime());
         }
       }
       halfHours = 48;
@@ -91,8 +91,10 @@ function AvailabilitySelector(props: {
     for (let i = 0; i < halfHours; i++) {
       for (let j = 0; j < numDays; j++) {
         const day = new Date(timeList[j].startTime);
-        let time = startTimeHours + 0.5 * i;
-        if (startTimeMins == 30) {
+        const dayHours = day.getHours();
+        let time = dayHours + 0.5 * i;
+        const dayMins = day.getMinutes();
+        if (dayMins == 30) {
           time += 0.5;
         }
         let hours;
@@ -132,12 +134,14 @@ function AvailabilitySelector(props: {
       }
     }
 
+    setNumCols(numDays);
     setTimeSlots(initialTimeSlots);
     setSelection(initialTimeSlots);
+    setIsLoading(false);
   }, [props.potentialTimes, props.availability]);
 
   useEffect(() => {
-    if (firstRender.current) {
+    if (firstRender.current || isLoading || start[0] === -1) {
       firstRender.current = false;
       return;
     }
@@ -146,8 +150,8 @@ function AvailabilitySelector(props: {
       row: number;
       col: number;
       status: AvailabilityStatus;
-    }[] = timeSlots.flatMap((object) => ({ ...object }));
-    const index = 5 * start[0] + start[1];
+    }[] = timeSlots.map((object) => ({ ...object }));
+    const index = numCols * start[0] + start[1];
     if (newTimeSlots[index].status === props.status) {
       newTimeSlots[index].status = AvailabilityStatus.Unavailable;
     } else if (props.status === AvailabilityStatus.Available) {
@@ -172,7 +176,7 @@ function AvailabilitySelector(props: {
 
     for (let i = row1; i <= row2; i++) {
       for (let j = col1; j <= col2; j++) {
-        const index = 5 * i + j;
+        const index = numCols * i + j;
         if (newTimeSlots[index].status === props.status) {
           newTimeSlots[index].status = AvailabilityStatus.Unavailable;
         } else if (props.status === AvailabilityStatus.Available) {
@@ -196,7 +200,7 @@ function AvailabilitySelector(props: {
   return (
     <div
       className="timeslotContainer"
-      style={{ gridTemplateColumns: 'repeat(5, 60px)' }}
+      style={{ gridTemplateColumns: 'repeat(' + numCols + ', 60px)' }}
     >
       {timeSlots.map((timeSlot, index) => (
         <div
