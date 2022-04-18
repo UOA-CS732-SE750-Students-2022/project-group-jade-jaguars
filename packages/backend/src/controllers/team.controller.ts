@@ -123,3 +123,14 @@ export async function deleteTeamById(req: Request, res: Response) {
     res.status(StatusCodes.NO_CONTENT).send();
   }
 }
+
+export async function addMemberById(req: Request, res: Response) {
+  // TODO: Add auth middleware to this
+  const teamId = convertToObjectId(req.params.id);
+  const result = await TeamModel.deleteOne({ _id: teamId });
+  if (result.deletedCount === 0) {
+    throw new ServerError('team not found', StatusCodes.NOT_FOUND, result);
+  } else {
+    res.status(StatusCodes.NO_CONTENT).send();
+  }
+}

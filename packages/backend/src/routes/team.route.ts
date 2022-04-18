@@ -7,7 +7,7 @@ import {
 } from '../controllers/team.controller';
 export const teamRouter = express.Router();
 
-// TODO: Update swagger doc comments
+// TODO: swagger docs
 teamRouter.get('/team/:id', getTeamById);
 teamRouter.post('/team', createTeam);
 teamRouter.put('/team/:id', updateTeamById);

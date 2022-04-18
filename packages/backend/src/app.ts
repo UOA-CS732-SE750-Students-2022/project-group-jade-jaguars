@@ -66,8 +66,6 @@ async function initialize() {
   );
   console.log(`serving swagger on: http://localhost:${PORT}${BASE_URL}/docs`);
 
-  // ROUTER.get('/', () => {});
-
   if (process.env.NODE_ENV !== 'testing') {
     await mongoose.connect(DATABASE_URL);
     console.log(`Database connected: ${DATABASE_URL}`);

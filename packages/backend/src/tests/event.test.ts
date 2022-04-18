@@ -1,6 +1,6 @@
 import app from '../app';
 import request from 'supertest';
-import { EventStatus } from '../schemas/event.schema';
+import { EventStatus, IEventAvailability } from '../schemas/event.schema';
 import { StatusCodes } from 'http-status-codes';
 
 describe('Events', () => {
@@ -8,16 +8,18 @@ describe('Events', () => {
     const eventCreateResponse = await request(app)
       .post('/api/v1/event')
       .send({
-        startTime: 0,
-        title: 'asdf',
+        title: 'title',
+        description: 'description',
         status: EventStatus.Accepted,
+        startTime: 0,
         endTime: 0,
+        availability: {} as IEventAvailability,
         attendees: ['01234e357ec3446e40e1b29b'],
-        description: ['comment1'],
-        location: 'location1',
+        location: 'location',
       })
       .expect(StatusCodes.CREATED);
 
+    console.log(eventCreateResponse.body);
     const eventId = eventCreateResponse.body.id;
 
     const eventGetResponse = await request(app)
@@ -30,13 +32,14 @@ describe('Events', () => {
     await request(app)
       .post('/api/v1/event')
       .send({
-        startTime: 0,
-        title: 'asdf',
+        title: 'title',
+        description: 'description',
         status: EventStatus.Accepted,
+        startTime: 0,
         endTime: 0,
+        availability: {} as IEventAvailability,
         attendees: ['01234e357ec3446e40e1b29b'],
-        description: ['comment1'],
-        location: 'location1',
+        location: 'location',
       })
       .expect(StatusCodes.CREATED);
   });
@@ -45,13 +48,14 @@ describe('Events', () => {
     const eventCreateResponse = await request(app)
       .post('/api/v1/event')
       .send({
-        startTime: 0,
-        title: 'asdf',
+        title: 'title',
+        description: 'description',
         status: EventStatus.Accepted,
+        startTime: 0,
         endTime: 0,
+        availability: {} as IEventAvailability,
         attendees: ['01234e357ec3446e40e1b29b'],
-        description: ['comment1'],
-        location: 'location1',
+        location: 'location',
       })
       .expect(StatusCodes.CREATED);
     const eventId = eventCreateResponse.body.id;
@@ -69,13 +73,14 @@ describe('Events', () => {
     const eventCreateResponse = await request(app)
       .post('/api/v1/event')
       .send({
-        startTime: 0,
-        title: 'asdf',
+        title: 'title',
+        description: 'description',
         status: EventStatus.Accepted,
+        startTime: 0,
         endTime: 0,
+        availability: {} as IEventAvailability,
         attendees: ['01234e357ec3446e40e1b29b'],
-        description: ['comment1'],
-        location: 'location1',
+        location: 'location',
       })
       .expect(StatusCodes.CREATED);
 

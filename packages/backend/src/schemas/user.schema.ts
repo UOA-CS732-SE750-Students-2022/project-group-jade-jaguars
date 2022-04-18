@@ -1,4 +1,5 @@
-import { Model, model, Document, Types, Schema } from 'mongoose';
+import { Model, model, Types, Schema } from 'mongoose';
+
 export interface IUser {
   firstName: string;
   lastName: string;
@@ -7,7 +8,7 @@ export interface IUser {
   // teams: Types.ObjectId[];
 }
 
-const userSchema = new Schema({
+const userSchema = new Schema<IUser>({
   firstName: {
     type: String,
     required: true,
@@ -17,7 +18,7 @@ const userSchema = new Schema({
     required: true,
   },
   events: {
-    type: [Types.ObjectId],
+    type: [Schema.Types.ObjectId],
     ref: 'Event',
     required: true,
     default: [],

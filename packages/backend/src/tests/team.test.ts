@@ -9,8 +9,8 @@ describe('Team', () => {
   let adminDoc;
   beforeEach(async () => {
     adminDoc = await UserModel.create({
-      firstName: 'firstname',
-      lastName: 'lastname',
+      firstName: 'firstName',
+      lastName: 'lastName',
     });
   });
   it('Get', async () => {

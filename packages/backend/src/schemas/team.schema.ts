@@ -1,7 +1,7 @@
 import { Model, model, Types, Schema } from 'mongoose';
 import { randomEnum } from '..//libs/utils.lib';
 
-// TODO: Replace this with a appropriate library
+// TODO: Replace this with a appropriate library or expand to whatever we need
 export enum Colour {
   RED,
   BLUE,

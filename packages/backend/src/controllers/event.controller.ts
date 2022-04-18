@@ -1,4 +1,9 @@
-import { EventModel, EventStatus, IEvent } from '../schemas/event.schema';
+import {
+  IEventAvailability,
+  EventModel,
+  EventStatus,
+  IEvent,
+} from '../schemas/event.schema';
 import { Request, Response, NextFunction } from 'express';
 import { StatusCodes } from 'http-status-codes';
 import {
@@ -12,23 +17,25 @@ import { validate, validators } from '../libs/validate.lib';
 
 // TODO: Change createdto for optional/generated fields
 interface CreateEventDTO {
-  startTime: number;
   title: string;
+  description: string;
   status: EventStatus;
+  startTime: number;
   endTime: number;
+  availability: IEventAvailability;
   attendees: Types.ObjectId[];
-  description: string[];
   location: string;
 }
 
 interface EventResponseDTO {
   id: Types.ObjectId;
-  startTime: number;
   title: string;
+  description: string;
   status: EventStatus;
+  startTime: number;
   endTime: number;
+  availability: IEventAvailability;
   attendees: Types.ObjectId[];
-  description: string[];
   location: string;
 }
 
@@ -45,10 +52,11 @@ export async function getEventById(
   }
   res.status(StatusCodes.OK).send({
     id: eventDoc._id,
-    startTime: eventDoc.startTime,
     title: eventDoc.title,
     status: eventDoc.status,
+    startTime: eventDoc.startTime,
     endTime: eventDoc.endTime,
+    availability: eventDoc.availability,
     attendees: eventDoc.attendees,
     description: eventDoc.description,
     location: eventDoc.location,
@@ -68,10 +76,11 @@ export async function createEvent(
   const eventDoc = await EventModel.create(formData);
   res.status(StatusCodes.CREATED).send({
     id: eventDoc._id,
-    startTime: eventDoc.startTime,
     title: eventDoc.title,
     status: eventDoc.status,
+    startTime: eventDoc.startTime,
     endTime: eventDoc.endTime,
+    availability: eventDoc.availability,
     attendees: eventDoc.attendees,
     description: eventDoc.description,
     location: eventDoc.location,
@@ -101,10 +110,11 @@ export async function updateEventById(
   } else {
     res.status(StatusCodes.OK).send({
       id: eventDoc._id,
-      startTime: eventDoc.startTime,
       title: eventDoc.title,
       status: eventDoc.status,
+      startTime: eventDoc.startTime,
       endTime: eventDoc.endTime,
+      availability: eventDoc.availability,
       attendees: eventDoc.attendees,
       description: eventDoc.description,
       location: eventDoc.location,
