@@ -51,7 +51,7 @@ function AvailabilitySelector(props: {
       halfHours--;
     }
     if (endTime.getMinutes() == 30) {
-      halfHours--;
+      halfHours++;
     }
 
     // timeList will contain the list of potential times split up among different days.
