@@ -5,16 +5,22 @@ import {
 } from '../types/AvailabilityBlock';
 import TimeBracket from '../types/TimeBracket';
 
-// Assumption: no more than 7 days sent through as potentialTimes.
+/*
+ *  Assumption: no more than 7 days sent through as potentialTimes.
+ *  Props: potentialTimes: a list of times that can be selected.
+ *         availability: a list of times that the user has previously specified their availability for (can be empty).
+ *         status: the current selection status.
+ */
 function AvailabilitySelector(props: {
   potentialTimes: TimeBracket[];
   availability: AvailabilityBlock[];
   status: AvailabilityStatus;
 }) {
-  const firstRender = useRef(true);
   const [isLoading, setIsLoading] = useState<Boolean>(true);
   const [selecting, setSelecting] = useState<Boolean>(false);
-  const [start, setStart] = useState<number[]>([-1, -1]);
+  const [start, setStart] = useState<number[]>([-1, -1]); // The row and column of the click.
+
+  // The status of the grid upon mouse release.
   const [timeSlots, setTimeSlots] = useState<
     {
       row: number;
@@ -23,6 +29,7 @@ function AvailabilitySelector(props: {
     }[]
   >([]);
 
+  // The status of the grid when dragging.
   const [selection, setSelection] = useState<
     {
       row: number;
@@ -33,26 +40,24 @@ function AvailabilitySelector(props: {
 
   const [numCols, setNumCols] = useState<number>(0);
 
+  // Initialise the grid.
   useEffect(() => {
     const startTime = new Date(props.potentialTimes[0].startTime);
-    const startTimeHours = startTime.getHours();
-    const startTimeMins = startTime.getMinutes();
     const endTime = new Date(props.potentialTimes[0].endTime);
-    const endTimeHours = endTime.getHours();
-    const endTimeMins = endTime.getMinutes();
-    const hours = endTimeHours - startTimeHours;
 
-    let halfHours = hours * 2;
+    let halfHours = (endTime.getHours() - startTime.getHours()) * 2;
 
-    if (startTimeMins == 30) {
+    if (startTime.getMinutes() == 30) {
       halfHours--;
     }
-    if (endTimeMins == 30) {
+    if (endTime.getMinutes() == 30) {
       halfHours--;
     }
 
+    // timeList will contain the list of potential times split up among different days.
     let timeList = props.potentialTimes;
 
+    // If the time brackets are between midnight and midnight, need to split up the days.
     if (
       !(
         endTime.getFullYear() === startTime.getFullYear() &&
@@ -61,12 +66,14 @@ function AvailabilitySelector(props: {
       )
     ) {
       timeList = [];
+      // Check each set of time brackets.
       for (let index in props.potentialTimes) {
         let myStartTime = new Date(props.potentialTimes[index].startTime);
         const finalEndTime = new Date(props.potentialTimes[index].endTime);
         const daysInTB =
-          (finalEndTime.getTime() - myStartTime.getTime()) / (1000 * 3600 * 24);
+          (finalEndTime.getTime() - myStartTime.getTime()) / (1000 * 3600 * 24); // How many days to split into.
 
+        // Separate out each day.
         for (let i = 0; i < daysInTB; i++) {
           let myEndTime = new Date(myStartTime);
           myEndTime.setDate(myStartTime.getDate() + 1);
@@ -88,13 +95,12 @@ function AvailabilitySelector(props: {
 
     const numDays = timeList.length;
 
+    // Map the time slots to grid items.
     for (let i = 0; i < halfHours; i++) {
       for (let j = 0; j < numDays; j++) {
         const day = new Date(timeList[j].startTime);
-        const dayHours = day.getHours();
-        let time = dayHours + 0.5 * i;
-        const dayMins = day.getMinutes();
-        if (dayMins == 30) {
+        let time = day.getHours() + 0.5 * i;
+        if (day.getMinutes() == 30) {
           time += 0.5;
         }
         let hours;
@@ -114,6 +120,7 @@ function AvailabilitySelector(props: {
           mins,
         );
         let currentStatus = AvailabilityStatus.Unavailable;
+        // Check whether user is available at this time.
         for (let index in props.availability) {
           if (
             props.availability[index].status == AvailabilityStatus.Unavailable
@@ -140,9 +147,9 @@ function AvailabilitySelector(props: {
     setIsLoading(false);
   }, [props.potentialTimes, props.availability]);
 
+  // Change grid on mouse down.
   useEffect(() => {
-    if (firstRender.current || isLoading || start[0] === -1) {
-      firstRender.current = false;
+    if (isLoading || start[0] === -1) {
       return;
     }
     setSelecting(true);
@@ -162,6 +169,7 @@ function AvailabilitySelector(props: {
     setSelection(newTimeSlots);
   }, start);
 
+  // Change grid when mouse over div.
   function updateSelection(end: number[]) {
     const row1 = Math.min(start[0], end[0]);
     const row2 = Math.max(start[0], end[0]);
@@ -174,6 +182,7 @@ function AvailabilitySelector(props: {
       status: AvailabilityStatus;
     }[] = timeSlots.map((object) => ({ ...object }));
 
+    // Update all divs between first mouse down and current mouse position.
     for (let i = row1; i <= row2; i++) {
       for (let j = col1; j <= col2; j++) {
         const index = numCols * i + j;
