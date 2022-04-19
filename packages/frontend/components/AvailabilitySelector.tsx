@@ -19,6 +19,9 @@ function AvailabilitySelector(props: {
   const [isLoading, setIsLoading] = useState<Boolean>(true);
   const [selecting, setSelecting] = useState<Boolean>(false);
   const [start, setStart] = useState<number[]>([-1, -1]); // The row and column of the click.
+  const [newStatus, setNewStatus] = useState<AvailabilityStatus>(
+    AvailabilityStatus.Unavailable,
+  );
 
   // The status of the grid upon mouse release.
   const [timeSlots, setTimeSlots] = useState<
@@ -167,6 +170,7 @@ function AvailabilitySelector(props: {
       newTimeSlots[index].status = AvailabilityStatus.Tentative;
     }
     setSelection(newTimeSlots);
+    setNewStatus(newTimeSlots[index].status);
   }, start);
 
   // Change grid when mouse over div.
@@ -186,13 +190,7 @@ function AvailabilitySelector(props: {
     for (let i = row1; i <= row2; i++) {
       for (let j = col1; j <= col2; j++) {
         const index = numCols * i + j;
-        if (newTimeSlots[index].status === props.status) {
-          newTimeSlots[index].status = AvailabilityStatus.Unavailable;
-        } else if (props.status === AvailabilityStatus.Available) {
-          newTimeSlots[index].status = AvailabilityStatus.Available;
-        } else {
-          newTimeSlots[index].status = AvailabilityStatus.Tentative;
-        }
+        newTimeSlots[index].status = newStatus;
       }
     }
 
