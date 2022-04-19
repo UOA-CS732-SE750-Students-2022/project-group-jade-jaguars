@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { DateRangePicker, TimeRangeInput } from '@mantine/dates';
-import { Box, Grid, Textarea, TextInput } from '@mantine/core';
+import { Box, Grid, Paper, Textarea, TextInput } from '@mantine/core';
 import dayjs from 'dayjs';
 interface FormValues {
   title: string;
@@ -13,35 +13,40 @@ const EventForm = () => {
     new Date(),
   ]);
   return (
-    <Box sx={{ maxWidth: 500 }} mx="auto">
-      <Grid>
-        <Grid.Col>
-          <TextInput label="Event Title" placeholder="Add event title" />
-        </Grid.Col>
-        <Grid.Col span={6}>
-          <DateRangePicker
-            label="Date Range"
-            placeholder="Pick dates range"
-            value={value}
-            onChange={setValue}
-          />
-        </Grid.Col>
-        <Grid.Col span={6}>
-          <TimeRangeInput label="Time Range" />
-        </Grid.Col>
-        <Grid.Col>
-          <Textarea
-            label="Description"
-            placeholder="Event Details"
-            autosize
-            minRows={2}
-            maxRows={4}
-          />
-        </Grid.Col>
-        <Grid.Col>
-          <TextInput label="Location" placeholder="location/meeting link" />
-        </Grid.Col>
-      </Grid>
+    <Box sx={{ maxWidth: 700 }} mx="auto">
+      <Paper p="xl" withBorder>
+        <Grid className="m-[50px]">
+          <Grid.Col>
+            <TextInput label="Event Title" placeholder="add event title" />
+          </Grid.Col>
+          <Grid.Col span={6}>
+            <DateRangePicker
+              label="Date Range"
+              placeholder="Pick dates range"
+              value={value}
+              onChange={setValue}
+            />
+          </Grid.Col>
+          <Grid.Col span={6}>
+            <TimeRangeInput label="Time Range" />
+          </Grid.Col>
+          <Grid.Col>
+            <Textarea
+              label="Description"
+              placeholder="event details"
+              autosize
+              minRows={2}
+              maxRows={4}
+            />
+          </Grid.Col>
+          <Grid.Col>
+            <TextInput
+              label="Location"
+              placeholder="location or meeting link"
+            />
+          </Grid.Col>
+        </Grid>
+      </Paper>
     </Box>
   );
 };
