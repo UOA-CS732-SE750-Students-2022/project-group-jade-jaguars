@@ -52,3 +52,48 @@ const teamSchema = new Schema({
 });
 
 export const TeamModel: Model<ITeam> = model<ITeam>('Team', teamSchema);
+
+/**
+ * @swagger
+ * components:
+ *    schemas:
+ *      Team:
+ *        type: object
+ *        required:
+ *          - title
+ *          - description
+ *          - color
+ *          - admin
+ *          - members
+ *          - events
+ *        properties:
+ *          id:
+ *            type: integer
+ *            description: The auto-generated id of the Event.
+ *          title:
+ *            type: string
+ *            description: The title of the Event.
+ *          color:
+ *            type: string
+ *            description: ENUM of the display color of the team.
+ *          admin:
+ *            type: uuid
+ *            description: uuid of the admin user object.
+ *          description:
+ *            type: string
+ *            description: short description of the Event.
+ *          members:
+ *            type: uuid[]
+ *            description: a list of user object IDs that are members of the team.
+ *          events:
+ *            type: uuid[]
+ *            description: a list of event object IDs that are scheduled for the team.
+ *        example:
+ *          id: "000000000000000000000000"
+ *          title: "Front end team"
+ *          description: "A team of developers"
+ *          color: "red"
+ *          admin: "990000000000000000000000"
+ *          members: ["340000000000000000000000", "120000000000000000000000"]
+ *          events: ["3300000000000000000000000", "334000000000000000000001"]
+ */
