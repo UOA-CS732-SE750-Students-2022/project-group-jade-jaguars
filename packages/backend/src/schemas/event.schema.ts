@@ -133,3 +133,91 @@ const eventSchema = new Schema<IEvent>({
 });
 
 export const EventModel: Model<IEvent> = model<IEvent>('Event', eventSchema);
+
+/**
+ * @swagger
+ * components:
+ *    schemas:
+ *      Event:
+ *        type: object
+ *        required:
+ *          - title
+ *          - status
+ *          - finished
+ *          - startTime
+ *          - endTime
+ *          - location
+ *          - description
+ *        properties:
+ *          id:
+ *            type: integer
+ *            description: The auto-generated id of the Event.
+ *          title:
+ *            type: string
+ *            description: The title of the Event.
+ *          status:
+ *            type: string
+ *            description: ENUM - pending, accepted, rejected, cancelled
+ *          startTime:
+ *            type: number
+ *            description: UNIX time stamp of the chosen start time.
+ *          endTime:
+ *            type: number
+ *            description: UNIX time stamp of the chosen end time
+ *          location:
+ *            type: string
+ *            description: Location of the event.
+ *          description:
+ *            type: string
+ *            description: short description of the Event.
+ *          attendees:
+ *            type: uuid[]
+ *            description: a list of user object IDs that are attending or invited to the event.
+ *          availability:
+ *            type: object
+ *            $ref: '#/components/schemas/EventAvailability'
+ *        example:
+ *          id: "000000000000000000000000"
+ *          title: "Dev Meeting"
+ *          status: "Pending"
+ *          startTime: 1588888888
+ *          endTime: 1588888888
+ *          location: "Room 1"
+ *          description: "A meeting for developers"
+ *          attendees: ["340000000000000000000000", "120000000000000000000000"]
+ *          availability: "object"
+ *
+ *      EventAvailability:
+ *        type: object
+ *        required:
+ *          - potentialTimes
+ *          - attendeeAvailability
+ *        properties:
+ *          potentialTimes:
+ *            type: object[]
+ *            description: A list of potential times for the event.
+ *            $ref: '#/components/schemas/TimeBracket'
+ *          finalisedTime:
+ *            type: object
+ *            description: The finalised time for the event.
+ *            $ref: '#/components/schemas/TimeBracket'
+ *          attendeeAvailability:
+ *            type: object[]
+ *            description: A list of attendee availability for the event.
+ *      TimeBracket:
+ *        type: object
+ *        required:
+ *          - startTime
+ *          - endTime
+ *        properties:
+ *          startTime:
+ *            type: number
+ *            description: UNIX time stamp of the start time.
+ *          endTime:
+ *            type: number
+ *            description: UNIX time stamp of the end time
+ *
+ *
+ *
+ *
+ */
