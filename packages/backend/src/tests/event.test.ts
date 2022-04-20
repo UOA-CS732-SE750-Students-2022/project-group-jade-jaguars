@@ -133,7 +133,7 @@ describe.only('Events', () => {
       AvailabilityStatus.Available,
     );
   });
-  it.only('Remove user availability entirely', async () => {
+  it('Remove user availability entirely', async () => {
     const userDoc = await UserModel.create({
       firstName: 'firstName',
       lastName: 'lastName',
@@ -184,5 +184,195 @@ describe.only('Events', () => {
     expect(
       eventDoc.availability.attendeeAvailability[0].availability,
     ).toHaveLength(0);
+  });
+
+  it('Remove user availability left side', async () => {
+    const userDoc = await UserModel.create({
+      firstName: 'firstName',
+      lastName: 'lastName',
+    });
+
+    // This payload is only valid with startDate < endDate
+    const startDate = new Date('1900');
+    const endDate = new Date('2000');
+    let eventDoc = await EventModel.create({
+      title: 'title',
+      description: 'description',
+      status: EventStatus.Accepted,
+      startTime: startDate,
+      endTime: endDate,
+      availability: {
+        potentialTimes: [],
+        finalisedTime: { startDate: startDate, endDate: endDate },
+        attendeeAvailability: [
+          {
+            attendee: userDoc._id,
+            availability: [
+              {
+                startDate: startDate,
+                endDate: endDate,
+                status: AvailabilityStatus.Available,
+              },
+            ],
+          },
+        ],
+      },
+      attendees: [userDoc._id],
+      location: 'location',
+    });
+
+    await request(app)
+      .delete(`/api/v1/event/availability`)
+      .send({
+        eventId: eventDoc._id,
+        userId: userDoc._id,
+        startDate: new Date('1850'),
+        endDate: new Date('1950'),
+        status: AvailabilityStatus.Available,
+      })
+      .expect(StatusCodes.OK);
+
+    // Refresh document
+    eventDoc = await EventModel.findById(eventDoc._id);
+    expect(eventDoc.availability.attendeeAvailability).toHaveLength(1);
+    expect(
+      eventDoc.availability.attendeeAvailability[0].availability,
+    ).toHaveLength(1);
+    expect(
+      eventDoc.availability.attendeeAvailability[0].availability[0].startDate,
+    ).toEqual(new Date('1950'));
+    expect(
+      eventDoc.availability.attendeeAvailability[0].availability[0].endDate,
+    ).toEqual(endDate);
+  });
+
+  it('Remove user availability right side', async () => {
+    const userDoc = await UserModel.create({
+      firstName: 'firstName',
+      lastName: 'lastName',
+    });
+
+    // This payload is only valid with startDate < endDate
+    const startDate = new Date('1900');
+    const endDate = new Date('2000');
+    let eventDoc = await EventModel.create({
+      title: 'title',
+      description: 'description',
+      status: EventStatus.Accepted,
+      startTime: startDate,
+      endTime: endDate,
+      availability: {
+        potentialTimes: [],
+        finalisedTime: { startDate: startDate, endDate: endDate },
+        attendeeAvailability: [
+          {
+            attendee: userDoc._id,
+            availability: [
+              {
+                startDate: startDate,
+                endDate: endDate,
+                status: AvailabilityStatus.Available,
+              },
+            ],
+          },
+        ],
+      },
+      attendees: [userDoc._id],
+      location: 'location',
+    });
+
+    await request(app)
+      .delete(`/api/v1/event/availability`)
+      .send({
+        eventId: eventDoc._id,
+        userId: userDoc._id,
+        startDate: new Date('1950'),
+        endDate: new Date('2100'),
+        status: AvailabilityStatus.Available,
+      })
+      .expect(StatusCodes.OK);
+
+    // Refresh document
+    eventDoc = await EventModel.findById(eventDoc._id);
+    expect(eventDoc.availability.attendeeAvailability).toHaveLength(1);
+    expect(
+      eventDoc.availability.attendeeAvailability[0].availability,
+    ).toHaveLength(1);
+    expect(
+      eventDoc.availability.attendeeAvailability[0].availability[0].startDate,
+    ).toEqual(startDate);
+    expect(
+      eventDoc.availability.attendeeAvailability[0].availability[0].endDate,
+    ).toEqual(new Date('1950'));
+  });
+
+  it('Remove user availability middle', async () => {
+    const userDoc = await UserModel.create({
+      firstName: 'firstName',
+      lastName: 'lastName',
+    });
+
+    // This payload is only valid with startDate < endDate
+    const startDate = new Date('1900');
+    const endDate = new Date('2000');
+    let eventDoc = await EventModel.create({
+      title: 'title',
+      description: 'description',
+      status: EventStatus.Accepted,
+      startTime: startDate,
+      endTime: endDate,
+      availability: {
+        potentialTimes: [],
+        finalisedTime: { startDate: startDate, endDate: endDate },
+        attendeeAvailability: [
+          {
+            attendee: userDoc._id,
+            availability: [
+              {
+                startDate: startDate,
+                endDate: endDate,
+                status: AvailabilityStatus.Available,
+              },
+            ],
+          },
+        ],
+      },
+      attendees: [userDoc._id],
+      location: 'location',
+    });
+
+    await request(app)
+      .delete(`/api/v1/event/availability`)
+      .send({
+        eventId: eventDoc._id,
+        userId: userDoc._id,
+        startDate: new Date('1940'),
+        endDate: new Date('1960'),
+        status: AvailabilityStatus.Available,
+      })
+      .expect(StatusCodes.OK);
+
+    // Refresh document
+    eventDoc = await EventModel.findById(eventDoc._id);
+    expect(eventDoc.availability.attendeeAvailability).toHaveLength(1);
+    expect(
+      eventDoc.availability.attendeeAvailability[0].availability,
+    ).toHaveLength(2);
+
+    // Left block
+    expect(
+      eventDoc.availability.attendeeAvailability[0].availability[0].startDate,
+    ).toEqual(startDate);
+    expect(
+      eventDoc.availability.attendeeAvailability[0].availability[0].endDate,
+    ).toEqual(new Date('1940'));
+
+    // Right Block
+    expect(
+      eventDoc.availability.attendeeAvailability[0].availability[1].startDate,
+    ).toEqual(new Date('1960'));
+    expect(
+      eventDoc.availability.attendeeAvailability[0].availability[1].endDate,
+    ).toEqual(endDate);
   });
 });

@@ -267,7 +267,7 @@ export async function removeUserAvalabilityById(
       // Left block
       adjustedAttendeeAvailability.push({
         startDate: ts.startDate,
-        endDate: removeBracket.endDate,
+        endDate: removeBracket.startDate,
         status: ts.status,
       });
       // Right block
