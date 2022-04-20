@@ -3,7 +3,7 @@ import request from 'supertest';
 import { StatusCodes } from 'http-status-codes';
 import { UserModel } from '../schemas/user.schema';
 
-describe('Users', () => {
+describe.skip('Users', () => {
   it('Get', async () => {
     const userDoc = await UserModel.create({
       firstName: 'firstName',

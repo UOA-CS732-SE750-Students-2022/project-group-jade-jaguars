@@ -6,21 +6,24 @@ export interface IUser {
   events: Types.ObjectId[];
 }
 
-const userSchema = new Schema<IUser>({
-  firstName: {
-    type: String,
-    required: true,
+const userSchema = new Schema<IUser>(
+  {
+    firstName: {
+      type: String,
+      required: true,
+    },
+    lastName: {
+      type: String,
+      required: true,
+    },
+    events: {
+      type: [Schema.Types.ObjectId],
+      ref: 'Event',
+      required: true,
+      default: [],
+    },
   },
-  lastName: {
-    type: String,
-    required: true,
-  },
-  events: {
-    type: [Schema.Types.ObjectId],
-    ref: 'Event',
-    required: true,
-    default: [],
-  },
-});
+  { timestamps: true },
+);
 
 export const UserModel: Model<IUser> = model<IUser>('User', userSchema);
