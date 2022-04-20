@@ -80,7 +80,7 @@ const EventForm = () => {
               placeholder="location or meeting link"
               value={form.values.location}
               onChange={(e) =>
-                form.setFieldValue('description', e.currentTarget.value)
+                form.setFieldValue('location', e.currentTarget.value)
               }
             />
           </Grid.Col>
