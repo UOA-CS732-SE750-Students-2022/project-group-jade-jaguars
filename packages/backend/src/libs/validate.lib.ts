@@ -11,7 +11,7 @@ const lastName = () => Joi.string().min(1);
 const objectId = () => Joi.string().hex().length(24);
 const objectIds = () => Joi.array().items(Joi.string().hex().length(24));
 const startDate = () => Joi.date().iso().required();
-const endDate = () => Joi.date().iso().greater(Joi.ref('startTime')).required();
+const endDate = () => Joi.date().iso().greater(Joi.ref('startDate')).required();
 
 export const validators = {
   username,

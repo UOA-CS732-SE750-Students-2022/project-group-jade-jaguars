@@ -11,7 +11,7 @@ import { identifier } from '../models/models.module';
 import { UserModel } from '../schemas/user.schema';
 import { EventResponseDTO } from 'src/controllers/event.controller';
 
-describe('Events', () => {
+describe.only('Events', () => {
   it('Get', async () => {
     const eventDoc = await EventModel.create({
       title: 'title',
@@ -81,9 +81,9 @@ describe('Events', () => {
       location: 'location',
     });
 
-    const eventId = eventDoc._id.toString();
     await request(app)
-      .delete(`/api/v1/event/${eventId}`)
+      .delete(`/api/v1/event/`)
+      .send({ id: eventDoc._id })
       .expect(StatusCodes.NO_CONTENT);
   });
   it('Generate random identifier', async () => {
@@ -133,48 +133,56 @@ describe('Events', () => {
       AvailabilityStatus.Available,
     );
   });
-  it.skip('Remove user availability', async () => {
+  it.only('Remove user availability entirely', async () => {
     const userDoc = await UserModel.create({
       firstName: 'firstName',
       lastName: 'lastName',
     });
-    const userId = userDoc._id.toString();
 
-    const date = new Date(Date.now());
-    const eventDoc = await EventModel.create({
+    // This payload is only valid with startDate < endDate
+    const startDate = new Date('1000');
+    const endDate = new Date('2000');
+    let eventDoc = await EventModel.create({
       title: 'title',
       description: 'description',
       status: EventStatus.Accepted,
-      startTime: date,
-      endTime: date,
-      attendees: [userId],
+      startTime: startDate,
+      endTime: endDate,
+      availability: {
+        potentialTimes: [],
+        finalisedTime: { startDate: startDate, endDate: endDate },
+        attendeeAvailability: [
+          {
+            attendee: userDoc._id,
+            availability: [
+              {
+                startDate: startDate,
+                endDate: endDate,
+                status: AvailabilityStatus.Available,
+              },
+            ],
+          },
+        ],
+      },
+      attendees: [userDoc._id],
       location: 'location',
     });
-    const eventId = eventDoc._id.toString();
 
-    const eventResponseDTO: EventResponseDTO = (
-      await request(app)
-        .delete(`/api/v1/event/availability`)
-        .send({
-          eventId: eventId,
-          userId: userId,
-          startDate: date,
-          endDate: date,
-          status: AvailabilityStatus.Available,
-        })
-        .expect(StatusCodes.OK)
-    ).body;
+    await request(app)
+      .delete(`/api/v1/event/availability`)
+      .send({
+        eventId: eventDoc._id,
+        userId: userDoc._id,
+        startDate: startDate,
+        endDate: endDate,
+        status: AvailabilityStatus.Available,
+      })
+      .expect(StatusCodes.OK);
 
-    const attendeeAvailability =
-      eventResponseDTO.availability.attendeeAvailability;
-    expect(attendeeAvailability).toHaveLength(1);
-    expect(attendeeAvailability[0].attendee).toEqual(userId.toString());
-    expect(attendeeAvailability[0].availability).toHaveLength(1);
-    console.log(attendeeAvailability[0].availability[0]);
-    // expect(attendeeAvailability[0].availability[0].startDate).toEqual(date.toString());
-    // expect(attendeeAvailability[0].availability[0].endDate).toEqual(`${date}`);
-    expect(attendeeAvailability[0].availability[0].status).toEqual(
-      AvailabilityStatus.Available,
-    );
+    // Refresh document
+    eventDoc = await EventModel.findById(eventDoc._id);
+    expect(
+      eventDoc.availability.attendeeAvailability[0].availability,
+    ).toHaveLength(0);
   });
 });

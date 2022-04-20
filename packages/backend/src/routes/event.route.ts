@@ -5,6 +5,7 @@ import {
   deleteEventById,
   getEventById,
   addUserAvalabilityById,
+  removeUserAvalabilityById,
 } from '../controllers/event.controller';
 export const eventsRouter = express.Router();
 
@@ -124,6 +125,7 @@ eventsRouter.put('/event/:id', updateEventById);
  *       501:
  *         description: Internal Server Error
  */
-eventsRouter.delete('/event/:id', deleteEventById);
+eventsRouter.delete('/event/', deleteEventById);
 
 eventsRouter.post('/event/availability', addUserAvalabilityById);
+eventsRouter.delete('/event/availability', removeUserAvalabilityById);
