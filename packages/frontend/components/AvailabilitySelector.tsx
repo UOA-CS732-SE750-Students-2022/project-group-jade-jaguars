@@ -170,7 +170,7 @@ function AvailabilitySelector(props: {
       if (mins === '30' && i != startDate.getHours()) {
         hourList.push(hour.toString() + ':00');
       }
-      hourList.push(hour.toString() + ':00');
+      hourList.push(hour.toString() + ':' + mins);
       if (mins === '00' && i !== 24) {
         hourList.push(hour.toString() + ':30');
       }
