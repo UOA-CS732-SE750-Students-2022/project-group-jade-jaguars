@@ -1,15 +1,21 @@
 import express from 'express';
-import dotenv from 'dotenv';
 import swaggerUi from 'swagger-ui-express';
 import swaggerJsdoc from 'swagger-jsdoc';
-import { EVENTS_ROUTER } from './routes/eventsRoute';
-import { PORT, BASE_URL, VERBOSE } from './config';
-import { mongoService } from './services/mongoService';
+import { usersRouter, eventsRouter } from './routes/routes.module';
+import {
+  PORT,
+  BASE_URL,
+  VERBOSE,
+  DATABASE_URL,
+} from './configs/backend.config';
+import mongoose from 'mongoose';
+import bodyParser from 'body-parser';
+import { teamRouter } from './routes/team.route';
 
-dotenv.config({ path: `.env.${process.env.NODE_ENV}` });
+const app = express();
+app.use(bodyParser.json());
 
-const APP = express();
-const ROUTER = express.Router();
+const router = express.Router();
 
 // Swagger definition
 const definition = {
@@ -25,10 +31,10 @@ const definition = {
   },
   servers: [
     {
-      url: `http://localhost:${PORT}/`,
+      url: `http://localhost:${PORT}${BASE_URL}`,
     },
   ],
-  host: `localhost:${PORT}`,
+  host: `localhost:${PORT}${BASE_URL}`,
   securityDefinitions: {
     bearerAuth: {
       type: 'apiKey',
@@ -44,27 +50,33 @@ const options = {
   apis: ['**/*.ts'],
 };
 
-function initialize() {
-  APP.use(BASE_URL, ROUTER);
-  APP.use(BASE_URL, EVENTS_ROUTER);
-  APP.use(express.json());
+async function initialize() {
+  // Initialize endpoints
+  app.use(BASE_URL, router);
+  app.use(BASE_URL, eventsRouter);
+  app.use(BASE_URL, usersRouter);
+  app.use(BASE_URL, teamRouter);
 
-  APP.use(
-    `${BASE_URL}/docs`,
-    swaggerUi.serve,
-    swaggerUi.setup(swaggerJsdoc(options)),
-  );
+  app.use(express.json());
 
-  // ROUTER.get('/', () => {});
-
-  APP.listen(PORT, () => {
-    if (!VERBOSE) {
-      console.clear();
-    }
-    console.log(`app on - https://localhost:${PORT}`);
-  });
-
-  mongoService.connect();
+  if (process.env.NODE_ENV !== 'testing') {
+    app.use(
+      `${BASE_URL}/docs`,
+      swaggerUi.serve,
+      swaggerUi.setup(swaggerJsdoc(options)),
+    );
+    console.log(`serving swagger on: http://localhost:${PORT}${BASE_URL}/docs`);
+    await mongoose.connect(DATABASE_URL);
+    console.log(`Database connected: ${DATABASE_URL}`);
+    app.listen(PORT, () => {
+      if (!VERBOSE) {
+        console.clear();
+      }
+      console.log(`app on - https://localhost:${PORT}`);
+    });
+  }
 }
 
 initialize();
+
+export default app;
