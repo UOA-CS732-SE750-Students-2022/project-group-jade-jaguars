@@ -1,5 +1,4 @@
-import { Checkbox, ScrollArea } from '@mantine/core';
-import { useHover } from '@mantine/hooks';
+import { ScrollArea } from '@mantine/core';
 import React from 'react';
 import { TeamCheckBox } from './TeamCheckBox';
 
@@ -17,7 +16,7 @@ const CheckBoxList = () => {
   return (
     <ScrollArea style={{ height: 100, width: 300 }}>
       {teamList.map((team, index) => {
-        return <TeamCheckBox label={team} order={index} />;
+        return <TeamCheckBox key={index} label={team} order={index} />;
       })}
     </ScrollArea>
   );
