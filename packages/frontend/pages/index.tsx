@@ -9,7 +9,7 @@ import {
   AvailabilityStatus,
 } from '../types/AvailabilityBlock';
 
-const potentialTimes: TimeBracket[] = [
+const timeOptions: TimeBracket[] = [
   {
     startTime: 1650229200000,
     endTime: 1650258000000,
@@ -68,7 +68,7 @@ const availability: AvailabilityBlock[] = [
 const Home: NextPage = () => {
   return (
     <AvailabilitySelector
-      potentialTimes={potentialTimes}
+      timeOptions={timeOptions}
       availability={availability}
       status={AvailabilityStatus.Available}
     />

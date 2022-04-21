@@ -6,17 +6,16 @@ import {
 import TimeBracket from '../types/TimeBracket';
 
 /*
- *  Assumption: no more than 7 days sent through as potentialTimes.
- *  Props: potentialTimes: a list of times that can be selected.
+ *  Assumption: no more than 7 days sent through as timeOptions.
+ *  Props: timeOptions: a list of times that can be selected.
  *         availability: a list of times that the user has previously specified their availability for (can be empty).
  *         status: the current selection status.
  */
 function AvailabilitySelector(props: {
-  potentialTimes: TimeBracket[];
+  timeOptions: TimeBracket[];
   availability: AvailabilityBlock[];
   status: AvailabilityStatus;
 }) {
-  const [isLoading, setIsLoading] = useState<Boolean>(true);
   const [selecting, setSelecting] = useState<Boolean>(false);
   const [start, setStart] = useState<number[]>([-1, -1]); // The row and column of the click.
   const [newStatus, setNewStatus] = useState<AvailabilityStatus>(
@@ -45,8 +44,8 @@ function AvailabilitySelector(props: {
 
   // Initialise the grid.
   useEffect(() => {
-    const startTime = new Date(props.potentialTimes[0].startTime);
-    const endTime = new Date(props.potentialTimes[0].endTime);
+    const startTime = new Date(props.timeOptions[0].startTime);
+    const endTime = new Date(props.timeOptions[0].endTime);
 
     let halfHours = (endTime.getHours() - startTime.getHours()) * 2;
 
@@ -58,7 +57,7 @@ function AvailabilitySelector(props: {
     }
 
     // timeList will contain the list of potential times split up among different days.
-    let timeList = props.potentialTimes;
+    let timeList = props.timeOptions;
 
     // If the time brackets are between midnight and midnight, need to split up the days.
     if (
@@ -70,9 +69,9 @@ function AvailabilitySelector(props: {
     ) {
       timeList = [];
       // Check each set of time brackets.
-      for (let index in props.potentialTimes) {
-        let myStartTime = new Date(props.potentialTimes[index].startTime);
-        const finalEndTime = new Date(props.potentialTimes[index].endTime);
+      for (let index in props.timeOptions) {
+        let myStartTime = new Date(props.timeOptions[index].startTime);
+        const finalEndTime = new Date(props.timeOptions[index].endTime);
         const daysInTB =
           (finalEndTime.getTime() - myStartTime.getTime()) / (1000 * 3600 * 24); // How many days to split into.
 
@@ -147,21 +146,18 @@ function AvailabilitySelector(props: {
     setNumCols(numDays);
     setTimeSlots(initialTimeSlots);
     setSelection(initialTimeSlots);
-    setIsLoading(false);
-  }, [props.potentialTimes, props.availability]);
+  }, [props.timeOptions, props.availability]);
 
   // Change grid on mouse down.
-  useEffect(() => {
-    if (isLoading || start[0] === -1) {
-      return;
-    }
+  function startDrag(newStart: number[]) {
     setSelecting(true);
+    setStart(newStart);
     let newTimeSlots: {
       row: number;
       col: number;
       status: AvailabilityStatus;
     }[] = timeSlots.map((object) => ({ ...object }));
-    const index = numCols * start[0] + start[1];
+    const index = numCols * newStart[0] + newStart[1];
     if (newTimeSlots[index].status === props.status) {
       newTimeSlots[index].status = AvailabilityStatus.Unavailable;
     } else if (props.status === AvailabilityStatus.Available) {
@@ -171,7 +167,7 @@ function AvailabilitySelector(props: {
     }
     setSelection(newTimeSlots);
     setNewStatus(newTimeSlots[index].status);
-  }, start);
+  }
 
   // Change grid when mouse over div.
   function updateSelection(end: number[]) {
@@ -226,13 +222,16 @@ function AvailabilitySelector(props: {
               }
             })(),
           }}
-          onPointerDown={() => setStart([timeSlot.row, timeSlot.col])}
-          onPointerEnter={() => {
+          onMouseDown={(e) => {
+            e.preventDefault();
+            startDrag([timeSlot.row, timeSlot.col]);
+          }}
+          onMouseEnter={() => {
             if (selecting) {
               updateSelection([timeSlot.row, timeSlot.col]);
             }
           }}
-          onPointerUp={() => finaliseSelection()}
+          onMouseUp={() => finaliseSelection()}
         ></div>
       ))}
     </div>
