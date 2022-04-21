@@ -90,6 +90,11 @@ const eventSchema = new Schema<IEvent>(
               type: Date,
               required: true,
             },
+            isAddedByAdmin: {
+              type: Boolean,
+              required: true,
+              default: false,
+            },
           },
         ],
       },

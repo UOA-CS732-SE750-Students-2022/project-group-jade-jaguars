@@ -5,7 +5,7 @@ import { UserModel } from '../schemas/user.schema';
 import { TeamModel } from '../schemas/team.schema';
 import { Colour } from '../schemas/team.schema';
 
-describe.skip('Team', () => {
+describe('Team', () => {
   let adminDoc;
   beforeEach(async () => {
     adminDoc = await UserModel.create({
