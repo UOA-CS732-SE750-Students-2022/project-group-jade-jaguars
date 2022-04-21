@@ -1,3 +1,4 @@
+import { isAuthenticated } from './libs/middleware.lib';
 import express from 'express';
 import swaggerUi from 'swagger-ui-express';
 import swaggerJsdoc from 'swagger-jsdoc';
@@ -11,6 +12,7 @@ import {
 import mongoose from 'mongoose';
 import bodyParser from 'body-parser';
 import { teamRouter } from './routes/team.route';
+import { initializeApp, applicationDefault } from 'firebase-admin/app';
 
 const app = express();
 app.use(bodyParser.json());
@@ -51,13 +53,17 @@ const options = {
 };
 
 async function initialize() {
-  // Initialize endpoints
-  app.use(BASE_URL, router);
-  app.use(BASE_URL, eventsRouter);
-  app.use(BASE_URL, usersRouter);
-  app.use(BASE_URL, teamRouter);
+  initializeApp({
+    credential: applicationDefault(),
+  });
 
   app.use(express.json());
+
+  // Initialize endpoints
+  app.use(BASE_URL, isAuthenticated, router);
+  app.use(BASE_URL, isAuthenticated, eventsRouter);
+  app.use(BASE_URL, isAuthenticated, usersRouter);
+  app.use(BASE_URL, isAuthenticated, teamRouter);
 
   if (process.env.NODE_ENV !== 'testing') {
     app.use(
