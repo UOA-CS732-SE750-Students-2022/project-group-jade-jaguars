@@ -17,6 +17,10 @@ import Joi from 'joi';
 import { validate, validators } from '../libs/validate.lib';
 
 // TODO: Change createdto for optional/generated fields
+interface GetEventDTO {
+  eventId: Types.ObjectId;
+}
+
 interface CreateEventDTO {
   title: string;
   description: string;
@@ -26,25 +30,20 @@ interface CreateEventDTO {
   availability: IEventAvailability;
   attendees: Types.ObjectId[];
   location: string;
+  team?: Types.ObjectId;
 }
 
-export interface EventResponseDTO {
-  id: Types.ObjectId;
-  title: string;
-  description: string;
-  status: EventStatus;
-  startTime: number;
-  endTime: number;
-  availability: IEventAvailability;
-  attendees: Types.ObjectId[];
-  location: string;
-  identifier: string;
+interface UpdateEventDTO extends Partial<IEvent> {
+  eventId: Types.ObjectId;
 }
-
-interface UpdateEventDTO extends Partial<IEvent> {}
 
 interface DeleteEventDTO {
-  id: Types.ObjectId;
+  eventId: Types.ObjectId;
+}
+
+interface SearchEventDTO {
+  eventId?: Types.ObjectId;
+  teamId?: Types.ObjectId;
 }
 
 // TODO: For now include userId in this payload, eventually this property should be removed and instead using the authToken we look up the userId
@@ -58,16 +57,22 @@ interface AddUserAvalabilityDTO {
 
 interface RemoveUserAvalabilityDTO extends AddUserAvalabilityDTO {}
 
-export async function getEventById(
-  req: Request,
-  res: Response<EventResponseDTO>,
-) {
-  const eventId = convertToObjectId(req.params.id);
-  const eventDoc = await EventModel.findById(eventId);
-  if (!eventDoc) {
-    throw new ServerError('event not found', StatusCodes.NOT_FOUND);
-  }
-  res.status(StatusCodes.OK).send({
+export interface EventResponseDTO {
+  id: Types.ObjectId;
+  title: string;
+  description: string;
+  status: EventStatus;
+  startTime: number;
+  endTime: number;
+  availability: IEventAvailability;
+  attendees: Types.ObjectId[];
+  location: string;
+  identifier: string;
+  team: Types.ObjectId;
+}
+
+function eventDocToResponseDTO(eventDoc: any): EventResponseDTO {
+  return {
     id: eventDoc._id,
     title: eventDoc.title,
     status: eventDoc.status,
@@ -78,7 +83,19 @@ export async function getEventById(
     description: eventDoc.description,
     location: eventDoc.location,
     identifier: eventDoc.identifier,
-  });
+    team: eventDoc.team,
+  };
+}
+
+export async function getEventById(
+  req: Request<GetEventDTO>,
+  res: Response<EventResponseDTO>,
+) {
+  const eventDoc = await EventModel.findById(req.body.eventId);
+  if (!eventDoc) {
+    throw new ServerError('event not found', StatusCodes.NOT_FOUND);
+  }
+  res.status(StatusCodes.OK).send(eventDocToResponseDTO(eventDoc));
 }
 
 export async function createEvent(
@@ -88,22 +105,13 @@ export async function createEvent(
   // TODO: create/use remainder of validation rules
   const rules = Joi.object<CreateEventDTO>({
     title: validators.title().required(),
+    description: validators.description().required(),
+    team: validators.objectId().optional(),
   });
   const formData = validate(rules, req.body, { allowUnknown: true });
 
   const eventDoc = await EventModel.create(formData);
-  res.status(StatusCodes.CREATED).send({
-    id: eventDoc._id,
-    title: eventDoc.title,
-    status: eventDoc.status,
-    startTime: eventDoc.startTime,
-    endTime: eventDoc.endTime,
-    availability: eventDoc.availability,
-    attendees: eventDoc.attendees,
-    description: eventDoc.description,
-    location: eventDoc.location,
-    identifier: eventDoc.identifier,
-  });
+  res.status(StatusCodes.CREATED).send(eventDocToResponseDTO(eventDoc));
 }
 
 // TODO: Add auth middleware to this
@@ -113,13 +121,13 @@ export async function updateEventById(
 ) {
   // TODO: create/use remainder of validation rules
   const rules = Joi.object<UpdateEventDTO>({
-    title: validators.title().required(),
+    title: validators.title().optional(),
+    description: validators.description().optional(),
   });
 
   const formData = validate(rules, req.body, { allowUnknown: true });
-  const eventId = convertToObjectId(req.params.id);
   const eventDoc = await EventModel.findOneAndUpdate(
-    { _id: eventId },
+    { _id: req.body.eventId },
     { $set: formData },
     { new: true },
   );
@@ -127,18 +135,7 @@ export async function updateEventById(
   if (!eventDoc) {
     throw new ServerError('event not found', StatusCodes.BAD_REQUEST);
   } else {
-    res.status(StatusCodes.OK).send({
-      id: eventDoc._id,
-      title: eventDoc.title,
-      status: eventDoc.status,
-      startTime: eventDoc.startTime,
-      endTime: eventDoc.endTime,
-      availability: eventDoc.availability,
-      attendees: eventDoc.attendees,
-      description: eventDoc.description,
-      location: eventDoc.location,
-      identifier: eventDoc.identifier,
-    });
+    res.status(StatusCodes.OK).send(eventDocToResponseDTO(eventDoc));
   }
 }
 
@@ -147,7 +144,7 @@ export async function deleteEventById(
   req: TypedRequestBody<DeleteEventDTO>,
   res: Response,
 ) {
-  const result = await EventModel.deleteOne({ _id: req.body.id });
+  const result = await EventModel.deleteOne({ _id: req.body.eventId });
   if (result.deletedCount === 0) {
     throw new ServerError('event not found', StatusCodes.NOT_FOUND, result);
   } else {
@@ -155,7 +152,42 @@ export async function deleteEventById(
   }
 }
 
-export async function addUserAvalabilityById(
+export async function searchEvent(
+  req: TypedRequestBody<SearchEventDTO>,
+  res: Response<EventResponseDTO[]>,
+) {
+  const rules = Joi.object<SearchEventDTO>({
+    eventId: validators.objectId().optional(),
+    teamId: validators.startDate().optional(),
+  }).xor();
+
+  const formData = validate(rules, req.body, { allowUnknown: true });
+
+  let events: EventResponseDTO[] = [];
+  if (formData.eventId) {
+    let eventDoc = await EventModel.findById(formData.eventId);
+    if (!eventDoc) {
+      throw new ServerError('event not found', StatusCodes.NOT_FOUND);
+    }
+    events.push(eventDocToResponseDTO(eventDoc));
+  } else if (formData.teamId) {
+    const eventDocs = await (
+      await EventModel.find({ team: formData.teamId })
+    ).map((eventDoc) => {
+      return eventDocToResponseDTO(eventDoc);
+    });
+    events.push.apply(events, eventDocs);
+  } else {
+    throw new ServerError(
+      'server error: xor search payload fail',
+      StatusCodes.INTERNAL_SERVER_ERROR,
+    );
+  }
+
+  res.status(StatusCodes.OK).send(events);
+}
+
+export async function addUserAvailabilityById(
   req: TypedRequestBody<AddUserAvalabilityDTO>,
   res: Response<EventResponseDTO>,
 ) {
@@ -191,18 +223,7 @@ export async function addUserAvalabilityById(
   }
 
   await eventDoc.save();
-  res.status(StatusCodes.OK).send({
-    id: eventDoc._id,
-    title: eventDoc.title,
-    status: eventDoc.status,
-    startTime: eventDoc.startTime,
-    endTime: eventDoc.endTime,
-    availability: eventDoc.availability,
-    attendees: eventDoc.attendees,
-    description: eventDoc.description,
-    location: eventDoc.location,
-    identifier: eventDoc.identifier,
-  });
+  res.status(StatusCodes.OK).send(eventDocToResponseDTO(eventDoc));
 }
 
 export async function removeUserAvalabilityById(

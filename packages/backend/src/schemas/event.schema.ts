@@ -50,12 +50,13 @@ export interface IEvent {
   title: string;
   description: string;
   status: EventStatus;
-  startTime: number;
-  endTime: number;
+  startDate: Date;
+  endDate: Date;
   availability: IEventAvailability;
   attendees: Types.ObjectId[];
   location: string;
   identifier: string;
+  team: Types.ObjectId;
 }
 
 const eventSchema = new Schema<IEvent>(
@@ -69,12 +70,12 @@ const eventSchema = new Schema<IEvent>(
       enum: Object.values(EventStatus),
       required: true,
     },
-    startTime: {
-      type: Number,
+    startDate: {
+      type: Date,
       required: true,
     },
-    endTime: {
-      type: Number,
+    endDate: {
+      type: Date,
       required: true,
     },
     availability: {
@@ -152,8 +153,18 @@ const eventSchema = new Schema<IEvent>(
       required: true,
       default: identifier(10),
     },
+    team: {
+      type: Schema.Types.ObjectId,
+      required: false,
+      ref: 'Team',
+    },
   },
   { timestamps: true },
 );
+
+// eventSchema.post('save', (doc, next) => {
+
+//   next();
+// });
 
 export const EventModel: Model<IEvent> = model<IEvent>('Event', eventSchema);
