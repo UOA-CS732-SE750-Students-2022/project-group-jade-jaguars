@@ -27,6 +27,7 @@ export interface IAvailabilityBlock extends ITimeBracket {
 export interface IAttendeeAvailability {
   attendee: Types.ObjectId;
   availability: IAvailabilityBlock[];
+  confirmed: Boolean;
 }
 
 export interface IEventAvailability {

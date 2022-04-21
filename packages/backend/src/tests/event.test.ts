@@ -8,7 +8,10 @@ import {
 import { StatusCodes } from 'http-status-codes';
 import { identifier } from '../models/models.module';
 import { UserModel } from '../schemas/user.schema';
-import { EventResponseDTO } from 'src/controllers/event.controller';
+import {
+  EventResponseDTO,
+  GetEventAvailabilityConfirmationsResponseDTO,
+} from 'src/controllers/event.controller';
 
 describe('Events', () => {
   it('Get', async () => {
@@ -115,6 +118,7 @@ describe('Events', () => {
                   status: AvailabilityStatus.Available,
                 },
               ],
+              confirmed: false,
             },
           ],
         },
@@ -256,6 +260,74 @@ describe('Events', () => {
       expect(
         eventDoc.availability.attendeeAvailability[0].availability[1].endDate,
       ).toEqual(endDate);
+    });
+
+    it('Confirm user availability', async () => {
+      await request(app)
+        .patch(`/api/v1/event/availability/confirm`)
+        .send({
+          userId,
+          eventId,
+          confirmed: true,
+        })
+        .expect(StatusCodes.OK);
+
+      expect(
+        (await EventModel.findById(eventId)).availability
+          .attendeeAvailability[0].confirmed,
+      ).toBe(true);
+    });
+    it('Get user availability confirmation count', async () => {
+      // Initially the confirmation count will be zero
+      const {
+        confirmed: confirmedInitial,
+      }: GetEventAvailabilityConfirmationsResponseDTO = (
+        await request(app)
+          .get(`/api/v1/event/availability/confirm`)
+          .send({
+            userId,
+            eventId,
+          })
+          .expect(StatusCodes.OK)
+      ).body;
+      expect(confirmedInitial).toBe(0);
+
+      // Create second user
+      const secondUser = await UserModel.create({
+        firstName: 'firstName',
+        lastName: 'lastName',
+      });
+      const secondUserId = secondUser._id;
+
+      // Create a confirmed availability for second user
+      const eventDoc = await EventModel.findById(eventId);
+      eventDoc.availability.attendeeAvailability.push({
+        attendee: secondUserId,
+        availability: [
+          {
+            startDate: startDate,
+            endDate: endDate,
+            status: AvailabilityStatus.Available,
+          },
+        ],
+        confirmed: true,
+      });
+      await eventDoc.save();
+
+      // Check confirmations increases to one
+      const {
+        confirmed: confirmedFinal,
+      }: GetEventAvailabilityConfirmationsResponseDTO = (
+        await request(app)
+          .get(`/api/v1/event/availability/confirm`)
+          .send({
+            userId,
+            eventId,
+          })
+          .expect(StatusCodes.OK)
+      ).body;
+
+      expect(confirmedFinal).toBe(1);
     });
   });
 });

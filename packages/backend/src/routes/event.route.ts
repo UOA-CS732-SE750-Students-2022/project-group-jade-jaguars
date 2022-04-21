@@ -7,6 +7,8 @@ import {
   addUserAvailabilityById,
   removeUserAvalabilityById,
   searchEvent,
+  setEventAvailabilityConfirmation,
+  getEventAvailabilityConfirmations,
 } from '../controllers/event.controller';
 export const eventsRouter = express.Router();
 
@@ -134,7 +136,13 @@ eventsRouter.delete('/event/availability', removeUserAvalabilityById);
 
 // availability confirmations
 // get number of availability confirmations
-eventsRouter.get('/event/availability/confirm', searchEvent);
+eventsRouter.get(
+  '/event/availability/confirm',
+  getEventAvailabilityConfirmations,
+);
 
 // confirm user availability selection
-eventsRouter.patch('/event/availability/confirm', searchEvent);
+eventsRouter.patch(
+  '/event/availability/confirm',
+  setEventAvailabilityConfirmation,
+);

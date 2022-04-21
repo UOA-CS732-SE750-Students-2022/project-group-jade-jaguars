@@ -7,6 +7,7 @@ const username = () => Joi.string().min(3).alphanum();
 const password = () => Joi.string().min(6);
 const title = () => Joi.string().min(3);
 const description = () => Joi.string().min(3);
+const location = () => Joi.string().min(1);
 const firstName = () => Joi.string().min(1);
 const lastName = () => Joi.string().min(1);
 const objectId = () => Joi.string().hex().length(24);
@@ -22,6 +23,7 @@ export const validators = {
   password,
   title,
   description,
+  location,
   firstName,
   lastName,
   objectId,
