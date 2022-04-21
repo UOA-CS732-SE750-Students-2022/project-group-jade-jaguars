@@ -14,17 +14,6 @@ export interface ITimeBracket {
   endDate: Date;
 }
 
-const timeBracketSchema = new Schema<ITimeBracket>({
-  startDate: {
-    type: Date,
-    required: true,
-  },
-  endDate: {
-    type: Date,
-    required: true,
-  },
-});
-
 export enum AvailabilityStatus {
   Available = 'Available',
   Unavailable = 'Unavailable',
@@ -69,6 +58,7 @@ const eventSchema = new Schema<IEvent>(
       type: String,
       enum: Object.values(EventStatus),
       required: true,
+      default: EventStatus.Pending,
     },
     startDate: {
       type: Date,
@@ -79,9 +69,28 @@ const eventSchema = new Schema<IEvent>(
       required: true,
     },
     availability: {
-      potentialTimes: {
-        type: [
-          {
+      type: {
+        potentialTimes: {
+          type: [
+            {
+              startDate: {
+                type: Date,
+                required: true,
+              },
+              endDate: {
+                type: Date,
+                required: true,
+              },
+              isAddedByAdmin: {
+                type: Boolean,
+                required: true,
+                default: false,
+              },
+            },
+          ],
+        },
+        finalisedTime: {
+          type: {
             startDate: {
               type: Date,
               required: true,
@@ -90,53 +99,55 @@ const eventSchema = new Schema<IEvent>(
               type: Date,
               required: true,
             },
-            isAddedByAdmin: {
-              type: Boolean,
-              required: true,
-              default: false,
+          },
+          required: false,
+          default: null,
+        },
+        attendeeAvailability: {
+          type: [
+            {
+              attendee: {
+                type: Schema.Types.ObjectId,
+                ref: 'User',
+              },
+              availability: {
+                type: [
+                  {
+                    startDate: {
+                      type: Date,
+                      required: true,
+                    },
+                    endDate: {
+                      type: Date,
+                      required: true,
+                    },
+                    status: {
+                      type: String,
+                      enum: Object.values(AvailabilityStatus),
+                      required: true,
+                      default: AvailabilityStatus.Available,
+                    },
+                  },
+                ],
+                required: true,
+                default: [],
+              },
+              confirmed: {
+                type: Boolean,
+                required: true,
+                default: false,
+              },
             },
-          },
-        ],
-      },
-      finalisedTime: {
-        type: {
-          startDate: {
-            type: Date,
-            required: true,
-          },
-          endDate: {
-            type: Date,
-            required: true,
-          },
+          ],
+          required: true,
+          default: [],
         },
       },
-      attendeeAvailability: {
-        type: [
-          {
-            attendee: {
-              type: Schema.Types.ObjectId,
-              ref: 'User',
-            },
-            availability: {
-              type: [
-                {
-                  startDate: {
-                    type: Date,
-                  },
-                  endDate: {
-                    type: Date,
-                  },
-                  status: {
-                    type: String,
-                    enum: Object.values(AvailabilityStatus),
-                  },
-                },
-              ],
-            },
-          },
-        ],
-        required: true,
-        default: [],
+      required: true,
+      default: {
+        potentialTimes: [],
+        attendeeAvailability: [],
+        finalisedTime: null,
       },
     },
     attendees: {

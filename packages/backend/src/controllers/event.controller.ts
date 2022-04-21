@@ -15,6 +15,8 @@ import {
 import { Types } from 'mongoose';
 import Joi from 'joi';
 import { validate, validators } from '../libs/validate.lib';
+import { UserModel } from '../schemas/user.schema';
+import { TeamModel } from '../schemas/team.schema';
 
 // TODO: Change createdto for optional/generated fields
 interface GetEventDTO {
@@ -25,8 +27,8 @@ interface CreateEventDTO {
   title: string;
   description: string;
   status: EventStatus;
-  startTime: number;
-  endTime: number;
+  startDate: Date;
+  endDate: Date;
   availability: IEventAvailability;
   attendees: Types.ObjectId[];
   location: string;
@@ -44,6 +46,11 @@ interface DeleteEventDTO {
 interface SearchEventDTO {
   eventId?: Types.ObjectId;
   teamId?: Types.ObjectId;
+  startDate?: Date;
+  endDate?: Date;
+  titleSubStr?: string;
+  descriptionSubStr?: string;
+  limit?: number;
 }
 
 // TODO: For now include userId in this payload, eventually this property should be removed and instead using the authToken we look up the userId
@@ -57,13 +64,18 @@ interface AddUserAvalabilityDTO {
 
 interface RemoveUserAvalabilityDTO extends AddUserAvalabilityDTO {}
 
+interface ConfirmUserAvailabilityDTO {
+  userId: Types.ObjectId;
+  eventId: Types.ObjectId;
+}
+
 export interface EventResponseDTO {
   id: Types.ObjectId;
   title: string;
   description: string;
   status: EventStatus;
-  startTime: number;
-  endTime: number;
+  startDate: number;
+  endDate: number;
   availability: IEventAvailability;
   attendees: Types.ObjectId[];
   location: string;
@@ -76,8 +88,8 @@ function eventDocToResponseDTO(eventDoc: any): EventResponseDTO {
     id: eventDoc._id,
     title: eventDoc.title,
     status: eventDoc.status,
-    startTime: eventDoc.startTime,
-    endTime: eventDoc.endTime,
+    startDate: eventDoc.startDate,
+    endDate: eventDoc.endDate,
     availability: eventDoc.availability,
     attendees: eventDoc.attendees,
     description: eventDoc.description,
@@ -106,6 +118,9 @@ export async function createEvent(
   const rules = Joi.object<CreateEventDTO>({
     title: validators.title().required(),
     description: validators.description().required(),
+    status: validators.availabilityStatus().optional(),
+    startDate: validators.startDate().required(),
+    endDate: validators.endDate().required(),
     team: validators.objectId().optional(),
   });
   const formData = validate(rules, req.body, { allowUnknown: true });
@@ -158,30 +173,83 @@ export async function searchEvent(
 ) {
   const rules = Joi.object<SearchEventDTO>({
     eventId: validators.objectId().optional(),
-    teamId: validators.startDate().optional(),
-  }).xor();
+    teamId: validators.objectId().optional(),
+    titleSubStr: Joi.string().optional(),
+    descriptionSubStr: Joi.string().optional(),
+    startDate: validators.startDate().optional(),
+    endDate: validators.startDate().optional(),
+    limit: Joi.number().integer().greater(0).optional(),
+  })
+    .xor('eventId', 'teamId', 'titlePartial', 'descriptionPartial')
+    .and('startDate', 'endDate');
 
   const formData = validate(rules, req.body, { allowUnknown: true });
 
   let events: EventResponseDTO[] = [];
+  // Search by eventId
   if (formData.eventId) {
     let eventDoc = await EventModel.findById(formData.eventId);
     if (!eventDoc) {
       throw new ServerError('event not found', StatusCodes.NOT_FOUND);
     }
     events.push(eventDocToResponseDTO(eventDoc));
-  } else if (formData.teamId) {
-    const eventDocs = await (
-      await EventModel.find({ team: formData.teamId })
+  }
+  // Search for events belonging to a team
+  else if (formData.teamId) {
+    if (!(await TeamModel.exists({ _id: req.body.teamId }))) {
+      throw new ServerError('team not found', StatusCodes.NOT_FOUND);
+    }
+    const eventDocs = (await EventModel.find({ team: formData.teamId })).map(
+      (eventDoc) => {
+        return eventDocToResponseDTO(eventDoc);
+      },
+    );
+    events.push.apply(events, eventDocs);
+  }
+  // Search for events with a matching substring of a title
+  else if (formData.titleSubStr) {
+    const eventDocs = (
+      await EventModel.find({
+        title: { $regex: formData.titleSubStr, $options: 'i' },
+      })
     ).map((eventDoc) => {
       return eventDocToResponseDTO(eventDoc);
     });
     events.push.apply(events, eventDocs);
-  } else {
+  }
+  // Search for events with a matching substring of a description
+  else if (formData.descriptionSubStr) {
+    const eventDocs = (
+      await EventModel.find({
+        description: { $regex: formData.descriptionSubStr, $options: 'i' },
+      })
+    ).map((eventDoc) => {
+      return eventDocToResponseDTO(eventDoc);
+    });
+    events.push.apply(events, eventDocs);
+    // Search for events falling completely withing a time bracket
+  } else if (formData.startDate && formData.endDate) {
+    const eventDocs = (
+      await EventModel.find({
+        startDate: { $gte: formData.startDate },
+        endDate: { $lte: formData.endDate },
+      })
+    ).map((eventDoc) => {
+      return eventDocToResponseDTO(eventDoc);
+    });
+    events.push.apply(events, eventDocs);
+  }
+  // Exactly one of cases above must be called, otherwise Joi validation has failed to detect malformed payload
+  else {
     throw new ServerError(
       'server error: xor search payload fail',
       StatusCodes.INTERNAL_SERVER_ERROR,
     );
+  }
+
+  // Limit the number of returned events
+  if (formData.limit && events.length >= formData.limit) {
+    events = events.splice(0, formData.limit - 1);
   }
 
   res.status(StatusCodes.OK).send(events);
@@ -192,6 +260,10 @@ export async function addUserAvailabilityById(
   res: Response<EventResponseDTO>,
 ) {
   // TODO: Update with Joi rules
+
+  if (!(await UserModel.exists({ _id: req.body.userId }))) {
+    throw new ServerError('user not found', StatusCodes.NOT_FOUND);
+  }
 
   let eventDoc = await EventModel.findById(req.body.eventId);
   if (!eventDoc) {
@@ -306,5 +378,13 @@ export async function removeUserAvalabilityById(
     userEventAvailabilityIndex
   ].availability = adjustedAttendeeAvailability;
   await eventDoc.save();
+  res.status(StatusCodes.OK).send();
+}
+
+export async function confirmEventAvailability(
+  req: TypedRequestBody<ConfirmUserAvailabilityDTO>,
+  res: Response,
+) {
+  // UserModel.exi;
   res.status(StatusCodes.OK).send();
 }

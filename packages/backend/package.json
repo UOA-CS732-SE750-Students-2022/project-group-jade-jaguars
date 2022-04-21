@@ -12,6 +12,7 @@
     "start:dev": "nodemon",
     "start:prod": "node dist/app",
     "test": "cross-env NODE_ENV=testing jest --run-in-band",
+    "test:dev": "cross-env NODE_ENV=testing jest --run-in-band --watch",
     "coverage": "cross-env NODE_ENV=testing nyc npm run test"
   },
   "dependencies": {

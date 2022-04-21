@@ -1,5 +1,6 @@
 import { StatusCodes } from 'http-status-codes';
 import Joi from 'joi';
+import { AvailabilityStatus, EventStatus } from '../schemas/event.schema';
 import { ServerError } from './utils.lib';
 
 const username = () => Joi.string().min(3).alphanum();
@@ -12,6 +13,9 @@ const objectId = () => Joi.string().hex().length(24);
 const objectIds = () => Joi.array().items(Joi.string().hex().length(24));
 const startDate = () => Joi.date().iso().required();
 const endDate = () => Joi.date().iso().greater(Joi.ref('startDate')).required();
+const eventStatus = () => Joi.string().valid(...Object.values(EventStatus));
+const availabilityStatus = () =>
+  Joi.string().valid(...Object.values(AvailabilityStatus));
 
 export const validators = {
   username,
@@ -24,6 +28,8 @@ export const validators = {
   objectIds,
   startDate,
   endDate,
+  eventStatus,
+  availabilityStatus,
 };
 
 export function validate<T>(

@@ -131,3 +131,10 @@ eventsRouter.delete('/event', deleteEventById);
 eventsRouter.get('/event/search', searchEvent);
 eventsRouter.post('/event/availability', addUserAvailabilityById);
 eventsRouter.delete('/event/availability', removeUserAvalabilityById);
+
+// availability confirmations
+// get number of availability confirmations
+eventsRouter.get('/event/availability/confirm', searchEvent);
+
+// confirm user availability selection
+eventsRouter.patch('/event/availability/confirm', searchEvent);

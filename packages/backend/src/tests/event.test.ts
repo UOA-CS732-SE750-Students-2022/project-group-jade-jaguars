@@ -4,7 +4,6 @@ import {
   AvailabilityStatus,
   EventModel,
   EventStatus,
-  IEventAvailability,
 } from '../schemas/event.schema';
 import { StatusCodes } from 'http-status-codes';
 import { identifier } from '../models/models.module';
@@ -16,11 +15,8 @@ describe('Events', () => {
     const eventDoc = await EventModel.create({
       title: 'title',
       description: 'description',
-      status: EventStatus.Accepted,
-      startDate: 0,
-      endDate: 0,
-      availability: {} as IEventAvailability,
-      attendees: ['01234e357ec3446e40e1b29b'],
+      startDate: new Date('1900'),
+      endDate: new Date('2000'),
       location: 'location',
     });
 
@@ -39,11 +35,8 @@ describe('Events', () => {
       .send({
         title: 'title',
         description: 'description',
-        status: EventStatus.Accepted,
-        startDate: 0,
-        endDate: 0,
-        availability: {} as IEventAvailability,
-        attendees: ['01234e357ec3446e40e1b29b'],
+        startDate: new Date('1900'),
+        endDate: new Date('2000'),
         location: 'location',
       })
       .expect(StatusCodes.CREATED);
@@ -53,11 +46,8 @@ describe('Events', () => {
     const eventDoc = await EventModel.create({
       title: 'title',
       description: 'description',
-      status: EventStatus.Accepted,
-      startDate: 0,
-      endDate: 0,
-      availability: {} as IEventAvailability,
-      attendees: ['01234e357ec3446e40e1b29b'],
+      startDate: new Date('1900'),
+      endDate: new Date('2000'),
       location: 'location',
     });
 
@@ -77,18 +67,18 @@ describe('Events', () => {
     const eventDoc = await EventModel.create({
       title: 'title',
       description: 'description',
-      status: EventStatus.Accepted,
-      startDate: 0,
-      endDate: 0,
-      availability: {} as IEventAvailability,
-      attendees: ['01234e357ec3446e40e1b29b'],
+      startDate: new Date('1900'),
+      endDate: new Date('2000'),
       location: 'location',
     });
+    const eventId = eventDoc._id;
 
     await request(app)
       .delete(`/api/v1/event`)
       .send({ eventId: eventDoc._id })
       .expect(StatusCodes.NO_CONTENT);
+
+    expect(await EventModel.exists({ _id: eventId })).toBe(null);
   });
 
   it('Generate random identifier', async () => {
@@ -110,7 +100,6 @@ describe('Events', () => {
       const eventDoc = await EventModel.create({
         title: 'title',
         description: 'description',
-        status: EventStatus.Accepted,
         startDate: startDate,
         endDate: endDate,
         availability: {
@@ -221,7 +210,6 @@ describe('Events', () => {
         })
         .expect(StatusCodes.OK);
 
-      // Refresh document
       const eventDoc = await EventModel.findById(eventId);
       expect(eventDoc.availability.attendeeAvailability).toHaveLength(1);
       expect(
@@ -247,7 +235,6 @@ describe('Events', () => {
         })
         .expect(StatusCodes.OK);
 
-      // Refresh document
       const eventDoc = await EventModel.findById(eventId);
       expect(eventDoc.availability.attendeeAvailability).toHaveLength(1);
       expect(
