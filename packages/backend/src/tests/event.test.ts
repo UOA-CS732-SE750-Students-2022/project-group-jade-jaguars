@@ -8,6 +8,7 @@ import {
 import { StatusCodes } from 'http-status-codes';
 import { identifier } from '../models/models.module';
 import { UserModel } from '../schemas/user.schema';
+import { TeamModel } from '../schemas/team.schema';
 import {
   EventResponseDTO,
   GetEventAvailabilityConfirmationsResponseDTO,
@@ -88,7 +89,135 @@ describe('Events', () => {
     expect(identifier(10)).toHaveLength(10);
   });
 
-  describe('User availability', () => {
+  describe('Search', () => {
+    let userId, teamId, eventId;
+
+    beforeEach(async () => {
+      const userDoc = await UserModel.create({
+        firstName: 'firstName',
+        lastName: 'lastName',
+      });
+      userId = userDoc._id;
+
+      const teamDoc = await TeamModel.create({
+        title: 'title',
+        description: 'description',
+        admin: userId,
+      });
+      teamId = teamDoc._id;
+
+      const eventDoc = await EventModel.create({
+        title: 'title',
+        description: 'description',
+        startDate: new Date('1900'),
+        endDate: new Date('2000'),
+        team: teamId,
+        location: 'location',
+      });
+      eventId = eventDoc._id;
+    });
+
+    it('By eventId', async () => {
+      const searchResponse: EventResponseDTO[] = (
+        await request(app)
+          .get(`/api/v1/event/search`)
+          .send({
+            eventId,
+          })
+          .expect(StatusCodes.OK)
+      ).body;
+
+      expect(searchResponse).toHaveLength(1);
+      expect(searchResponse[0].id).toBe(eventId.toString());
+    });
+    it('By teamId', async () => {
+      const searchResponse: EventResponseDTO[] = (
+        await request(app)
+          .get(`/api/v1/event/search`)
+          .send({
+            teamId,
+          })
+          .expect(StatusCodes.OK)
+      ).body;
+
+      expect(searchResponse).toHaveLength(1);
+      expect(searchResponse[0].id).toBe(eventId.toString());
+    });
+    it('By title sub-string', async () => {
+      const searchResponse: EventResponseDTO[] = (
+        await request(app)
+          .get(`/api/v1/event/search`)
+          .send({
+            titleSubStr: 'ti',
+          })
+          .expect(StatusCodes.OK)
+      ).body;
+
+      expect(searchResponse).toHaveLength(1);
+      expect(searchResponse[0].id).toBe(eventId.toString());
+    });
+    it('By description sub-string', async () => {
+      const searchResponse: EventResponseDTO[] = (
+        await request(app)
+          .get(`/api/v1/event/search`)
+          .send({
+            descriptionSubStr: 'des',
+          })
+          .expect(StatusCodes.OK)
+      ).body;
+
+      expect(searchResponse).toHaveLength(1);
+      expect(searchResponse[0].id).toBe(eventId.toString());
+    });
+    it('By date range', async () => {
+      const searchResponse: EventResponseDTO[] = (
+        await request(app)
+          .get(`/api/v1/event/search`)
+          .send({
+            startDate: new Date('1800'),
+            endDate: new Date('2100'),
+          })
+          .expect(StatusCodes.OK)
+      ).body;
+
+      expect(searchResponse).toHaveLength(1);
+      expect(searchResponse[0].id).toBe(eventId.toString());
+    });
+    it('Limit', async () => {
+      // Create a second identical event
+      await EventModel.create({
+        title: 'title',
+        description: 'description',
+        startDate: new Date('1900'),
+        endDate: new Date('2000'),
+        team: teamId,
+        location: 'location',
+      });
+
+      const searchResponse: EventResponseDTO[] = (
+        await request(app)
+          .get(`/api/v1/event/search`)
+          .send({
+            teamId,
+            limit: 1,
+          })
+          .expect(StatusCodes.OK)
+      ).body;
+
+      expect(searchResponse).toHaveLength(1);
+      expect(searchResponse[0].id).toBe(eventId.toString());
+    });
+    //TODO: This works as intended but the Jest doesn't seem to work here
+    it.skip('Conflicting keys in payload', async () => {
+      await expect(async () => {
+        await request(app).get(`/api/v1/event/search`).send({
+          teamId,
+          eventId,
+        });
+      }).rejects.toThrow('I should fail');
+    });
+  });
+  describe('User event availability', () => {
     let userId, eventId;
 
     const startDate = new Date('1900');

@@ -197,14 +197,9 @@ export async function searchEvent(
     teamId: validators.objectId().optional(),
     titleSubStr: Joi.string().optional(),
     descriptionSubStr: Joi.string().optional(),
-    startDate: validators.startDate().optional(),
-    endDate: validators.startDate().optional(),
-    limit: Joi.number().integer().greater(0).optional(),
-  })
-    .xor('eventId', 'teamId', 'titlePartial', 'descriptionPartial')
-    .and('startDate', 'endDate');
+  }).oxor('eventId', 'teamId', 'titleSubStr', 'descriptionSubStr');
 
-  const formData = validate(rules, req.body, { allowUnknown: true });
+  let formData = validate(rules, req.body, { allowUnknown: true });
 
   let events: EventResponseDTO[] = [];
   // Search by eventId
@@ -250,6 +245,14 @@ export async function searchEvent(
     events.push.apply(events, eventDocs);
     // Search for events falling completely withing a time bracket
   } else if (formData.startDate && formData.endDate) {
+    //XXX: Workaround with limitation of Joi single rule application
+    const dateRules = Joi.object<SearchEventDTO>({
+      startDate: validators.startDate().optional(),
+      endDate: validators.startDate().optional(),
+    }).and('startDate', 'endDate');
+
+    formData = validate(dateRules, req.body, { allowUnknown: true });
+
     const eventDocs = (
       await EventModel.find({
         startDate: { $gte: formData.startDate },
@@ -268,9 +271,15 @@ export async function searchEvent(
     );
   }
 
+  //XXX: Workaround with limitation of Joi single rule application
+  const limitRules = Joi.object<SearchEventDTO>({
+    limit: Joi.number().greater(0).optional(),
+  });
+  formData = validate(limitRules, req.body, { allowUnknown: true });
+
   // Limit the number of returned events
   if (formData.limit && events.length >= formData.limit) {
-    events = events.splice(0, formData.limit - 1);
+    events = events.slice(0, formData.limit);
   }
 
   res.status(StatusCodes.OK).send(events);
