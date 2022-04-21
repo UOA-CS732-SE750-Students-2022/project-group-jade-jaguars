@@ -22,6 +22,9 @@ function AvailabilitySelector(props: {
     AvailabilityStatus.Unavailable,
   );
 
+  const [timeList, setTimeList] = useState<TimeBracket[]>([]);
+  const [hourList, setHourList] = useState<string[]>([]);
+
   // The status of the grid upon mouse release.
   const [timeSlots, setTimeSlots] = useState<
     {
@@ -143,7 +146,39 @@ function AvailabilitySelector(props: {
       }
     }
 
+    const startDate = new Date(timeList[0].startTime);
+    const endDate = new Date(timeList[0].endTime);
+
+    let hourList: string[] = [];
+    let mins = '00';
+
+    if (startDate.getMinutes() == 30) {
+      mins = '30';
+    }
+
+    let end = endDate.getHours();
+
+    if (endDate.getHours() === 0) {
+      end = 24;
+    }
+
+    for (let i = startDate.getHours(); i < end; i++) {
+      let hour = i;
+      if (i > 12) {
+        hour = i - 12;
+      }
+      if (mins === '30' && i != startDate.getHours()) {
+        hourList.push(hour.toString() + ':00');
+      }
+      hourList.push(hour.toString() + ':00');
+      if (mins === '00' && i !== 24) {
+        hourList.push(hour.toString() + ':30');
+      }
+    }
+
+    setHourList(hourList);
     setNumCols(numDays);
+    setTimeList(timeList);
     setTimeSlots(initialTimeSlots);
     setSelection(initialTimeSlots);
   }, [props.timeOptions, props.availability]);
@@ -201,39 +236,68 @@ function AvailabilitySelector(props: {
   }
 
   return (
-    <div
-      className="timeslotContainer"
-      style={{ gridTemplateColumns: 'repeat(' + numCols + ', 60px)' }}
-    >
-      {timeSlots.map((timeSlot, index) => (
+    <div>
+      <div
+        className="dayList"
+        style={{ gridTemplateColumns: 'repeat(' + numCols + ', 60px)' }}
+      >
+        {timeList.map((timeBracket, index) => {
+          const startDate = new Date(timeBracket.startTime);
+          return (
+            <div className="day" key={index}>
+              {startDate.getDate()}/{startDate.getMonth() + 1}
+            </div>
+          );
+        })}
+      </div>
+      <div style={{ display: 'flex' }}>
         <div
-          className="timeslot"
-          key={index}
-          style={{
-            backgroundColor: (() => {
-              if (selection[index].status === AvailabilityStatus.Available) {
-                return 'green';
-              } else if (
-                selection[index].status === AvailabilityStatus.Tentative
-              ) {
-                return 'yellow';
-              } else {
-                return 'white';
-              }
-            })(),
-          }}
-          onMouseDown={(e) => {
-            e.preventDefault();
-            startDrag([timeSlot.row, timeSlot.col]);
-          }}
-          onMouseEnter={() => {
-            if (selecting) {
-              updateSelection([timeSlot.row, timeSlot.col]);
-            }
-          }}
-          onMouseUp={() => finaliseSelection()}
-        ></div>
-      ))}
+          className="hourList"
+          style={{ gridTemplateColumns: 'repeat(1, 30px)' }}
+        >
+          {hourList.map((hour, index) => (
+            <div className="hour" key={index}>
+              {hour}
+            </div>
+          ))}
+        </div>
+        <div
+          className="timeslotContainer"
+          style={{ gridTemplateColumns: 'repeat(' + numCols + ', 60px)' }}
+        >
+          {timeSlots.map((timeSlot, index) => (
+            <div
+              className="timeslot"
+              key={index}
+              style={{
+                backgroundColor: (() => {
+                  if (
+                    selection[index].status === AvailabilityStatus.Available
+                  ) {
+                    return 'green';
+                  } else if (
+                    selection[index].status === AvailabilityStatus.Tentative
+                  ) {
+                    return 'yellow';
+                  } else {
+                    return 'white';
+                  }
+                })(),
+              }}
+              onMouseDown={(e) => {
+                e.preventDefault();
+                startDrag([timeSlot.row, timeSlot.col]);
+              }}
+              onMouseEnter={() => {
+                if (selecting) {
+                  updateSelection([timeSlot.row, timeSlot.col]);
+                }
+              }}
+              onMouseUp={() => finaliseSelection()}
+            ></div>
+          ))}
+        </div>
+      </div>
     </div>
   );
 }
