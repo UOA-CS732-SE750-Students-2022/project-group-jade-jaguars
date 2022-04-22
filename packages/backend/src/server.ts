@@ -95,7 +95,10 @@ class Server extends http.Server {
     this.setMiddleware();
     await this.setDatabase();
     if (process.env.NODE_ENV !== 'testing') {
+      // When testing socket io is started with a different http server to avoid port listen conflict when running jest
       socket(this, this.app);
+      console.log(`socketio: http://localhost:${PORT}${BASE_URL}/socketio`);
+      // Swagger only needed when not testing
       this.app.listen(this.app.get('port'), () => {
         console.log(`server: http://localhost:${this.app.get('port')}`);
       });
