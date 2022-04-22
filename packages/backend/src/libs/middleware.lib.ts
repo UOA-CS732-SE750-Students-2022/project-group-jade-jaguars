@@ -2,7 +2,6 @@ import { StatusCodes } from 'http-status-codes';
 import { Request, Response, NextFunction } from 'express';
 import { getAuth } from 'firebase-admin/auth';
 
-// TODO: implement firebase auth
 export const isAuthenticated = async (
   req: Request,
   res: Response,

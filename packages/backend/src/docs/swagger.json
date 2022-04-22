@@ -23,26 +23,142 @@
       "in": "header"
     }
   },
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    },
+    "schemas": {
+      "User": {
+        "type": "object",
+        "properties": {
+          "firstName": {
+            "type": "string"
+          },
+          "lastName": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "events": {
+            "type": "object[]",
+            "$ref": "#/components/schemas/Event"
+          }
+        }
+      },
+      "Event": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "title": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "description": "ENUM - pending, accepted, rejected, cancelled"
+          },
+          "startTime": {
+            "type": "number",
+            "description": "UNIX time stamp of the chosen start time."
+          },
+          "endTime": {
+            "type": "number",
+            "description": "UNIX time stamp of the chosen end time"
+          },
+          "location": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "attendees": {
+            "type": "uuid[]",
+            "description": "a list of user object IDs that are attending or invited to the event."
+          },
+          "availability": {
+            "type": "object",
+            "$ref": "#/components/schemas/EventAvailability"
+          }
+        }
+      },
+      "EventAvailability": {
+        "type": "object",
+        "properties": {
+          "potentialTimes": {
+            "type": "object[]",
+            "description": "A list of potential times for the event.",
+            "$ref": "#/components/schemas/TimeBracket"
+          },
+          "finalisedTime": {
+            "type": "object",
+            "description": "The finalised time for the event.",
+            "$ref": "#/components/schemas/TimeBracket"
+          },
+          "attendeeAvailability": {
+            "type": "object[]",
+            "description": "A list of attendee availability for the event."
+          }
+        }
+      },
+      "TimeBracket": {
+        "type": "object",
+        "required": ["startTime", "endTime"],
+        "properties": {
+          "startTime": {
+            "type": "number",
+            "description": "UNIX time stamp of the start time."
+          },
+          "endTime": {
+            "type": "number",
+            "description": "UNIX time stamp of the end time"
+          }
+        }
+      },
+      "Team": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "title": {
+            "type": "string"
+          },
+          "color": {
+            "type": "enum",
+            "description": "ENUM of the display color of the team."
+          },
+          "admin": {
+            "type": "uuid",
+            "description": "uuid of the admin user object."
+          },
+          "description": {
+            "type": "string"
+          },
+          "members": {
+            "type": "uuid[]",
+            "description": "a list of user object IDs that are members of the team."
+          },
+          "events": {
+            "type": "uuid[]",
+            "description": "a list of event object IDs that are scheduled for the team."
+          }
+        }
+      }
+    }
+  },
+
   "paths": {
-    "user": {
+    "/user": {
       "get": {
         "tags": ["User"],
         "summary": "Get user by id",
         "produces": ["application/json"],
-        "responses": {
-          "200": {
-            "description": "successful operation",
-            "schema": {
-              "$ref": "#/definitions/User"
-            }
-          },
-          "400": {
-            "description": "Invalid ID supplied"
-          },
-          "404": {
-            "description": "User not found"
-          }
-        },
         "security": [
           {
             "bearerAuth": []
@@ -61,15 +177,10 @@
             "description": "Created user object",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/User"
+              "$ref": "#/components/schemas/User"
             }
           }
         ],
-        "responses": {
-          "default": {
-            "description": "successful operation"
-          }
-        },
         "security": [
           {
             "bearerAuth": []
@@ -96,15 +207,10 @@
             "description": "Updated user object",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/User"
+              "$ref": "#/components/schemas/User"
             }
           }
         ],
-        "responses": {
-          "default": {
-            "description": "successful operation"
-          }
-        },
         "security": [
           {
             "bearerAuth": []
@@ -125,11 +231,6 @@
             "type": "string"
           }
         ],
-        "responses": {
-          "default": {
-            "description": "successful operation"
-          }
-        },
         "security": [
           {
             "bearerAuth": []
@@ -137,25 +238,11 @@
         ]
       }
     },
-    "event": {
+    "/event": {
       "get": {
         "tags": ["Event"],
         "summary": "Get event by id",
         "produces": ["application/json"],
-        "responses": {
-          "200": {
-            "description": "successful operation",
-            "schema": {
-              "$ref": "#/definitions/Event"
-            }
-          },
-          "400": {
-            "description": "Invalid ID supplied"
-          },
-          "404": {
-            "description": "Event not found"
-          }
-        },
         "security": [
           {
             "bearerAuth": []
@@ -174,15 +261,10 @@
             "description": "Created event object",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/Event"
+              "$ref": "#/components/schemas/Event"
             }
           }
         ],
-        "responses": {
-          "default": {
-            "description": "successful operation"
-          }
-        },
         "security": [
           {
             "bearerAuth": []
@@ -209,15 +291,10 @@
             "description": "Updated event object",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/Event"
+              "$ref": "#/components/schemas/Event"
             }
           }
         ],
-        "responses": {
-          "default": {
-            "description": "successful operation"
-          }
-        },
         "security": [
           {
             "bearerAuth": []
@@ -238,11 +315,6 @@
             "type": "string"
           }
         ],
-        "responses": {
-          "default": {
-            "description": "successful operation"
-          }
-        },
         "security": [
           {
             "bearerAuth": []
@@ -250,25 +322,11 @@
         ]
       }
     },
-    "teams": {
+    "/teams": {
       "get": {
         "tags": ["Team"],
         "summary": "Get team by id",
         "produces": ["application/json"],
-        "responses": {
-          "200": {
-            "description": "successful operation",
-            "schema": {
-              "$ref": "#/definitions/Team"
-            }
-          },
-          "400": {
-            "description": "Invalid ID supplied"
-          },
-          "404": {
-            "description": "Team not found"
-          }
-        },
         "security": [
           {
             "bearerAuth": []
@@ -287,15 +345,10 @@
             "description": "Created team object",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/Team"
+              "$ref": "#/components/schemas/Team"
             }
           }
         ],
-        "responses": {
-          "default": {
-            "description": "successful operation"
-          }
-        },
         "security": [
           {
             "bearerAuth": []
@@ -322,15 +375,10 @@
             "description": "Updated team object",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/Team"
+              "$ref": "#/components/schemas/Team"
             }
           }
         ],
-        "responses": {
-          "default": {
-            "description": "successful operation"
-          }
-        },
         "security": [
           {
             "bearerAuth": []
@@ -351,91 +399,11 @@
             "type": "string"
           }
         ],
-        "responses": {
-          "default": {
-            "description": "successful operation"
-          }
-        },
         "security": [
           {
             "bearerAuth": []
           }
         ]
-      }
-    }
-  },
-  "definitions": {
-    "User": {
-      "type": "object",
-      "properties": {
-        "id": {
-          "type": "integer",
-          "format": "int64"
-        },
-        "name": {
-          "type": "string"
-        },
-        "email": {
-          "type": "string"
-        },
-        "password": {
-          "type": "string"
-        },
-        "createdAt": {
-          "type": "string",
-          "format": "date-time"
-        },
-        "updatedAt": {
-          "type": "string",
-          "format": "date-time"
-        }
-      }
-    },
-    "Event": {
-      "type": "object",
-      "properties": {
-        "id": {
-          "type": "integer",
-          "format": "int64"
-        },
-        "name": {
-          "type": "string"
-        },
-        "description": {
-          "type": "string"
-        },
-        "date": {
-          "type": "string",
-          "format": "date"
-        },
-        "createdAt": {
-          "type": "string",
-          "format": "date-time"
-        },
-        "updatedAt": {
-          "type": "string",
-          "format": "date-time"
-        }
-      }
-    },
-    "Team": {
-      "type": "object",
-      "properties": {
-        "id": {
-          "type": "integer",
-          "format": "int64"
-        },
-        "name": {
-          "type": "string"
-        },
-        "createdAt": {
-          "type": "string",
-          "format": "date-time"
-        },
-        "updatedAt": {
-          "type": "string",
-          "format": "date-time"
-        }
       }
     }
   }
