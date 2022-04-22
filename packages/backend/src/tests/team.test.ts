@@ -1,4 +1,4 @@
-import app from '../app';
+import server from '../app';
 import request from 'supertest';
 import { StatusCodes } from 'http-status-codes';
 import { UserModel } from '../schemas/user.schema';
@@ -20,7 +20,7 @@ describe('Team', () => {
       admin: adminDoc._id,
     });
     const teamId = teamDoc._id.toString();
-    const teamGetResponse = await request(app)
+    const teamGetResponse = await request(server)
       .get(`/api/v1/team/${teamId}`)
       .expect(StatusCodes.OK);
 
@@ -28,7 +28,7 @@ describe('Team', () => {
   });
 
   it('Create', async () => {
-    await request(app)
+    await request(server)
       .post('/api/v1/team')
       .send({
         title: 'title',
@@ -47,7 +47,7 @@ describe('Team', () => {
     });
     const teamId = teamDoc._id.toString();
 
-    const userUpdateResponse = await request(app)
+    const userUpdateResponse = await request(server)
       .put(`/api/v1/team/${teamId}`)
       .send({
         title: 'changed',
@@ -65,7 +65,7 @@ describe('Team', () => {
       admin: adminDoc._id,
     });
     const teamId = teamDoc._id.toString();
-    await request(app)
+    await request(server)
       .delete(`/api/v1/team/${teamId}`)
       .expect(StatusCodes.NO_CONTENT);
 

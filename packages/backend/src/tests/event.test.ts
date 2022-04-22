@@ -1,4 +1,4 @@
-import app from '../app';
+import server from '../app';
 import request from 'supertest';
 import {
   AvailabilityStatus,
@@ -13,6 +13,7 @@ import {
   EventResponseDTO,
   GetEventAvailabilityConfirmationsResponseDTO,
 } from 'src/controllers/event.controller';
+import { io } from 'socket.io-client';
 
 describe('Events', () => {
   it('Get', async () => {
@@ -25,7 +26,7 @@ describe('Events', () => {
     });
 
     const eventId = eventDoc._id.toString();
-    const eventGetResponse = await request(app)
+    const eventGetResponse = await request(server)
       .get(`/api/v1/event`)
       .send({ eventId })
       .expect(StatusCodes.OK);
@@ -34,7 +35,7 @@ describe('Events', () => {
   });
 
   it('Create', async () => {
-    await request(app)
+    await request(server)
       .post('/api/v1/event')
       .send({
         title: 'title',
@@ -56,7 +57,7 @@ describe('Events', () => {
     });
 
     const eventId = eventDoc._id.toString();
-    const eventUpdateResponse = await request(app)
+    const eventUpdateResponse = await request(server)
       .patch(`/api/v1/event`)
       .send({
         eventId,
@@ -77,7 +78,7 @@ describe('Events', () => {
     });
     const eventId = eventDoc._id;
 
-    await request(app)
+    await request(server)
       .delete(`/api/v1/event`)
       .send({ eventId: eventDoc._id })
       .expect(StatusCodes.NO_CONTENT);
@@ -119,7 +120,7 @@ describe('Events', () => {
 
     it('By eventId', async () => {
       const searchResponse: EventResponseDTO[] = (
-        await request(app)
+        await request(server)
           .get(`/api/v1/event/search`)
           .send({
             eventId,
@@ -132,7 +133,7 @@ describe('Events', () => {
     });
     it('By teamId', async () => {
       const searchResponse: EventResponseDTO[] = (
-        await request(app)
+        await request(server)
           .get(`/api/v1/event/search`)
           .send({
             teamId,
@@ -145,7 +146,7 @@ describe('Events', () => {
     });
     it('By title sub-string', async () => {
       const searchResponse: EventResponseDTO[] = (
-        await request(app)
+        await request(server)
           .get(`/api/v1/event/search`)
           .send({
             titleSubStr: 'ti',
@@ -158,7 +159,7 @@ describe('Events', () => {
     });
     it('By description sub-string', async () => {
       const searchResponse: EventResponseDTO[] = (
-        await request(app)
+        await request(server)
           .get(`/api/v1/event/search`)
           .send({
             descriptionSubStr: 'des',
@@ -171,7 +172,7 @@ describe('Events', () => {
     });
     it('By date range', async () => {
       const searchResponse: EventResponseDTO[] = (
-        await request(app)
+        await request(server)
           .get(`/api/v1/event/search`)
           .send({
             startDate: new Date('1800'),
@@ -195,7 +196,7 @@ describe('Events', () => {
       });
 
       const searchResponse: EventResponseDTO[] = (
-        await request(app)
+        await request(server)
           .get(`/api/v1/event/search`)
           .send({
             teamId,
@@ -210,7 +211,7 @@ describe('Events', () => {
     //TODO: This works as intended but the Jest doesn't seem to work here
     it.skip('Conflicting keys in payload', async () => {
       await expect(async () => {
-        await request(app).get(`/api/v1/event/search`).send({
+        await request(server).get(`/api/v1/event/search`).send({
           teamId,
           eventId,
         });
@@ -259,7 +260,7 @@ describe('Events', () => {
 
     it('Add user availability', async () => {
       const eventResponseDTO: EventResponseDTO = (
-        await request(app)
+        await request(server)
           .post(`/api/v1/event/availability`)
           .send({
             eventId: eventId,
@@ -288,7 +289,7 @@ describe('Events', () => {
     });
 
     it('Remove user availability entirely', async () => {
-      await request(app)
+      await request(server)
         .delete(`/api/v1/event/availability`)
         .send({
           eventId,
@@ -307,7 +308,7 @@ describe('Events', () => {
     });
 
     it('Remove user availability left side', async () => {
-      await request(app)
+      await request(server)
         .delete(`/api/v1/event/availability`)
         .send({
           eventId,
@@ -332,7 +333,7 @@ describe('Events', () => {
     });
 
     it('Remove user availability right side', async () => {
-      await request(app)
+      await request(server)
         .delete(`/api/v1/event/availability`)
         .send({
           eventId,
@@ -357,7 +358,7 @@ describe('Events', () => {
     });
 
     it('Remove user availability middle', async () => {
-      await request(app)
+      await request(server)
         .delete(`/api/v1/event/availability`)
         .send({
           eventId,
@@ -392,7 +393,7 @@ describe('Events', () => {
     });
 
     it('Confirm user availability', async () => {
-      await request(app)
+      await request(server)
         .patch(`/api/v1/event/availability/confirm`)
         .send({
           userId,
@@ -406,12 +407,13 @@ describe('Events', () => {
           .attendeeAvailability[0].confirmed,
       ).toBe(true);
     });
+
     it('Get user availability confirmation count', async () => {
       // Initially the confirmation count will be zero
       const {
         confirmed: confirmedInitial,
       }: GetEventAvailabilityConfirmationsResponseDTO = (
-        await request(app)
+        await request(server)
           .get(`/api/v1/event/availability/confirm`)
           .send({
             userId,
@@ -447,7 +449,7 @@ describe('Events', () => {
       const {
         confirmed: confirmedFinal,
       }: GetEventAvailabilityConfirmationsResponseDTO = (
-        await request(app)
+        await request(server)
           .get(`/api/v1/event/availability/confirm`)
           .send({
             userId,
@@ -457,6 +459,15 @@ describe('Events', () => {
       ).body;
 
       expect(confirmedFinal).toBe(1);
+    });
+
+    it.skip('Fetch team availability via socket.io', async () => {
+      const socket = io('http://localhost:3000');
+      await socket.connect();
+
+      socket.on('connect', () => {
+        console.log(socket.id);
+      });
     });
   });
 });
