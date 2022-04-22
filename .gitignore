@@ -114,3 +114,6 @@ dist
 
 .vscode/
 .idea/
+
+
+**/firebase.credentials.json

@@ -19,31 +19,18 @@ app.use(bodyParser.json());
 
 const router = express.Router();
 
-// Swagger definition
-const options = {
-  explorer: true,
-  swaggerOptions: {
-    urls: [
-      {
-        url: './docs/swagger.json',
-        name: 'Spec1',
-      },
-    ],
-  },
-};
-
 async function initialize() {
   initializeApp({
     credential: applicationDefault(),
   });
-
   app.use(express.json());
+  app.use(BASE_URL, isAuthenticated);
 
   // Initialize endpoints
-  app.use(BASE_URL, isAuthenticated, router);
-  app.use(BASE_URL, isAuthenticated, eventsRouter);
-  app.use(BASE_URL, isAuthenticated, usersRouter);
-  app.use(BASE_URL, isAuthenticated, teamRouter);
+  app.use(BASE_URL, router);
+  app.use(BASE_URL, eventsRouter);
+  app.use(BASE_URL, usersRouter);
+  app.use(BASE_URL, teamRouter);
 
   if (process.env.NODE_ENV !== 'testing') {
     app.use(`/docs`, swaggerUi.serve, swaggerUi.setup(swaggerDocument));
