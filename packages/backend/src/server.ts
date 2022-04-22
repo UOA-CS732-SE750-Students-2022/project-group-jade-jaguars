@@ -16,6 +16,7 @@ import { eventsRouter } from './routes/event.route';
 import { usersRouter } from './routes/user.route';
 import { teamRouter } from './routes/team.route';
 import mongoose from 'mongoose';
+import socket from './socketio';
 
 const indexRouter = express.Router();
 
@@ -89,35 +90,16 @@ class Server extends http.Server {
     }
   }
 
-  private setSocketIO() {
-    const io = new socketio.Server(this, { path: '/socket.io' });
-    this.app.set('io', io);
-    const chat = io.of('./chat');
-    chat.on('connection', (socket: socketio.Socket) => {
-      const req = socket.request;
-      const ip = req.headers['X-forwarded-for'] || req.socket.remoteAddress;
-      console.log('client connected!', ip, socket.id);
-      socket.on('reply', (data) => {
-        console.log(data);
-      });
-      socket.on('error', (error) => {
-        console.error(error);
-      });
-      socket.on('disconnect', () => {
-        console.log('client disconneted', ip, socket.id);
-      });
-    });
-  }
-
   async start() {
     this.app.set('port', PORT);
     this.setMiddleware();
     await this.setDatabase();
-    this.setSocketIO();
     if (process.env.NODE_ENV !== 'testing') {
+      socket(this, this.app);
       this.app.listen(this.app.get('port'), () => {
         console.log(`server: http://localhost:${this.app.get('port')}`);
       });
+    } else {
     }
   }
 }

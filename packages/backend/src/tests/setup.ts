@@ -19,12 +19,10 @@ beforeEach(async () => {
 });
 
 afterEach(async () => {
-  server.close();
   // The following is to make sure the database is clean before a test starts
   await mongoose.connection.db.dropDatabase();
 });
 
 afterAll(async () => {
-  server.close();
   await mongoServer.stop();
 });

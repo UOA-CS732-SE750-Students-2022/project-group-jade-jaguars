@@ -13,7 +13,13 @@ import {
   EventResponseDTO,
   GetEventAvailabilityConfirmationsResponseDTO,
 } from 'src/controllers/event.controller';
-import { io } from 'socket.io-client';
+// import { io } from 'socket.io-client';
+import { createServer } from 'http';
+import { io as Client } from 'socket.io-client';
+import { Server } from 'socket.io';
+import { AddressInfo } from 'net';
+import socket from '../socketio';
+import { BASE_URL } from '../configs/backend.config';
 
 describe('Events', () => {
   it('Get', async () => {
@@ -461,12 +467,56 @@ describe('Events', () => {
       expect(confirmedFinal).toBe(1);
     });
 
-    it.skip('Fetch team availability via socket.io', async () => {
-      const socket = io('http://localhost:3000');
-      await socket.connect();
+    // it('Fetch team availability via socket.io', async (done) => {
+    //   const socket = io('http://localhost:3000/api/v1/socketio');
+    //   socket.connect();
+    //   socket.on('connect', () => {
+    //     console.log(socket.id);
+    //     done();
+    //   });
+    //   console.log('running test');
+    // });
 
-      socket.on('connect', () => {
-        console.log(socket.id);
+    describe.only('my awesome project', () => {
+      let io: Server;
+      let serverSocket, clientSocket;
+
+      beforeAll((done) => {
+        const httpServer = createServer();
+        socket(httpServer, server.app);
+        io = server.app.get('socketio');
+
+        httpServer.listen(() => {
+          const port = (httpServer.address() as AddressInfo).port;
+          clientSocket = Client(`http://localhost:${port}`);
+          io.on('connection', (socket) => {
+            serverSocket = socket;
+          });
+          clientSocket.on('connect', done);
+        });
+      });
+
+      afterAll(() => {
+        io.close();
+        clientSocket.close();
+      });
+
+      it('should work', (done) => {
+        clientSocket.on('hello', (arg) => {
+          expect(arg).toBe('world');
+          done();
+        });
+        serverSocket.emit('hello', 'world');
+      });
+
+      it('should work (with ack)', (done) => {
+        serverSocket.on('hi', (cb) => {
+          cb('hola');
+        });
+        clientSocket.emit('hi', (arg) => {
+          expect(arg).toBe('hola');
+          done();
+        });
       });
     });
   });
