@@ -5,11 +5,14 @@ import {
   Button,
   Grid,
   Group,
+  InputWrapper,
   Paper,
   Textarea,
   TextInput,
 } from '@mantine/core';
 import { useForm } from '@mantine/hooks';
+import { TimePicker } from 'antd';
+import moment from 'moment';
 interface FormValues {
   title: string;
   dateRange: [Date | null, Date | null];
@@ -42,8 +45,11 @@ const EventForm = () => {
               }
             />
           </Grid.Col>
-          <Grid.Col span={6}>
+          <Grid.Col span={8}>
             <DateRangePicker
+              classNames={{
+                input: 'py-[20.5px] text-[16px]',
+              }}
               required
               label="Date Range"
               placeholder="Pick dates range"
@@ -52,14 +58,28 @@ const EventForm = () => {
               minDate={new Date()}
             />
           </Grid.Col>
-          <Grid.Col span={6}>
-            <TimeRangeInput
-              label="Time Range"
-              value={form.values.timeRange}
-              onChange={(e) => form.setFieldValue('timeRange', [e[0], e[1]])}
-              required
-              clearable
-            />
+          <Grid.Col span={4}>
+            <InputWrapper label="Time Range" required>
+              <div className="border-[#C3CAD1] border rounded">
+                <TimePicker.RangePicker
+                  clearIcon
+                  bordered={false}
+                  defaultValue={[
+                    moment('09:00', 'HH:mm'),
+                    moment('17:00', 'HH:mm'),
+                  ]}
+                  format="HH:mm"
+                  showSecond={false}
+                  minuteStep={30}
+                  size={'large'}
+                  onCalendarChange={(values) => {
+                    const startHour = values?.[0]?.toDate();
+                    const endHour = values?.[1]?.toDate();
+                    form.setFieldValue('timeRange', [startHour!, endHour!]);
+                  }}
+                ></TimePicker.RangePicker>
+              </div>
+            </InputWrapper>
           </Grid.Col>
           <Grid.Col>
             <Textarea
