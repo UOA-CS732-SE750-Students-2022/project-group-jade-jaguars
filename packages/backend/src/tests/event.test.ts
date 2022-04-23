@@ -16,12 +16,9 @@ import {
 // import { io } from 'socket.io-client';
 import { createServer, Server as HttpServer } from 'http';
 import { io as Client } from 'socket.io-client';
-import { Server, Socket } from 'socket.io';
+import { Server } from 'socket.io';
 import { AddressInfo } from 'net';
 import socket from '../socketio';
-import { BASE_URL } from '../configs/backend.config';
-import path from 'path';
-import { create } from 'domain';
 
 describe('Events', () => {
   it('Get', async () => {
@@ -238,7 +235,6 @@ describe('Events', () => {
             },
           ],
         },
-        attendees: [userDoc._id],
       });
       eventId = eventDoc._id.toString();
     });

@@ -43,7 +43,6 @@ export interface IEvent {
   startDate: Date;
   endDate: Date;
   availability: IEventAvailability;
-  attendees: Types.ObjectId[];
   location?: string;
   identifier: string;
   team?: Types.ObjectId;
@@ -150,12 +149,6 @@ const eventSchema = new Schema<IEvent>(
         attendeeAvailability: [],
         finalisedTime: null,
       },
-    },
-    attendees: {
-      type: [Types.ObjectId],
-      ref: 'User',
-      required: true,
-      default: [],
     },
     description: {
       type: String,

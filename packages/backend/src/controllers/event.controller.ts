@@ -16,7 +16,7 @@ import { Types } from 'mongoose';
 import Joi from 'joi';
 import { validate, validators } from '../libs/validate.lib';
 import { UserModel } from '../schemas/user.schema';
-import { TeamModel } from '../schemas/team.schema';
+import { ITeam, TeamModel } from '../schemas/team.schema';
 import Server from 'src/server';
 
 export interface CreateEventDTO {
@@ -26,7 +26,6 @@ export interface CreateEventDTO {
   startDate: Date;
   endDate: Date;
   availability: IEventAvailability;
-  attendees: Types.ObjectId[];
   location: string;
   team?: Types.ObjectId;
 }
@@ -80,7 +79,6 @@ export interface EventResponseDTO {
   startDate: Date;
   endDate: Date;
   availability: IEventAvailability;
-  attendees: Types.ObjectId[];
   location?: string;
   identifier: string;
   team: Types.ObjectId;
@@ -94,7 +92,6 @@ function eventDocToResponseDTO(eventDoc: any): EventResponseDTO {
     startDate: eventDoc.startDate,
     endDate: eventDoc.endDate,
     availability: eventDoc.availability,
-    attendees: eventDoc.attendees,
     description: eventDoc.description,
     location: eventDoc.location,
     identifier: eventDoc.identifier,
@@ -318,6 +315,7 @@ export async function addUserAvailabilityById(
     res.status(StatusCodes.NOT_FOUND).send('event not found');
     return;
   }
+
   const userEventAvailabilityIndex =
     eventDoc.availability.attendeeAvailability.findIndex((x) =>
       x.attendee._id.equals(formData.userId),
