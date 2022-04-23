@@ -17,14 +17,11 @@ import Joi from 'joi';
 import { validate, validators } from '../libs/validate.lib';
 import { UserModel } from '../schemas/user.schema';
 import { TeamModel } from '../schemas/team.schema';
-
-export interface GetEventDTO {
-  eventId: Types.ObjectId;
-}
+import Server from 'src/server';
 
 export interface CreateEventDTO {
   title: string;
-  description: string;
+  description?: string;
   status?: EventStatus;
   startDate: Date;
   endDate: Date;
@@ -34,16 +31,11 @@ export interface CreateEventDTO {
   team?: Types.ObjectId;
 }
 
-export interface UpdateEventDTO extends Partial<IEvent> {
-  eventId: Types.ObjectId;
-}
-
-export interface DeleteEventDTO {
+export interface PatchEventDTO extends Partial<IEvent> {
   eventId: Types.ObjectId;
 }
 
 export interface SearchEventDTO {
-  eventId?: Types.ObjectId;
   teamId?: Types.ObjectId;
   startDate?: Date;
   endDate?: Date;
@@ -55,17 +47,20 @@ export interface SearchEventDTO {
 // TODO: For now include userId in this payload, eventually this property should be removed and instead using the authToken we look up the userId
 export interface AddUserAvalabilityDTO {
   userId: Types.ObjectId;
-  eventId: Types.ObjectId;
   startDate: Date;
   endDate: Date;
   status?: AvailabilityStatus;
 }
 
-export interface RemoveUserAvalabilityDTO extends AddUserAvalabilityDTO {}
+export interface RemoveUserAvalabilityDTO {
+  userId: string;
+  eventId: string;
+  startDate: Date;
+  endDate: Date;
+}
 
-export interface GetEventAvailabilityConfirmationsDTO {
+export interface SetEventAvailabilityConfirmationDTO {
   userId: Types.ObjectId;
-  eventId: Types.ObjectId;
   confirmed: Boolean;
 }
 
@@ -80,13 +75,13 @@ export interface GetEventAvailabilityConfirmationsResponseDTO {
 export interface EventResponseDTO {
   id: Types.ObjectId;
   title: string;
-  description: string;
+  description?: string;
   status: EventStatus;
-  startDate: number;
-  endDate: number;
+  startDate: Date;
+  endDate: Date;
   availability: IEventAvailability;
   attendees: Types.ObjectId[];
-  location: string;
+  location?: string;
   identifier: string;
   team: Types.ObjectId;
 }
@@ -108,16 +103,20 @@ function eventDocToResponseDTO(eventDoc: any): EventResponseDTO {
 }
 
 export async function getEventById(
-  req: Request<GetEventDTO>,
-  res: Response<EventResponseDTO>,
+  req: Request,
+  res: Response<EventResponseDTO | string>,
 ) {
-  const rules = Joi.object<UpdateEventDTO>({
-    eventId: validators.objectId().required(),
-  });
-  const formData = validate(rules, req.body, { allowUnknown: true });
-  const eventDoc = await EventModel.findById(formData.eventId);
+  let eventId;
+  try {
+    eventId = convertToObjectId(req.params.eventId);
+  } catch (e: unknown) {
+    if (!(e instanceof ServerError)) throw e;
+    res.status(e.status).send(e.message);
+  }
+
+  const eventDoc = await EventModel.findById(eventId);
   if (!eventDoc) {
-    throw new ServerError('event not found', StatusCodes.NOT_FOUND);
+    res.status(StatusCodes.NOT_FOUND).send('event not found');
   }
   res.status(StatusCodes.OK).send(eventDocToResponseDTO(eventDoc));
 }
@@ -129,11 +128,11 @@ export async function createEvent(
   // TODO: create/use remainder of validation rules
   const rules = Joi.object<CreateEventDTO>({
     title: validators.title().required(),
-    description: validators.description().required(),
+    description: validators.description().optional(),
     status: validators.availabilityStatus().optional(),
     startDate: validators.startDate().required(),
     endDate: validators.endDate().required(),
-    location: validators.location().required(),
+    location: validators.location().optional(),
     team: validators.objectId().optional(),
   });
   const formData = validate(rules, req.body, { allowUnknown: true });
@@ -142,12 +141,19 @@ export async function createEvent(
   res.status(StatusCodes.CREATED).send(eventDocToResponseDTO(eventDoc));
 }
 
-// TODO: Add auth middleware to this
-export async function updateEventById(
-  req: TypedRequestBody<UpdateEventDTO>,
-  res: Response<EventResponseDTO>,
+export async function patchEventById(
+  req: TypedRequestBody<PatchEventDTO>,
+  res: Response<EventResponseDTO | string>,
 ) {
-  const rules = Joi.object<UpdateEventDTO>({
+  let eventId;
+  try {
+    eventId = convertToObjectId(req.params.eventId);
+  } catch (e: unknown) {
+    if (!(e instanceof ServerError)) throw e;
+    res.status(e.status).send(e.message);
+  }
+
+  const rules = Joi.object<PatchEventDTO>({
     title: validators.title().optional(),
     description: validators.description().optional(),
     status: validators.availabilityStatus().optional(),
@@ -159,30 +165,30 @@ export async function updateEventById(
 
   const formData = validate(rules, req.body, { allowUnknown: true });
   const eventDoc = await EventModel.findOneAndUpdate(
-    { _id: formData.eventId },
+    { _id: eventId },
     { $set: formData },
     { new: true },
   );
 
   if (!eventDoc) {
-    throw new ServerError('event not found', StatusCodes.BAD_REQUEST);
+    res.status(StatusCodes.NOT_FOUND).send('event not found');
   } else {
     res.status(StatusCodes.OK).send(eventDocToResponseDTO(eventDoc));
   }
 }
 
-// TODO: Add auth middleware to this
-export async function deleteEventById(
-  req: TypedRequestBody<DeleteEventDTO>,
-  res: Response,
-) {
-  const rules = Joi.object<UpdateEventDTO>({
-    eventId: validators.objectId().required(),
-  });
-  const formData = validate(rules, req.body, { allowUnknown: true });
-  const result = await EventModel.deleteOne({ _id: formData.eventId });
-  if (result.deletedCount === 0) {
-    throw new ServerError('event not found', StatusCodes.NOT_FOUND, result);
+export async function deleteEventById(req: Request, res: Response) {
+  let eventId;
+  try {
+    eventId = convertToObjectId(req.params.eventId);
+  } catch (e: unknown) {
+    if (!(e instanceof ServerError)) throw e;
+    res.status(e.status).send(e.message);
+  }
+
+  const deleteResult = await EventModel.deleteOne({ _id: eventId });
+  if (deleteResult.deletedCount === 0) {
+    res.status(StatusCodes.NOT_FOUND).send('event not found');
   } else {
     res.status(StatusCodes.NO_CONTENT).send();
   }
@@ -190,30 +196,22 @@ export async function deleteEventById(
 
 export async function searchEvent(
   req: TypedRequestBody<SearchEventDTO>,
-  res: Response<EventResponseDTO[]>,
+  res: Response<EventResponseDTO[] | string>,
 ) {
   const rules = Joi.object<SearchEventDTO>({
-    eventId: validators.objectId().optional(),
     teamId: validators.objectId().optional(),
     titleSubStr: Joi.string().optional(),
     descriptionSubStr: Joi.string().optional(),
-  }).oxor('eventId', 'teamId', 'titleSubStr', 'descriptionSubStr');
+  }).oxor('teamId', 'titleSubStr', 'descriptionSubStr');
 
   let formData = validate(rules, req.body, { allowUnknown: true });
 
   let events: EventResponseDTO[] = [];
-  // Search by eventId
-  if (formData.eventId) {
-    let eventDoc = await EventModel.findById(formData.eventId);
-    if (!eventDoc) {
-      throw new ServerError('event not found', StatusCodes.NOT_FOUND);
-    }
-    events.push(eventDocToResponseDTO(eventDoc));
-  }
   // Search for events belonging to a team
-  else if (formData.teamId) {
+  if (formData.teamId) {
     if (!(await TeamModel.exists({ _id: formData.teamId }))) {
-      throw new ServerError('team not found', StatusCodes.NOT_FOUND);
+      res.status(StatusCodes.NOT_FOUND).send('team not found');
+      return;
     }
     const eventDocs = (await EventModel.find({ team: formData.teamId })).map(
       (eventDoc) => {
@@ -265,10 +263,9 @@ export async function searchEvent(
   }
   // Exactly one of cases above must be called, otherwise Joi validation has failed to detect malformed payload
   else {
-    throw new ServerError(
-      'server error: xor search payload fail',
-      StatusCodes.INTERNAL_SERVER_ERROR,
-    );
+    res
+      .status(StatusCodes.INTERNAL_SERVER_ERROR)
+      .send('server error: xor search payload fail');
   }
 
   //XXX: Workaround with limitation of Joi single rule application
@@ -287,26 +284,39 @@ export async function searchEvent(
 
 export async function addUserAvailabilityById(
   req: TypedRequestBody<AddUserAvalabilityDTO>,
-  res: Response<EventResponseDTO>,
+  res: Response<EventResponseDTO | string>,
 ) {
-  // TODO: Update with Joi rules
+  let eventId;
+  try {
+    eventId = convertToObjectId(req.params.eventId);
+  } catch (e: unknown) {
+    if (!(e instanceof ServerError)) throw e;
+    res.status(e.status).send(e.message);
+  }
+
+  const payload = {
+    eventId,
+    ...req.body,
+  };
 
   const rules = Joi.object<AddUserAvalabilityDTO>({
     userId: validators.objectId().required(),
-    eventId: validators.objectId().required(),
     startDate: validators.startDate().required(),
     endDate: validators.endDate().required(),
     status: validators.availabilityStatus().optional(),
   });
-  const formData = validate(rules, req.body, { allowUnknown: true });
+
+  const formData = validate(rules, payload, { allowUnknown: true });
 
   if (!(await UserModel.exists({ _id: formData.userId }))) {
-    throw new ServerError('user not found', StatusCodes.NOT_FOUND);
+    res.status(StatusCodes.NOT_FOUND).send('user not found');
+    return;
   }
 
-  let eventDoc = await EventModel.findById(formData.eventId);
+  let eventDoc = await EventModel.findById(eventId);
   if (!eventDoc) {
-    throw new ServerError('event not found', StatusCodes.NOT_FOUND);
+    res.status(StatusCodes.NOT_FOUND).send('event not found');
+    return;
   }
   const userEventAvailabilityIndex =
     eventDoc.availability.attendeeAvailability.findIndex((x) =>
@@ -339,34 +349,52 @@ export async function addUserAvailabilityById(
 }
 
 export async function removeUserAvalabilityById(
-  req: TypedRequestBody<RemoveUserAvalabilityDTO>,
-  res: Response<EventResponseDTO>,
+  req: Request,
+  res: Response<EventResponseDTO | string>,
 ) {
-  const rules = Joi.object<RemoveUserAvalabilityDTO>({
-    userId: validators.objectId().required(),
-    eventId: validators.objectId().required(),
+  let eventId, userId: Types.ObjectId;
+  try {
+    eventId = convertToObjectId(req.params.eventId);
+    userId = convertToObjectId(req.query.userId as string);
+  } catch (e: unknown) {
+    if (!(e instanceof ServerError)) throw e;
+    res.status(e.status).send(e.message);
+  }
+
+  const checkDatePayload = {
+    startDate: new Date(req.query.startDate as string),
+    endDate: new Date(req.query.endDate as string),
+  };
+
+  const rules = Joi.object({
     startDate: validators.startDate().required(),
     endDate: validators.endDate().required(),
   });
 
-  const removeBracket = validate(rules, req.body, { allowUnknown: true });
-  let eventDoc = await EventModel.findById(removeBracket.eventId);
+  const removeBracket = validate(rules, checkDatePayload, {
+    allowUnknown: true,
+  });
+
+  let eventDoc = await EventModel.findById(eventId);
   if (!eventDoc) {
-    throw new ServerError('event not found', StatusCodes.NOT_FOUND);
+    res.status(StatusCodes.NOT_FOUND).send('event not found');
+    return;
   }
 
   const userEventAvailabilityIndex =
     eventDoc.availability.attendeeAvailability.findIndex((x) =>
-      x.attendee._id.equals(removeBracket.userId),
+      x.attendee._id.equals(userId),
     );
 
   // Can't remove availability timebracket if it doesn't exist for the user
-  if (userEventAvailabilityIndex == -1) {
-    res.status(StatusCodes.BAD_REQUEST);
+  if (userEventAvailabilityIndex === -1) {
+    res.status(StatusCodes.BAD_REQUEST).send();
+    return;
   }
 
   // Sweep though availability brackets in order to edit to remove parts of or whole brackets
   let adjustedAttendeeAvailability = [];
+
   eventDoc.availability.attendeeAvailability[
     userEventAvailabilityIndex
   ].availability.forEach((ts) => {
@@ -376,7 +404,7 @@ export async function removeUserAvalabilityById(
       ts.endDate <= removeBracket.endDate
     ) {
     }
-    // Existing bracket starting side removed
+    // Existing bracket starting left side removed
     else if (
       ts.startDate >= removeBracket.startDate &&
       ts.endDate >= removeBracket.endDate
@@ -384,7 +412,7 @@ export async function removeUserAvalabilityById(
       ts.startDate = removeBracket.endDate;
       adjustedAttendeeAvailability.push(ts);
     }
-    // Existing bracket ending side removed
+    // Existing bracket ending right side removed
     else if (
       ts.startDate <= removeBracket.startDate &&
       ts.endDate <= removeBracket.endDate
@@ -397,23 +425,22 @@ export async function removeUserAvalabilityById(
       ts.startDate <= removeBracket.startDate &&
       ts.endDate >= removeBracket.endDate
     ) {
-      // Left block
+      // Start left block
       adjustedAttendeeAvailability.push({
         startDate: ts.startDate,
         endDate: removeBracket.startDate,
         status: ts.status,
       });
-      // Right block
+      // End right block
       adjustedAttendeeAvailability.push({
         startDate: removeBracket.endDate,
         endDate: ts.endDate,
         status: ts.status,
       });
     } else {
-      throw new ServerError(
-        'error modifying date brackets',
-        StatusCodes.INTERNAL_SERVER_ERROR,
-      );
+      res
+        .status(StatusCodes.INTERNAL_SERVER_ERROR)
+        .send('error modifying date brackets');
     }
   });
 
@@ -425,24 +452,32 @@ export async function removeUserAvalabilityById(
 }
 
 export async function setEventAvailabilityConfirmation(
-  req: TypedRequestBody<GetEventAvailabilityConfirmationsDTO>,
+  req: TypedRequestBody<SetEventAvailabilityConfirmationDTO>,
   res: Response,
 ) {
-  const rules = Joi.object<GetEventAvailabilityConfirmationsDTO>({
+  let eventId: Types.ObjectId;
+  try {
+    eventId = convertToObjectId(req.params.eventId);
+  } catch (e: unknown) {
+    if (!(e instanceof ServerError)) throw e;
+    res.status(e.status).send(e.message);
+  }
+
+  const rules = Joi.object<SetEventAvailabilityConfirmationDTO>({
     userId: validators.objectId().required(),
-    eventId: validators.objectId().required(),
     confirmed: Joi.boolean().required(),
   });
   const formData = validate(rules, req.body, { allowUnknown: true });
 
   // Check documents exist
   if (!(await UserModel.exists({ id: formData.userId }))) {
-    throw new ServerError('user not found', StatusCodes.NOT_FOUND);
+    res.status(StatusCodes.NOT_FOUND).send('user not found');
+    return;
   }
 
   const eventDoc = await EventModel.findOneAndUpdate(
     {
-      _id: formData.eventId,
+      _id: eventId,
       'availability.attendeeAvailability': {
         $elemMatch: { attendee: formData.userId },
       },
@@ -456,24 +491,29 @@ export async function setEventAvailabilityConfirmation(
   );
 
   if (!eventDoc) {
-    throw new ServerError('event not found', StatusCodes.NOT_FOUND);
+    res.status(StatusCodes.NOT_FOUND).send('event not found');
+    return;
   }
 
   res.status(StatusCodes.OK).send();
 }
 
 export async function getEventAvailabilityConfirmations(
-  req: TypedRequestBody<GetEventAvailabilityConfirmationsDTO>,
-  res: Response<GetEventAvailabilityConfirmationsResponseDTO>,
+  req: Request,
+  res: Response<GetEventAvailabilityConfirmationsResponseDTO | string>,
 ) {
-  const rules = Joi.object<GetEventAvailabilityConfirmationsDTO>({
-    eventId: validators.objectId().required(),
-  });
-  const formData = validate(rules, req.body, { allowUnknown: true });
+  let eventId: Types.ObjectId;
+  try {
+    eventId = convertToObjectId(req.params.eventId);
+  } catch (e: unknown) {
+    if (!(e instanceof ServerError)) throw e;
+    res.status(e.status).send(e.message);
+  }
 
-  const eventDoc = await EventModel.findOne({ _id: formData.eventId });
+  const eventDoc = await EventModel.findOne({ _id: eventId });
   if (!eventDoc) {
-    throw new ServerError('event not found', StatusCodes.NOT_FOUND);
+    res.status(StatusCodes.NOT_FOUND).send('event not found');
+    return;
   }
 
   let confirmed = 0;

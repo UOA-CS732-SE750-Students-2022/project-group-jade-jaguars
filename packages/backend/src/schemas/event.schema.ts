@@ -1,6 +1,6 @@
 import { required } from 'joi';
 import { Model, model, Types, Schema } from 'mongoose';
-import { identifier } from '../models/models.module';
+import { identifier } from '../service/models.service';
 
 export enum EventStatus {
   Pending = 'Pending',
@@ -38,15 +38,15 @@ export interface IEventAvailability {
 
 export interface IEvent {
   title: string;
-  description: string;
+  description?: string;
   status: EventStatus;
   startDate: Date;
   endDate: Date;
   availability: IEventAvailability;
   attendees: Types.ObjectId[];
-  location: string;
+  location?: string;
   identifier: string;
-  team: Types.ObjectId;
+  team?: Types.ObjectId;
 }
 
 const eventSchema = new Schema<IEvent>(
@@ -159,11 +159,11 @@ const eventSchema = new Schema<IEvent>(
     },
     description: {
       type: String,
-      required: true,
+      required: false,
     },
     location: {
       type: String,
-      required: true,
+      required: false,
     },
     identifier: {
       type: String,

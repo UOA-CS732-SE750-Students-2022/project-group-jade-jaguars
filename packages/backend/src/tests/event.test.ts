@@ -6,7 +6,7 @@ import {
   EventStatus,
 } from '../schemas/event.schema';
 import { StatusCodes } from 'http-status-codes';
-import { identifier } from '../models/models.module';
+import { identifier } from '../service/models.service';
 import { UserModel } from '../schemas/user.schema';
 import { TeamModel } from '../schemas/team.schema';
 import {
@@ -21,53 +21,51 @@ import { AddressInfo } from 'net';
 import socket from '../socketio';
 import { BASE_URL } from '../configs/backend.config';
 import path from 'path';
+import { create } from 'domain';
 
 describe('Events', () => {
   it('Get', async () => {
     const eventDoc = await EventModel.create({
       title: 'title',
-      description: 'description',
       startDate: new Date('1900'),
       endDate: new Date('2000'),
-      location: 'location',
     });
 
     const eventId = eventDoc._id.toString();
     const eventGetResponse = await request(server)
-      .get(`/api/v1/event`)
-      .send({ eventId })
+      .get(`/api/v1/event/${eventId}`)
+      .send()
       .expect(StatusCodes.OK);
 
     expect(eventGetResponse.body.id).toEqual(eventId);
   });
 
   it('Create', async () => {
-    await request(server)
+    const createResponse = await request(server)
       .post('/api/v1/event')
       .send({
         title: 'title',
-        description: 'description',
         startDate: new Date('1900'),
         endDate: new Date('2000'),
-        location: 'location',
       })
       .expect(StatusCodes.CREATED);
+
+    expect(
+      await EventModel.exists({ _id: createResponse.body.id }),
+    ).toBeTruthy();
   });
 
-  it('Update', async () => {
+  it('Patch', async () => {
     const eventDoc = await EventModel.create({
       title: 'title',
-      description: 'description',
       startDate: new Date('1900'),
       endDate: new Date('2000'),
-      location: 'location',
     });
 
     const eventId = eventDoc._id.toString();
     const eventUpdateResponse = await request(server)
-      .patch(`/api/v1/event`)
+      .patch(`/api/v1/event/${eventId}`)
       .send({
-        eventId,
         title: 'changed',
       })
       .expect(StatusCodes.OK);
@@ -78,16 +76,14 @@ describe('Events', () => {
   it('Delete', async () => {
     const eventDoc = await EventModel.create({
       title: 'title',
-      description: 'description',
       startDate: new Date('1900'),
       endDate: new Date('2000'),
-      location: 'location',
     });
-    const eventId = eventDoc._id;
+    const eventId = eventDoc._id.toString();
 
     await request(server)
-      .delete(`/api/v1/event`)
-      .send({ eventId: eventDoc._id })
+      .delete(`/api/v1/event/${eventId}`)
+      .send()
       .expect(StatusCodes.NO_CONTENT);
 
     expect(await EventModel.exists({ _id: eventId })).toBe(null);
@@ -120,28 +116,14 @@ describe('Events', () => {
         startDate: new Date('1900'),
         endDate: new Date('2000'),
         team: teamId,
-        location: 'location',
       });
       eventId = eventDoc._id;
     });
 
-    it('By eventId', async () => {
-      const searchResponse: EventResponseDTO[] = (
-        await request(server)
-          .get(`/api/v1/event/search`)
-          .send({
-            eventId,
-          })
-          .expect(StatusCodes.OK)
-      ).body;
-
-      expect(searchResponse).toHaveLength(1);
-      expect(searchResponse[0].id).toBe(eventId.toString());
-    });
     it('By teamId', async () => {
       const searchResponse: EventResponseDTO[] = (
         await request(server)
-          .get(`/api/v1/event/search`)
+          .post(`/api/v1/event/search`)
           .send({
             teamId,
           })
@@ -154,7 +136,7 @@ describe('Events', () => {
     it('By title sub-string', async () => {
       const searchResponse: EventResponseDTO[] = (
         await request(server)
-          .get(`/api/v1/event/search`)
+          .post(`/api/v1/event/search`)
           .send({
             titleSubStr: 'ti',
           })
@@ -167,7 +149,7 @@ describe('Events', () => {
     it('By description sub-string', async () => {
       const searchResponse: EventResponseDTO[] = (
         await request(server)
-          .get(`/api/v1/event/search`)
+          .post(`/api/v1/event/search`)
           .send({
             descriptionSubStr: 'des',
           })
@@ -180,7 +162,7 @@ describe('Events', () => {
     it('By date range', async () => {
       const searchResponse: EventResponseDTO[] = (
         await request(server)
-          .get(`/api/v1/event/search`)
+          .post(`/api/v1/event/search`)
           .send({
             startDate: new Date('1800'),
             endDate: new Date('2100'),
@@ -195,16 +177,14 @@ describe('Events', () => {
       // Create a second identical event
       await EventModel.create({
         title: 'title',
-        description: 'description',
         startDate: new Date('1900'),
         endDate: new Date('2000'),
         team: teamId,
-        location: 'location',
       });
 
       const searchResponse: EventResponseDTO[] = (
         await request(server)
-          .get(`/api/v1/event/search`)
+          .post(`/api/v1/event/search`)
           .send({
             teamId,
             limit: 1,
@@ -239,7 +219,6 @@ describe('Events', () => {
 
       const eventDoc = await EventModel.create({
         title: 'title',
-        description: 'description',
         startDate: startDate,
         endDate: endDate,
         availability: {
@@ -260,7 +239,6 @@ describe('Events', () => {
           ],
         },
         attendees: [userDoc._id],
-        location: 'location',
       });
       eventId = eventDoc._id.toString();
     });
@@ -268,10 +246,9 @@ describe('Events', () => {
     it('Add user availability', async () => {
       const eventResponseDTO: EventResponseDTO = (
         await request(server)
-          .post(`/api/v1/event/availability`)
+          .post(`/api/v1/event/${eventId}/availability`)
           .send({
-            eventId: eventId,
-            userId: userId,
+            userId,
             startDate,
             endDate,
             status: AvailabilityStatus.Available,
@@ -297,14 +274,11 @@ describe('Events', () => {
 
     it('Remove user availability entirely', async () => {
       await request(server)
-        .delete(`/api/v1/event/availability`)
-        .send({
-          eventId,
-          userId,
-          startDate,
-          endDate,
-          status: AvailabilityStatus.Available,
-        })
+        .delete(
+          `/api/v1/event/${eventId}/availability?userId=${userId}&startDate=${new Date(
+            '1800',
+          ).toISOString()}&endDate=${new Date('2100').toISOString()}`,
+        )
         .expect(StatusCodes.OK);
 
       const eventDoc = await EventModel.findById(eventId);
@@ -316,14 +290,11 @@ describe('Events', () => {
 
     it('Remove user availability left side', async () => {
       await request(server)
-        .delete(`/api/v1/event/availability`)
-        .send({
-          eventId,
-          userId,
-          startDate: new Date('1850'),
-          endDate: new Date('1950'),
-          status: AvailabilityStatus.Available,
-        })
+        .delete(
+          `/api/v1/event/${eventId}/availability?userId=${userId}&startDate=${new Date(
+            '1850',
+          ).toISOString()}&endDate=${new Date('1950').toISOString()}`,
+        )
         .expect(StatusCodes.OK);
 
       const eventDoc = await EventModel.findById(eventId);
@@ -341,14 +312,11 @@ describe('Events', () => {
 
     it('Remove user availability right side', async () => {
       await request(server)
-        .delete(`/api/v1/event/availability`)
-        .send({
-          eventId,
-          userId,
-          startDate: new Date('1950'),
-          endDate: new Date('2100'),
-          status: AvailabilityStatus.Available,
-        })
+        .delete(
+          `/api/v1/event/${eventId}/availability?userId=${userId}&startDate=${new Date(
+            '1950',
+          ).toISOString()}&endDate=${new Date('2100').toISOString()}`,
+        )
         .expect(StatusCodes.OK);
 
       const eventDoc = await EventModel.findById(eventId);
@@ -366,14 +334,11 @@ describe('Events', () => {
 
     it('Remove user availability middle', async () => {
       await request(server)
-        .delete(`/api/v1/event/availability`)
-        .send({
-          eventId,
-          userId,
-          startDate: new Date('1940'),
-          endDate: new Date('1960'),
-          status: AvailabilityStatus.Available,
-        })
+        .delete(
+          `/api/v1/event/${eventId}/availability?userId=${userId}&startDate=${new Date(
+            '1940',
+          ).toISOString()}&endDate=${new Date('1960').toISOString()}`,
+        )
         .expect(StatusCodes.OK);
 
       const eventDoc = await EventModel.findById(eventId);
@@ -401,10 +366,9 @@ describe('Events', () => {
 
     it('Confirm user availability', async () => {
       await request(server)
-        .patch(`/api/v1/event/availability/confirm`)
+        .patch(`/api/v1/event/${eventId}/availability/confirm`)
         .send({
           userId,
-          eventId,
           confirmed: true,
         })
         .expect(StatusCodes.OK);
@@ -421,10 +385,9 @@ describe('Events', () => {
         confirmed: confirmedInitial,
       }: GetEventAvailabilityConfirmationsResponseDTO = (
         await request(server)
-          .get(`/api/v1/event/availability/confirm`)
+          .get(`/api/v1/event/${eventId}/availability/confirm`)
           .send({
             userId,
-            eventId,
           })
           .expect(StatusCodes.OK)
       ).body;
@@ -457,10 +420,9 @@ describe('Events', () => {
         confirmed: confirmedFinal,
       }: GetEventAvailabilityConfirmationsResponseDTO = (
         await request(server)
-          .get(`/api/v1/event/availability/confirm`)
+          .get(`/api/v1/event/${eventId}/availability/confirm`)
           .send({
             userId,
-            eventId,
           })
           .expect(StatusCodes.OK)
       ).body;

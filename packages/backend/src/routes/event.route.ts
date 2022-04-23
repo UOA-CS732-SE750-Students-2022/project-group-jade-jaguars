@@ -1,7 +1,7 @@
 import express from 'express';
 import {
   createEvent,
-  updateEventById,
+  patchEventById,
   deleteEventById,
   getEventById,
   addUserAvailabilityById,
@@ -11,6 +11,18 @@ import {
   getEventAvailabilityConfirmations,
 } from '../controllers/event.controller';
 export const eventsRouter = express.Router();
+
+eventsRouter.post('/event/search', searchEvent);
+eventsRouter.post('/event/:eventId/availability', addUserAvailabilityById);
+eventsRouter.delete('/event/:eventId/availability', removeUserAvalabilityById);
+eventsRouter.get(
+  '/event/:eventId/availability/confirm',
+  getEventAvailabilityConfirmations,
+);
+eventsRouter.patch(
+  '/event/:eventId/availability/confirm',
+  setEventAvailabilityConfirmation,
+);
 
 /**
  * @swagger
@@ -29,7 +41,7 @@ export const eventsRouter = express.Router();
  *       501:
  *         description: Internal Server Error
  */
-eventsRouter.get('/event', getEventById);
+eventsRouter.get('/event/:eventId', getEventById);
 
 /**
  * @swagger
@@ -106,7 +118,7 @@ eventsRouter.post('/event', createEvent);
  *       501:
  *         description: Internal Server Error
  */
-eventsRouter.patch('/event', updateEventById);
+eventsRouter.patch('/event/:eventId', patchEventById);
 
 /**
  * @swagger
@@ -128,21 +140,4 @@ eventsRouter.patch('/event', updateEventById);
  *       501:
  *         description: Internal Server Error
  */
-eventsRouter.delete('/event', deleteEventById);
-
-eventsRouter.get('/event/search', searchEvent);
-eventsRouter.post('/event/availability', addUserAvailabilityById);
-eventsRouter.delete('/event/availability', removeUserAvalabilityById);
-
-// availability confirmations
-// get number of availability confirmations
-eventsRouter.get(
-  '/event/availability/confirm',
-  getEventAvailabilityConfirmations,
-);
-
-// confirm user availability selection
-eventsRouter.patch(
-  '/event/availability/confirm',
-  setEventAvailabilityConfirmation,
-);
+eventsRouter.delete('/event/:eventId', deleteEventById);
