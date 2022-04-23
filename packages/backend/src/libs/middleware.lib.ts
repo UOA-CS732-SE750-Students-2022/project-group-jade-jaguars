@@ -8,8 +8,8 @@ export const isAuthenticated = async (
   next: NextFunction,
 ) => {
   try {
-    const TOKEN = req.headers.authorization.split(' ')[1];
-    const decodedValue = await getAuth().verifyIdToken(TOKEN);
+    const token = req.headers.authorization.split(' ')[1];
+    const decodedValue = await getAuth().verifyIdToken(token);
 
     if (decodedValue) {
       return next();
