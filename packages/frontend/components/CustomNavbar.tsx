@@ -1,6 +1,7 @@
 import { Avatar, Group, Navbar } from '@mantine/core';
 import { useViewportSize } from '@mantine/hooks';
 import React from 'react';
+import { CalendarEvent, LayoutDashboard, Users } from 'tabler-icons-react';
 
 export const CustomNavbar = () => {
   const { height, width } = useViewportSize();
@@ -17,7 +18,11 @@ export const CustomNavbar = () => {
       {/* Layoutdashboard
        CalendarEvent
        Users*/}
-      <Navbar.Section>icons</Navbar.Section>
+      <Navbar.Section>
+        <LayoutDashboard />
+        <CalendarEvent />
+        <Users />
+      </Navbar.Section>
     </Navbar>
   );
 };
