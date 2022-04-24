@@ -1,6 +1,6 @@
 import { StatusCodes } from 'http-status-codes';
 import { Request, Response, NextFunction } from 'express';
-import { getAuth } from 'firebase-admin/auth';
+import { DecodedIdToken, getAuth } from 'firebase-admin/auth';
 
 export async function isAuthenticated(
   req: Request,
@@ -35,6 +35,24 @@ export async function isAuthenticated(
     }
 
     return res
+      .status(StatusCodes.INTERNAL_SERVER_ERROR)
+      .json({ message: 'Internal Server Error' });
+  }
+}
+
+export async function getFirebaseUser(
+  req: Request,
+  res: Response,
+): Promise<DecodedIdToken> {
+  try {
+    const token = req.headers.authorization.split(' ')[1];
+    const decodedValue = await getAuth().verifyIdToken(token);
+
+    return decodedValue;
+  } catch (error) {
+    console.log(error);
+
+    res
       .status(StatusCodes.INTERNAL_SERVER_ERROR)
       .json({ message: 'Internal Server Error' });
   }
