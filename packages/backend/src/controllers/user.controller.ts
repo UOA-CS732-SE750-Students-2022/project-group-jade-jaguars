@@ -98,6 +98,6 @@ export async function deleteUserById(req: Request, res: Response) {
   if (result.deletedCount === 0) {
     throw new ServerError('user not found', StatusCodes.NOT_FOUND, result);
   } else {
-    res.status(StatusCodes.NO_CONTENT).send();
+    res.sendStatus(StatusCodes.NO_CONTENT);
   }
 }

@@ -187,7 +187,7 @@ export async function deleteEventById(req: Request, res: Response) {
   if (deleteResult.deletedCount === 0) {
     res.status(StatusCodes.NOT_FOUND).send('event not found');
   } else {
-    res.status(StatusCodes.NO_CONTENT).send();
+    res.sendStatus(StatusCodes.NO_CONTENT);
   }
 }
 
@@ -386,7 +386,7 @@ export async function removeUserAvalabilityById(
 
   // Can't remove availability timebracket if it doesn't exist for the user
   if (userEventAvailabilityIndex === -1) {
-    res.status(StatusCodes.BAD_REQUEST).send();
+    res.sendStatus(StatusCodes.BAD_REQUEST);
     return;
   }
 
@@ -446,7 +446,7 @@ export async function removeUserAvalabilityById(
     userEventAvailabilityIndex
   ].availability = adjustedAttendeeAvailability;
   await eventDoc.save();
-  res.status(StatusCodes.OK).send();
+  res.sendStatus(StatusCodes.OK);
 }
 
 export async function setEventAvailabilityConfirmation(
@@ -493,7 +493,7 @@ export async function setEventAvailabilityConfirmation(
     return;
   }
 
-  res.status(StatusCodes.OK).send();
+  res.sendStatus(StatusCodes.OK);
 }
 
 export async function getEventAvailabilityConfirmations(

@@ -12,7 +12,7 @@
     "start:dev": "nodemon",
     "start:prod": "node dist/app",
     "test": "cross-env NODE_ENV=testing jest --maxWorkers=1 --verbose",
-    "test:dev": "cross-env NODE_ENV=testing jest --runInBand --maxWorkers=1 --watch",
+    "test:dev": "cross-env NODE_ENV=testing jest --maxWorkers=1 --verbose --watch",
     "coverage": "cross-env NODE_ENV=testing nyc npm run test"
   },
   "dependencies": {

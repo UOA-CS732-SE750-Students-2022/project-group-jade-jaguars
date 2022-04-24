@@ -31,7 +31,6 @@ describe('Events', () => {
     const eventId = eventDoc._id.toString();
     const eventGetResponse = await request(server)
       .get(`/api/v1/event/${eventId}`)
-      .send()
       .expect(StatusCodes.OK);
 
     expect(eventGetResponse.body.id).toEqual(eventId);
@@ -80,7 +79,6 @@ describe('Events', () => {
 
     await request(server)
       .delete(`/api/v1/event/${eventId}`)
-      .send()
       .expect(StatusCodes.NO_CONTENT);
 
     expect(await EventModel.exists({ _id: eventId })).toBe(null);
