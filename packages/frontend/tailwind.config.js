@@ -1,3 +1,5 @@
+const colors = require('tailwindcss/colors');
+
 module.exports = {
   content: [
     './pages/**/*.{js,ts,jsx,tsx}',
@@ -5,6 +7,13 @@ module.exports = {
   ],
   theme: {
     colors: {
+      black: colors.black,
+      white: colors.white,
+      gray: colors.slate,
+      green: colors.emerald,
+      purple: colors.violet,
+      yellow: colors.amber,
+      pink: colors.fuchsia,
       primary: '#99C08B', // primary green
       primarylight: '#FAF1E6', // light green
       secondary: '#FFE074', // secondary yellow
