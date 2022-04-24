@@ -17,7 +17,7 @@ const CheckBoxList = () => {
   return (
     <ScrollArea style={{ height: 100, width: 300 }}>
       {teamList.map((team, index) => {
-        <TeamCheckBox label={team} order={index} key={index} />;
+        return <TeamCheckBox label={team} order={index} key={index} />;
       })}
     </ScrollArea>
   );
