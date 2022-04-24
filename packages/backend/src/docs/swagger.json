@@ -1,0 +1,410 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Count Me In",
+    "version": "1.0.0",
+    "description": "",
+    "license": {
+      "name": "GPL-3.0",
+      "url": "https://choosealicense.com/licenses/gpl-3.0/"
+    }
+  },
+  "servers": [
+    {
+      "url": "http://localhost:3000/api/v1"
+    }
+  ],
+  "host": "http://localhost:3000/api/v1",
+  "securityDefinitions": {
+    "bearerAuth": {
+      "type": "apiKey",
+      "name": "Authorization",
+      "scheme": "bearer",
+      "in": "header"
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    },
+    "schemas": {
+      "User": {
+        "type": "object",
+        "properties": {
+          "firstName": {
+            "type": "string"
+          },
+          "lastName": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "events": {
+            "type": "object[]",
+            "$ref": "#/components/schemas/Event"
+          }
+        }
+      },
+      "Event": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "title": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "description": "ENUM - pending, accepted, rejected, cancelled"
+          },
+          "startTime": {
+            "type": "number",
+            "description": "UNIX time stamp of the chosen start time."
+          },
+          "endTime": {
+            "type": "number",
+            "description": "UNIX time stamp of the chosen end time"
+          },
+          "location": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "attendees": {
+            "type": "uuid[]",
+            "description": "a list of user object IDs that are attending or invited to the event."
+          },
+          "availability": {
+            "type": "object",
+            "$ref": "#/components/schemas/EventAvailability"
+          }
+        }
+      },
+      "EventAvailability": {
+        "type": "object",
+        "properties": {
+          "potentialTimes": {
+            "type": "object[]",
+            "description": "A list of potential times for the event.",
+            "$ref": "#/components/schemas/TimeBracket"
+          },
+          "finalisedTime": {
+            "type": "object",
+            "description": "The finalised time for the event.",
+            "$ref": "#/components/schemas/TimeBracket"
+          },
+          "attendeeAvailability": {
+            "type": "object[]",
+            "description": "A list of attendee availability for the event."
+          }
+        }
+      },
+      "TimeBracket": {
+        "type": "object",
+        "required": ["startTime", "endTime"],
+        "properties": {
+          "startTime": {
+            "type": "number",
+            "description": "UNIX time stamp of the start time."
+          },
+          "endTime": {
+            "type": "number",
+            "description": "UNIX time stamp of the end time"
+          }
+        }
+      },
+      "Team": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "title": {
+            "type": "string"
+          },
+          "color": {
+            "type": "enum",
+            "description": "ENUM of the display color of the team."
+          },
+          "admin": {
+            "type": "uuid",
+            "description": "uuid of the admin user object."
+          },
+          "description": {
+            "type": "string"
+          },
+          "members": {
+            "type": "uuid[]",
+            "description": "a list of user object IDs that are members of the team."
+          },
+          "events": {
+            "type": "uuid[]",
+            "description": "a list of event object IDs that are scheduled for the team."
+          }
+        }
+      }
+    }
+  },
+
+  "paths": {
+    "/user": {
+      "get": {
+        "tags": ["User"],
+        "summary": "Get user by id",
+        "produces": ["application/json"],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      },
+      "post": {
+        "tags": ["User"],
+        "summary": "Create a new user",
+        "description": "This can only be done by the logged in user.",
+        "produces": ["application/json"],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "description": "Created user object",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/User"
+            }
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      },
+      "put": {
+        "tags": ["User"],
+        "summary": "Update an existing user",
+        "description": "This can only be done by the logged in user.",
+        "produces": ["application/json"],
+        "parameters": [
+          {
+            "name": "ID",
+            "in": "path",
+            "description": "ID of user to update",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "description": "Updated user object",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/User"
+            }
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      },
+      "delete": {
+        "tags": ["User"],
+        "summary": "Delete user",
+        "description": "This can only be done by the logged in user.",
+        "produces": ["application/json"],
+        "parameters": [
+          {
+            "name": "ID",
+            "in": "path",
+            "description": "The name that needs to be deleted",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/event": {
+      "get": {
+        "tags": ["Event"],
+        "summary": "Get event by id",
+        "produces": ["application/json"],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      },
+      "post": {
+        "tags": ["Event"],
+        "summary": "Create a new event",
+        "description": "This can only be done by the logged in user.",
+        "produces": ["application/json"],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "description": "Created event object",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Event"
+            }
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      },
+      "put": {
+        "tags": ["Event"],
+        "summary": "Update an existing event",
+        "description": "This can only be done by the logged in user.",
+        "produces": ["application/json"],
+        "parameters": [
+          {
+            "name": "ID",
+            "in": "path",
+            "description": "ID of event to update",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "description": "Updated event object",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Event"
+            }
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      },
+      "delete": {
+        "tags": ["Event"],
+        "summary": "Delete event",
+        "description": "This can only be done by the logged in user.",
+        "produces": ["application/json"],
+        "parameters": [
+          {
+            "name": "ID",
+            "in": "path",
+            "description": "The name that needs to be deleted",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/teams": {
+      "get": {
+        "tags": ["Team"],
+        "summary": "Get team by id",
+        "produces": ["application/json"],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      },
+      "post": {
+        "tags": ["Team"],
+        "summary": "Create a new team",
+        "description": "This can only be done by the logged in user.",
+        "produces": ["application/json"],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "description": "Created team object",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Team"
+            }
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      },
+      "put": {
+        "tags": ["Team"],
+        "summary": "Update an existing team",
+        "description": "This can only be done by the logged in user.",
+        "produces": ["application/json"],
+        "parameters": [
+          {
+            "name": "ID",
+            "in": "path",
+            "description": "ID of team to update",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "description": "Updated team object",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Team"
+            }
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      },
+      "delete": {
+        "tags": ["Team"],
+        "summary": "Delete team",
+        "description": "This can only be done by the logged in user.",
+        "produces": ["application/json"],
+        "parameters": [
+          {
+            "name": "ID",
+            "in": "path",
+            "description": "The name that needs to be deleted",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    }
+  }
+}
