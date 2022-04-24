@@ -14,6 +14,20 @@ interface EventCardInterface {
   onHover?: () => void;
 }
 
+/**
+ * This is the card component that displays information of an event,
+ * including event title, date, time, description and participants
+ * @param title Title of the event
+ * @param date Date of the event
+ * @param timeRange Start and end time for the event (currently only support NZDT)
+ * @param participants A list of participants with name, profile picture is optional
+ * @param description Description of the event
+ * @param onClick Custom onClick event when clicking on the card, optional
+ * @param onHover Custom onHover event when hovering (mouse over) on the card, optional
+ *
+ * @author Raina Song (rainasong)
+ */
+
 const EventCard = (props: EventCardInterface) => {
   const {
     title,
