@@ -1,7 +1,6 @@
 import http from 'http';
 import express from 'express';
 import { Server, Socket } from 'socket.io';
-import { BASE_URL } from './configs/backend.config';
 
 const socket = (server: http.Server, app: express.Application) => {
   const io = new Server(server, { path: '/socketio/' });

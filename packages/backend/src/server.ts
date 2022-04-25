@@ -1,6 +1,5 @@
 import express from 'express';
 import http from 'http';
-import { PORT, BASE_URL, VERBOSE } from './configs/backend.config';
 import swaggerUi from 'swagger-ui-express';
 import bodyParser from 'body-parser';
 import { eventsRouter } from './routes/event.route';
@@ -13,6 +12,11 @@ import { isAuthenticated } from './libs/middleware.lib';
 import swaggerDocument from './docs/swagger.json';
 import * as firebase from 'firebase-admin';
 
+dotenv.config({ path: `.env.${process.env.ENV_PATH}` });
+const PORT: number = parseInt(process.env.PORT);
+const NODE_PATH: string = process.env.NODE_PATH;
+const BASE_URL: string = process.env.BASE_URL;
+
 const indexRouter = express.Router();
 
 class Server extends http.Server {
@@ -22,10 +26,6 @@ class Server extends http.Server {
     const app: express.Application = express();
     super(app);
     this.app = app;
-  }
-
-  private setEnvironment() {
-    dotenv.config({ path: `.env.${process.env.ENV_PATH}` });
   }
 
   private setRouter() {
@@ -44,12 +44,12 @@ class Server extends http.Server {
     this.app.use(bodyParser.json());
 
     if (process.env.NODE_PATH !== 'test') {
-      this.app.use(
-        `${BASE_URL}/docs`,
-        swaggerUi.serve,
-        swaggerUi.setup(swaggerDocument),
-      );
-      console.log(`swagger: http://localhost:${PORT}${BASE_URL}/docs`);
+      // this.app.use(
+      //   `${BASE_URL}/docs`,
+      //   swaggerUi.serve,
+      //   swaggerUi.setup(swaggerDocument),
+      // );
+      // console.log(`swagger: http://localhost:${PORT}${BASE_URL}/docs`);
     }
 
     this.setRouter();
@@ -62,7 +62,6 @@ class Server extends http.Server {
   }
 
   async start() {
-    this.setEnvironment();
     this.setMiddleware();
     await this.setDatabase();
     // When we are testing so no need to start socketio
