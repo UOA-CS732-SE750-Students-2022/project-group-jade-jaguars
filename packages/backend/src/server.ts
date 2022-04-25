@@ -34,7 +34,6 @@ class Server extends http.Server {
     this.app.use(BASE_URL, eventsRouter);
     this.app.use(BASE_URL, usersRouter);
     this.app.use(BASE_URL, teamRouter);
-    console.log('set all routers');
   }
 
   private setMiddleware() {
@@ -46,12 +45,12 @@ class Server extends http.Server {
     this.app.use(bodyParser.json());
 
     if (process.env.NODE_PATH !== 'test') {
-      // this.app.use(
-      //   `${BASE_URL}/docs`,
-      //   swaggerUi.serve,
-      //   swaggerUi.setup(swaggerDocument),
-      // );
-      // console.log(`swagger: http://localhost:${PORT}${BASE_URL}/docs`);
+      this.app.use(
+        `${BASE_URL}/docs`,
+        swaggerUi.serve,
+        swaggerUi.setup(swaggerDocument),
+      );
+      console.log(`swagger: http://localhost:${PORT}${BASE_URL}/docs`);
     }
 
     this.setRouter();
