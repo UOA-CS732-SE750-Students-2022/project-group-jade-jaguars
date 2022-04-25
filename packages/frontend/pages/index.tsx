@@ -51,7 +51,13 @@ const team: TeamDetails = {
 const Home: NextPage = () => {
   return (
     <>
-      <TeamDetailsCard {...team} />
+      <TeamDetailsCard
+        team={team}
+        editTeam={() => console.log('Editing team...')}
+        deleteTeam={() => console.log('Deleting team...')}
+        addUser={() => console.log('Adding user...')}
+        deleteUser={() => console.log('Deleting user...')}
+      />
     </>
   );
 };

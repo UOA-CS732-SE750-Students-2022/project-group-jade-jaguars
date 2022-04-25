@@ -1,33 +1,34 @@
 import { Card, User } from '@nextui-org/react';
 import { CloseButton } from '@mantine/core';
-import { useEffect, useState } from 'react';
+import { MouseEventHandler, useEffect, useState } from 'react';
 import Member from '../types/Member';
 
-function MemberCard(member: Member) {
+function MemberCard(props: {
+  member: Member;
+  deleteUser: MouseEventHandler<HTMLButtonElement>;
+}) {
   const [profilePic, setProfilePic] = useState<string>(
     'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png',
   );
 
   useEffect(() => {
-    if (member.profilePic) {
-      setProfilePic(member.profilePic);
+    if (props.member.profilePic) {
+      setProfilePic(props.member.profilePic);
     }
-  }, [member]);
+  }, [props]);
 
   return (
-    <Card css={{ mw: '220px', margin: '5px' }} bordered={false} shadow={false}>
+    <Card className="mw-px-220 m-px-5" bordered={false} shadow={false}>
       <div>
         <User
           src={profilePic}
-          name={member.name}
+          name={props.member.name}
           bordered
-          css={{ padding: 0, maxWidth: 'fit-content' }}
+          className="p-0 max-w-fit"
         />
         <CloseButton
-          onClick={() => {
-            console.log('Deleting user...');
-          }}
-          style={{ float: 'right', marginTop: '7px' }}
+          onClick={props.deleteUser}
+          className="mt-[7px] float-right"
         />
       </div>
     </Card>

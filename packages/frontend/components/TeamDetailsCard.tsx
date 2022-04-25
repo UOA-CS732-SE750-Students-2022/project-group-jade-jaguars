@@ -3,70 +3,50 @@ import { Card, Text, Row } from '@nextui-org/react';
 import MemberCard from './MemberCard';
 import { UserPlus, Edit, Trash } from 'tabler-icons-react';
 import { ActionIcon } from '@mantine/core';
+import styles from './TeamDetailsCard.module.css';
+import { MouseEventHandler } from 'react';
 
-function TeamDetailsCard(team: TeamDetails) {
+function TeamDetailsCard(props: {
+  team: TeamDetails;
+  editTeam: MouseEventHandler<SVGElement>;
+  deleteTeam: MouseEventHandler<SVGElement>;
+  addUser: MouseEventHandler<SVGElement>;
+  deleteUser: MouseEventHandler<HTMLButtonElement>;
+}) {
   return (
     <Card css={{ mw: '290px', height: '90vh' }}>
       <Row wrap="wrap" justify="space-between">
-        <Text h4 css={{ paddingTop: '20px', marginLeft: '5px' }}>
-          {team.title}
+        <Text h4 className="pt-[20px]" css={{ marginLeft: '5px' }}>
+          {props.team.title}
         </Text>
-        <ActionIcon
-          style={{ position: 'absolute', bottom: '0px', right: '40px' }}
-        >
-          <Edit
-            onClick={() => {
-              console.log('Editing team...');
-            }}
-          />
+        <ActionIcon className="absolute bottom-0 right-[40px]">
+          <Edit onClick={props.editTeam} />
         </ActionIcon>
-        <ActionIcon
-          style={{
-            position: 'absolute',
-            bottom: '0px',
-            right: '0px',
-            marginRight: '10px',
-          }}
-        >
-          <Trash
-            onClick={() => {
-              console.log('Deleting team...');
-            }}
-          />
+        <ActionIcon className="absolute bottom-0 right-0 mr-[10px]">
+          <Trash onClick={props.deleteTeam} />
         </ActionIcon>
       </Row>
       <Text css={{ fontSize: '$tiny', marginLeft: '5px' }}>
-        {team.description}
+        {props.team.description}
       </Text>
       <Row wrap="wrap" justify="space-between">
         <Text
-          css={{
-            paddingTop: '20px',
-            marginLeft: '5px',
-            maxWidth: 'fit-content',
-            marginRight: '0px',
-          }}
+          className="pt-[20px] mr-[0px] max-w-fit"
+          css={{ marginLeft: '5px' }}
         >
           Members
         </Text>
-        <ActionIcon
-          style={{
-            position: 'absolute',
-            bottom: '0px',
-            right: '0px',
-            marginRight: '10px',
-          }}
-        >
-          <UserPlus
-            onClick={() => {
-              console.log('Adding user...');
-            }}
-          />
+        <ActionIcon className="absolute bottom-0 right-0 mr-[10px]">
+          <UserPlus onClick={props.addUser} />
         </ActionIcon>
       </Row>
-      <div className="members" style={{ overflowY: 'scroll', padding: '5px' }}>
-        {team.members.map((member, index) => (
-          <MemberCard key={index} {...member} />
+      <div className={styles.members + ' overflow-y-scroll p-[5px]'}>
+        {props.team.members.map((member, index) => (
+          <MemberCard
+            key={index}
+            member={member}
+            deleteUser={props.deleteUser}
+          />
         ))}
       </div>
     </Card>
