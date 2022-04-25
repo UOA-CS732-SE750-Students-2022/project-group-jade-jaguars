@@ -128,7 +128,7 @@ export async function createEvent(
   const rules = Joi.object<CreateEventDTO>({
     title: validators.title().required(),
     description: validators.description().optional(),
-    status: validators.availabilityStatus().optional(),
+    status: validators.eventStatus().optional(),
     startDate: validators.startDate().required(),
     endDate: validators.endDate().required(),
     location: validators.location().optional(),
