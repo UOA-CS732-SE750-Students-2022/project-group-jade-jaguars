@@ -117,7 +117,7 @@ function AvailabilitySelector(props: {
           hours = time - 0.5;
           mins = 30;
         }
-        const datetime = new Date(
+        const dateTime = new Date(
           day.getFullYear(),
           day.getMonth(),
           day.getDate(),
@@ -133,7 +133,7 @@ function AvailabilitySelector(props: {
             continue;
           const startDT = new Date(props.availability[index].startTime);
           const endDT = new Date(props.availability[index].endTime);
-          if (datetime >= startDT && datetime < endDT) {
+          if (dateTime >= startDT && dateTime < endDT) {
             currentStatus = props.availability[index].status;
             break;
           }
