@@ -18,7 +18,15 @@ function TeamCard(team: TeamDetails) {
   }, [team]);
 
   return (
-    <Card css={{ mw: '295px', height: '180px' }}>
+    <Card
+      css={{
+        mw: '295px',
+        height: '180px',
+        '&:hover': {
+          background: '#99C08B',
+        },
+      }}
+    >
       <Text h4 css={{ paddingTop: '20px', marginLeft: '5px' }}>
         {team.title}
       </Text>
