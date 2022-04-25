@@ -22,9 +22,6 @@ module.exports = {
       backgroundgrey: '#F9F9F9',
       cardgrey: '#FAFAFA',
     },
-    fontSize: {
-      '2.5xl': '1.56rem',
-    },
     extend: {
       width: {
         196: '32rem',

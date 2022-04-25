@@ -1,5 +1,6 @@
-import { Checkbox, ScrollArea } from '@mantine/core';
-import React from 'react';
+import { Checkbox, ScrollArea, Select } from '@mantine/core';
+import { Avatar } from "@nextui-org/react";
+import React, { useState } from 'react';
 import DeleteIcon from '../../assets/Delete.svg';
 import ShareIcon from '../../assets/Share.svg';
 import EditIcon from '../../assets/Edit.svg';
@@ -15,10 +16,25 @@ interface EventDetailsCardInterface {
     name: string;
     profilePic?: string;
   }[];
-  onEdit: () => void;
-  onDelete: () => void;
-  onShare: () => void;
+  onEdit: (props?: any) => void;
+  onDelete: (props?: any) => void;
+  onShare: (props?: any) => void;
+  onSelectChange: (props?: any) => void;
+  onParticipantClick: (props?: any) => void;
 }
+
+const reminderOptions = [
+  { value: 'none', label: 'None' },
+  { value: 'At time', label: 'At time of event' },
+  { value: '5 minutes', label: '5 minutes before' },
+  { value: '10 minutes', label: '10 minutes before' },
+  { value: '15 minutes', label: '15 minutes before' },
+  { value: '30 minutes', label: '30 minutes before' },
+  { value: '1 hour', label: '1 hour before' },
+  { value: '2 hours', label: '2 hours before' },
+  { value: '1 day', label: '1 day before' },
+  { value: '2 days', label: '2 days before' },
+]
 
 const EventDetailsCard = (props: EventDetailsCardInterface) => {
   const {
@@ -31,12 +47,14 @@ const EventDetailsCard = (props: EventDetailsCardInterface) => {
     onEdit,
     onDelete,
     onShare,
+    onSelectChange,
+    onParticipantClick,
   } = props;
 
   return (
-    <div className="h-4/5 p-10 w-196 bg-white rounded-xl">
-      <div id="header" className="flex flex-row justify-between items-center">
-        <p className="text-2.5xl font-medium flex-1 truncate ...">{title}</p>
+    <div className="p-10 bg-white h-fit w-196 rounded-xl">
+      <div id="header" className="flex flex-row items-center justify-between">
+        <p className="text-[25px] font-medium mr-3 flex-1 truncate ...">{title}</p>
         <div id="tools" className="flex flex-row gap-5">
           <div onClick={onEdit} className="cursor-pointer">
             <EditIcon />
@@ -53,13 +71,41 @@ const EventDetailsCard = (props: EventDetailsCardInterface) => {
         <div>
           {date.toLocaleDateString()}, {formatTimeRange(timeRange)} NZDT
         </div>
-        <div className="h-56 overflow-scroll">{description}</div>
+        <div className="overflow-scroll h-44">{description}</div>
       </div>
-      <div id="location"></div>
-      <div id="reminder"></div>
-      <div id="participants"></div>
+      <div id="location" className='mt-5'>
+        <p className='font-medium text-[18px]'>Location</p>
+        <p className='max-w-full overflow-scroll max-h-10 text-ellipsis'>{location}</p>
+      </div>
+      <div id="reminder" className='mt-5'>
+        <p className='font-medium text-[18px]'>Reminder</p>
+        <div className='mt-1 w-52'>
+          <Select
+            placeholder="Set a reminder"
+            data={reminderOptions}
+            onChange={(value) => onSelectChange(value)}
+          />
+        </div>
+      </div>
+      <div id="participants" className='flex flex-col gap-3 mt-5'>
+        <p className='font-medium text-[18px]'>Participants</p>
+        <div className='flex flex-col w-56 overflow-scroll rounded-md h-52 '>
+        {participants?.map((participant, index) => {
+          return (
+            <div key={index} onClick={() => onParticipantClick(participant)} className='flex flex-row items-center gap-2 px-4 py-2 transition-colors rounded-lg cursor-pointer w-52 hover:bg-primary hover:text-white'>
+              <Avatar pointer src={participant.profilePic} text={participant.name} bordered borderWeight='light'/>
+              <p>{participant.name}</p>
+            </div>
+          )
+        })}
+        </div>
+      </div>
     </div>
   );
 };
 
 export default EventDetailsCard;
+function value(value: any): ((value: string | null) => void) | undefined {
+  throw new Error('Function not implemented.');
+}
+
