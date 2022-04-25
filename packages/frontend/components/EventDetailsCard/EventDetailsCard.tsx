@@ -1,6 +1,6 @@
-import { Checkbox, ScrollArea, Select } from '@mantine/core';
+import { Select } from '@mantine/core';
 import { Avatar } from "@nextui-org/react";
-import React, { useState } from 'react';
+import React from 'react';
 import DeleteIcon from '../../assets/Delete.svg';
 import ShareIcon from '../../assets/Share.svg';
 import EditIcon from '../../assets/Edit.svg';
@@ -123,7 +123,4 @@ const EventDetailsCard = (props: EventDetailsCardInterface) => {
 };
 
 export default EventDetailsCard;
-function value(value: any): ((value: string | null) => void) | undefined {
-  throw new Error('Function not implemented.');
-}
 
