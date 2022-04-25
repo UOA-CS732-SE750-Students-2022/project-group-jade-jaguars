@@ -24,25 +24,27 @@ const CheckBoxList = () => {
       {teamList.map((team, index) => {
         const color = 'teal';
         const inputBackgroundColor = inputBackgroundColorList[index % 5];
-        const inputStyle = `ml-3 border-solid border-black border-2`;
+        const inputStyle = `ml-3 border-solid border-black border-2 cursor-pointer`;
         return (
-          <Checkbox
-            key={index}
-            color={color}
-            label={team}
-            classNames={{
-              root: 'hover:bg-[#99C08B] w-full h-full rounded-md',
-              label: 'w-full p-2 ml-3 hover:text-white',
-              input: inputStyle,
-              icon: 'ml-[17px] text-black',
-            }}
-            styles={{
-              input: {
-                backgroundColor: inputBackgroundColor,
-                color: inputBackgroundColor,
-              },
-            }}
-          />
+          <div key={index}>
+            <Checkbox
+              key={index}
+              color={color}
+              label={team}
+              classNames={{
+                root: 'hover:bg-[#99C08B] w-full h-full rounded-md',
+                label: 'w-full p-2 ml-3 text-white cursor-pointer',
+                input: inputStyle,
+                icon: 'ml-[17px] text-black cursor-pointer',
+              }}
+              styles={{
+                input: {
+                  backgroundColor: inputBackgroundColor,
+                  color: inputBackgroundColor,
+                },
+              }}
+            />
+          </div>
         );
       })}
     </ScrollArea>
