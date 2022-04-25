@@ -8,16 +8,11 @@ import {
 } from '../schemas/event.schema';
 import { Request, Response } from 'express';
 import { StatusCodes } from 'http-status-codes';
-import {
-  convertToObjectId,
-  ServerError,
-  TypedRequestBody,
-} from '../libs/utils.lib';
+import { ServerError, TypedRequestBody } from '../libs/utils.lib';
 import Joi from 'joi';
 import { validate, validators } from '../libs/validate.lib';
 import { UserModel } from '../schemas/user.schema';
-import { ITeam, TeamModel } from '../schemas/team.schema';
-import Server from 'src/server';
+import { TeamModel } from '../schemas/team.schema';
 
 export interface CreateEventDTO {
   _id: string;
@@ -28,15 +23,15 @@ export interface CreateEventDTO {
   endDate: Date;
   availability: IEventAvailability;
   location: string;
-  team?: Types.ObjectId;
+  team?: string;
 }
 
 export interface PatchEventDTO extends Partial<IEvent> {
-  eventId: Types.ObjectId;
+  eventId: string;
 }
 
 export interface SearchEventDTO {
-  teamId?: Types.ObjectId;
+  teamId?: string;
   startDate?: Date;
   endDate?: Date;
   titleSubStr?: string;
@@ -60,12 +55,12 @@ export interface RemoveUserAvalabilityDTO {
 }
 
 export interface SetEventAvailabilityConfirmationDTO {
-  userId: Types.ObjectId;
+  userId: string;
   confirmed: Boolean;
 }
 
 export interface GetEventAvailabilityConfirmationsDTO {
-  eventId: Types.ObjectId;
+  eventId: string;
 }
 
 export interface GetEventAvailabilityConfirmationsResponseDTO {
@@ -73,7 +68,7 @@ export interface GetEventAvailabilityConfirmationsResponseDTO {
 }
 
 export interface EventResponseDTO {
-  id: Types.ObjectId;
+  id: string;
   title: string;
   description?: string;
   status: EventStatus;
@@ -82,7 +77,7 @@ export interface EventResponseDTO {
   availability: IEventAvailability;
   location?: string;
   identifier: string;
-  team: Types.ObjectId;
+  team: string;
 }
 
 function eventDocToResponseDTO(eventDoc: any): EventResponseDTO {
@@ -106,7 +101,7 @@ export async function getEventById(
 ) {
   let eventId;
   try {
-    eventId = convertToObjectId(req.params.eventId);
+    eventId = req.params.eventId;
   } catch (e: unknown) {
     if (!(e instanceof ServerError)) throw e;
     res.status(e.status).send(e.message);
@@ -148,7 +143,7 @@ export async function patchEventById(
 ) {
   let eventId;
   try {
-    eventId = convertToObjectId(req.params.eventId);
+    eventId = req.params.eventId;
   } catch (e: unknown) {
     if (!(e instanceof ServerError)) throw e;
     res.status(e.status).send(e.message);
@@ -181,7 +176,7 @@ export async function patchEventById(
 export async function deleteEventById(req: Request, res: Response) {
   let eventId;
   try {
-    eventId = convertToObjectId(req.params.eventId);
+    eventId = req.params.eventId;
   } catch (e: unknown) {
     if (!(e instanceof ServerError)) throw e;
     res.status(e.status).send(e.message);
@@ -289,7 +284,7 @@ export async function addUserAvailabilityById(
 ) {
   let eventId;
   try {
-    eventId = convertToObjectId(req.params.eventId);
+    eventId = req.params.eventId;
   } catch (e: unknown) {
     if (!(e instanceof ServerError)) throw e;
     res.status(e.status).send(e.message);
@@ -354,10 +349,10 @@ export async function removeUserAvalabilityById(
   req: Request,
   res: Response<EventResponseDTO | string>,
 ) {
-  let eventId: Types.ObjectId;
+  let eventId: string;
   let userId: string;
   try {
-    eventId = convertToObjectId(req.params.eventId);
+    eventId = req.params.eventId;
     userId = req.query.userId as string;
   } catch (e: unknown) {
     if (!(e instanceof ServerError)) throw e;
@@ -458,9 +453,9 @@ export async function setEventAvailabilityConfirmation(
   req: TypedRequestBody<SetEventAvailabilityConfirmationDTO>,
   res: Response,
 ) {
-  let eventId: Types.ObjectId;
+  let eventId: string;
   try {
-    eventId = convertToObjectId(req.params.eventId);
+    eventId = req.params.eventId;
   } catch (e: unknown) {
     if (!(e instanceof ServerError)) throw e;
     res.status(e.status).send(e.message);
@@ -505,9 +500,9 @@ export async function getEventAvailabilityConfirmations(
   req: Request,
   res: Response<GetEventAvailabilityConfirmationsResponseDTO | string>,
 ) {
-  let eventId: Types.ObjectId;
+  let eventId: string;
   try {
-    eventId = convertToObjectId(req.params.eventId);
+    eventId = req.params.eventId;
   } catch (e: unknown) {
     if (!(e instanceof ServerError)) throw e;
     res.status(e.status).send(e.message);
