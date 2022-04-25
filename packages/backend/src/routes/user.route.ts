@@ -11,6 +11,6 @@ usersRouter.get('/user/:id', getUserById);
 
 usersRouter.post('/user', createUser);
 
-usersRouter.put('/user/:id', updateUserById);
+usersRouter.patch('/user', updateUserById);
 
 usersRouter.delete('/user/:id', deleteUserById);

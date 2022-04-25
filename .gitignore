@@ -116,4 +116,5 @@ dist
 .idea/
 
 
-**/firebase.credentials.json
+**/*.firebase.creds.json
+.env
