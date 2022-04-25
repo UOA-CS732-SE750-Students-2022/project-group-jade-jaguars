@@ -2,12 +2,7 @@ import { isAuthenticated } from './libs/middleware.lib';
 import express from 'express';
 import swaggerUi from 'swagger-ui-express';
 import { usersRouter, eventsRouter } from './routes/routes.module';
-import {
-  PORT,
-  BASE_URL,
-  VERBOSE,
-  DATABASE_URL,
-} from './configs/backend.config';
+import { PORT, BASE_URL, VERBOSE } from './configs/backend.config';
 import mongoose from 'mongoose';
 import bodyParser from 'body-parser';
 import { teamRouter } from './routes/team.route';
@@ -21,7 +16,7 @@ app.use(bodyParser.json());
 const router = express.Router();
 
 async function initialize() {
-  dotenv.config();
+  dotenv.config({ path: `.env.${process.env.ENV_PATH}` });
 
   initializeApp({
     credential: applicationDefault(),
@@ -38,10 +33,8 @@ async function initialize() {
     app.use(`/docs`, swaggerUi.serve, swaggerUi.setup(swaggerDocument));
     console.log(`serving swagger on: http://localhost:${PORT}/docs`);
 
-    await mongoose.connect(process.env.DATABASE_URL ?? DATABASE_URL);
-    console.log(
-      `Database connected: ${process.env.DATABASE_URL ?? DATABASE_URL}`,
-    );
+    await mongoose.connect(process.env.DATABASE_URL);
+    console.log(`Database connected: ${process.env.DATABASE_URL}`);
     app.listen(PORT, () => {
       if (!VERBOSE) {
         console.clear();
