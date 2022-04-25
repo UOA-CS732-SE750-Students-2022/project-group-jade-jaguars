@@ -6,6 +6,7 @@ import { ServerError, TypedRequestBody } from '../libs/utils.lib';
 import Joi from 'joi';
 import { validate, validators } from '../libs/validate.lib';
 import { StatusCodes } from 'http-status-codes';
+import { returnError } from '../libs/error.lib';
 
 interface CreateUserDTO {
   firstName: string;
@@ -36,7 +37,7 @@ export async function getUserById(
 
     const userDoc = await UserModel.findById(userId);
     if (!userDoc) {
-      throw new ServerError('user not found', StatusCodes.NOT_FOUND);
+      return returnError(Error('User Not Found'), res, StatusCodes.NOT_FOUND);
     }
 
     res.status(StatusCodes.OK).send({
@@ -45,9 +46,8 @@ export async function getUserById(
       lastName: userDoc.lastName,
       events: authSelf ? userDoc.events : [],
     });
-  } catch (error) {
-    console.log(error);
-    res.sendStatus(StatusCodes.INTERNAL_SERVER_ERROR);
+  } catch (err) {
+    returnError(err, res);
   }
 }
 
@@ -65,7 +65,11 @@ export async function createUser(
 
     // Test if user already exists
     if (await UserModel.findOne({ _id: firebaseUser.uid })) {
-      return res.sendStatus(StatusCodes.CONFLICT);
+      return returnError(
+        Error('User Already Exists'),
+        res,
+        StatusCodes.CONFLICT,
+      );
     }
 
     const formData = validate(rules, req.body, { allowUnknown: true });
@@ -81,10 +85,8 @@ export async function createUser(
       lastName: userDoc.lastName,
       events: userDoc.events,
     });
-  } catch (error) {
-    console.log(error);
-
-    res.sendStatus(StatusCodes.INTERNAL_SERVER_ERROR);
+  } catch (err) {
+    returnError(err, res);
   }
 }
 
@@ -104,7 +106,7 @@ export async function updateUserById(
 
     if (firebaseUser.uid !== formData._id) {
       // return Not found as its more secure to not tell the user if the UID exists or not
-      return res.sendStatus(StatusCodes.NOT_FOUND);
+      return returnError(Error('User Not Found'), res);
     }
 
     const userDoc = await UserModel.findOneAndUpdate(
@@ -114,7 +116,7 @@ export async function updateUserById(
     );
 
     if (!userDoc) {
-      return res.sendStatus(StatusCodes.NOT_FOUND);
+      return returnError(Error('User Not Found'), res);
     }
 
     res.status(StatusCodes.OK).send({
@@ -123,10 +125,8 @@ export async function updateUserById(
       lastName: userDoc.lastName,
       events: userDoc.events,
     });
-  } catch (error) {
-    console.log(error);
-
-    res.sendStatus(StatusCodes.INTERNAL_SERVER_ERROR);
+  } catch (err) {
+    returnError(err, res);
   }
 }
 
@@ -137,17 +137,15 @@ export async function deleteUserById(req: Request, res: Response) {
 
     if (firebaseUser.uid !== userId) {
       // return Not found as its more secure to not tell the user if the UID exists or not
-      return res.sendStatus(StatusCodes.NOT_FOUND);
+      return returnError(Error('User Not Found'), res);
     }
 
     const result = await UserModel.deleteOne({ _id: userId });
     if (result.deletedCount === 0) {
-      throw new ServerError('user not found', StatusCodes.NOT_FOUND, result);
-    } else {
-      res.status(StatusCodes.NO_CONTENT).send();
+      return returnError(Error('User Not Found'), res);
     }
-  } catch (error) {
-    console.log(error);
-    res.sendStatus(StatusCodes.INTERNAL_SERVER_ERROR);
+    res.sendStatus(StatusCodes.NO_CONTENT);
+  } catch (err) {
+    returnError(err, res);
   }
 }
