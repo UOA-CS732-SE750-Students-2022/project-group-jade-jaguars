@@ -25,10 +25,7 @@ function TeamCard(team: TeamDetails) {
       <Text css={{ fontSize: '$tiny', marginLeft: '5px' }}>
         {team.description}
       </Text>
-      <Avatar.Group
-        count={count}
-        css={{ marginLeft: '5px', marginTop: '20px', padding: '5px' }}
-      >
+      <Avatar.Group count={count} className="mt-[20px] ml-[5px] p-[5px]">
         {/* Map each member profile pic to an avatar */}
         {members.map((member, index) => {
           let photoUrl: string =
