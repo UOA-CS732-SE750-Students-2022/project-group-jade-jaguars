@@ -72,7 +72,7 @@ const EventDetailsCard = (props: EventDetailsCardInterface) => {
   return (
     <div className="p-10 bg-white h-fit w-196 rounded-xl">
       <div id="header" className="flex flex-row items-start justify-between">
-        <p className="text-[25px] font-medium mr-3 flex-1 h-fit max-h-20 overflow-scroll">{title}</p>
+        <p id="title" className="text-[25px] font-medium mr-3 flex-1 h-fit max-h-20 overflow-scroll">{title}</p>
         <div id="tools" className="flex flex-row gap-5 mt-2">
           <div onClick={onEdit} className="cursor-pointer">
             <EditIcon />
@@ -89,7 +89,7 @@ const EventDetailsCard = (props: EventDetailsCardInterface) => {
         <div>
           {date.toLocaleDateString()}, {formatTimeRange(timeRange)} NZDT
         </div>
-        <div className="overflow-scroll h-44">{description}</div>
+        <div id='description' className="overflow-scroll h-44">{description}</div>
       </div>
       <div id="location" className='mt-5'>
         <p className='font-medium text-[18px]'>Location</p>
