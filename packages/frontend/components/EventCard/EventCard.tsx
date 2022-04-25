@@ -10,8 +10,8 @@ interface EventCardInterface {
     profilePic?: string;
   }[];
   description: string;
-  onClick?: () => void;
-  onHover?: () => void;
+  onClick?: (props?: any) => void;
+  onHover?: (props?: any) => void;
 }
 
 /**
@@ -43,11 +43,11 @@ const EventCard = (props: EventCardInterface) => {
     <div
       onClick={onClick}
       onMouseOver={onHover}
-      className="w-218 py-8 px-10 h-56 bg-white flex flex-col gap-1 transition-colors rounded-2xl hover:bg-primary hover:text-white cursor-pointer select-none"
+      className="flex flex-col h-56 gap-1 px-10 py-8 transition-colors bg-white cursor-pointer select-none w-218 rounded-2xl hover:bg-primary hover:text-white"
     >
       <div
         id="header"
-        className="font-medium flex flex-row justify-between items-center mb-1"
+        className="flex flex-row items-center justify-between mb-1 font-medium"
       >
         <h1 className="text-2.5xl flex-1 truncate ... mr-5">{title}</h1>
         <div>
