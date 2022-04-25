@@ -7,17 +7,19 @@
   "main": "src/app.ts",
   "scripts": {
     "prebuild": "rimraf dist",
-    "build": "tsc",
+    "build": "cross-env ENV_PATH=prod tsc",
     "start": "ts-node ./src/app.ts",
-    "start:dev": "nodemon",
+    "start:dev": "cross-env ENV_PATH=dev nodemon",
     "start:prod": "node dist/app",
-    "test": "cross-env NODE_ENV=testing jest --run-in-band",
-    "coverage": "cross-env NODE_ENV=testing nyc npm run test"
+    "test": "cross-env ENV_PATH=test jest --run-in-band",
+    "coverage": "cross-env ENV_PATH=test nyc npm run test"
   },
   "dependencies": {
     "@types/joi": "^17.2.3",
     "cors": "^2.8.5",
+    "dotenv": "^16.0.0",
     "express": "^4.17.1",
+    "firebase-admin": "^10.0.2",
     "http-status-codes": "^2.2.0",
     "joi": "^17.6.0",
     "jsonwebtoken": "^8.5.1",
