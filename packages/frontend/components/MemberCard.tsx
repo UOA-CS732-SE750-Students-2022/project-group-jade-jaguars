@@ -18,7 +18,16 @@ function MemberCard(props: {
   }, [props]);
 
   return (
-    <Card className="mw-px-220 m-px-5" bordered={false} shadow={false}>
+    <Card
+      className="mw-px-220 m-px-5"
+      bordered={false}
+      shadow={false}
+      css={{
+        '&:hover': {
+          background: '#99C08B',
+        },
+      }}
+    >
       <div>
         <User
           src={profilePic}
