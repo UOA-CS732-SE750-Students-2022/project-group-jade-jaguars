@@ -1,12 +1,7 @@
 import { randomUUID } from 'crypto';
 import { Colour, ITeam, TeamModel } from '../schemas/team.schema';
 import { Request, Response } from 'express';
-import { Types } from 'mongoose';
-import {
-  convertToObjectId,
-  ServerError,
-  TypedRequestBody,
-} from '../libs/utils.lib';
+import { ServerError, TypedRequestBody } from '../libs/utils.lib';
 import Joi from 'joi';
 import { validate, validators } from '../libs/validate.lib';
 import { StatusCodes } from 'http-status-codes';
@@ -37,7 +32,7 @@ export async function getTeamById(
   req: Request,
   res: Response<TeamResponseDTO>,
 ) {
-  const teamId = convertToObjectId(req.params.id);
+  const teamId = req.params.id;
   const teamDoc = await TeamModel.findById(teamId);
   if (!teamDoc) {
     throw new ServerError('team not found', StatusCodes.NOT_FOUND);
@@ -118,7 +113,7 @@ export async function updateTeamById(
 
 export async function deleteTeamById(req: Request, res: Response) {
   // TODO: Add auth middleware to this
-  const teamId = convertToObjectId(req.params.id);
+  const teamId = req.params.id;
   const result = await TeamModel.deleteOne({ _id: teamId });
   if (result.deletedCount === 0) {
     throw new ServerError('team not found', StatusCodes.NOT_FOUND, result);
@@ -129,7 +124,7 @@ export async function deleteTeamById(req: Request, res: Response) {
 
 export async function addMemberById(req: Request, res: Response) {
   // TODO: Add auth middleware to this
-  const teamId = convertToObjectId(req.params.id);
+  const teamId = req.params.id;
   const result = await TeamModel.deleteOne({ _id: teamId });
   if (result.deletedCount === 0) {
     throw new ServerError('team not found', StatusCodes.NOT_FOUND, result);

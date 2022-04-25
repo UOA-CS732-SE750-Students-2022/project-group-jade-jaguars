@@ -1,4 +1,4 @@
-import { Model, model, Types, Schema } from 'mongoose';
+import { Model, model, Schema } from 'mongoose';
 import { randomEnum } from '..//libs/utils.lib';
 
 // TODO: Replace this with a appropriate library or expand to whatever we need
@@ -17,12 +17,12 @@ export interface ITeam {
   events?: string[];
 }
 
-  _id: {
-    type: String,
-    required: true,
-  },
 const teamSchema = new Schema(
   {
+    _id: {
+      type: String,
+      required: true,
+    },
     title: {
       type: String,
       required: true,
@@ -39,18 +39,18 @@ const teamSchema = new Schema(
       default: randomEnum(Colour),
     },
     admin: {
-      type: Types.ObjectId,
+      type: String,
       ref: 'User',
       required: true,
     },
     members: {
-      type: [Types.ObjectId],
+      type: [String],
       ref: 'User',
       required: true,
       default: [],
     },
     events: {
-      type: [Types.ObjectId],
+      type: [String],
       ref: 'Event',
       required: true,
       default: [],
