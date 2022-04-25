@@ -12,7 +12,7 @@ interface EventDetailsCardInterface {
   timeRange: [Date, Date];
   description: string;
   location: string;
-  participants?: {
+  participants: {
     name: string;
     profilePic?: string;
   }[];
@@ -35,6 +35,24 @@ const reminderOptions = [
   { value: '1 day', label: '1 day before' },
   { value: '2 days', label: '2 days before' },
 ]
+
+
+/**
+ * This is the component to display all event details,
+ * including event title, description, time, date, location, reminder,
+ * participant list.
+ * @param title The title of the event
+ * @param date The date of the event
+ * @param timeRange The start and end time of the event
+ * @param participants The list of participants with name, profilePic is optional
+ * @param onEdit Custom function for editing the event details
+ * @param onDelete Custom function for deleting the event
+ * @param onShare Custom function for sharing the event details
+ * @param onSelectChange Custon function for the select component for reminder
+ * @param onParticipantClick Custom function for clicking on participant component
+ *
+ * @author Raina Song (raina song)
+ */
 
 const EventDetailsCard = (props: EventDetailsCardInterface) => {
   const {
@@ -90,7 +108,7 @@ const EventDetailsCard = (props: EventDetailsCardInterface) => {
       <div id="participants" className='flex flex-col gap-3 mt-5'>
         <p className='font-medium text-[18px]'>Participants</p>
         <div className='flex flex-col w-56 overflow-scroll rounded-md h-52 '>
-        {participants?.map((participant, index) => {
+        {participants.map((participant, index) => {
           return (
             <div key={index} onClick={() => onParticipantClick(participant)} className='flex flex-row items-center gap-2 px-4 py-2 transition-colors rounded-lg cursor-pointer w-52 hover:bg-primary hover:text-white'>
               <Avatar pointer src={participant.profilePic} text={participant.name} bordered borderWeight='light'/>
