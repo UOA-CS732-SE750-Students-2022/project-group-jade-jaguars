@@ -1,4 +1,4 @@
-import { Model, model, Types, Schema } from 'mongoose';
+import { Model, model, Schema } from 'mongoose';
 
 export enum EventStatus {
   Pending = 'Pending',
@@ -50,13 +50,13 @@ const availabilityBlockSchema = new Schema<IAvailabilityBlock>({
 });
 
 export interface IAttendeeAvailability {
-  attendee: Types.ObjectId;
+  attendee: string;
   availability: IAvailabilityBlock[];
 }
 
 const attendeeAvailabilitySchema = new Schema<IAttendeeAvailability>({
   attendee: {
-    type: Schema.Types.ObjectId,
+    type: String,
     required: true,
   },
   availability: {
@@ -93,11 +93,16 @@ export interface IEvent {
   startTime: number;
   endTime: number;
   availability: IEventAvailability;
-  attendees: Types.ObjectId[];
+  attendees: string[];
   location: string;
+  _id: string;
 }
 
 const eventSchema = new Schema<IEvent>({
+  _id: {
+    type: String,
+    required: true,
+  },
   title: {
     type: String,
     required: true,
@@ -117,7 +122,7 @@ const eventSchema = new Schema<IEvent>({
   },
   availability: eventAvailabilitySchema,
   attendees: {
-    type: [Types.ObjectId],
+    type: [String],
     ref: 'User',
     required: true,
     default: [],

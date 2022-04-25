@@ -1,3 +1,4 @@
+import { randomUUID } from 'crypto';
 import {
   IEventAvailability,
   EventModel,
@@ -11,31 +12,31 @@ import {
   ServerError,
   TypedRequestBody,
 } from '../libs/utils.lib';
-import { Types } from 'mongoose';
 import Joi from 'joi';
 import { validate, validators } from '../libs/validate.lib';
 
 // TODO: Change createdto for optional/generated fields
 interface CreateEventDTO {
+  _id: string;
   title: string;
   description: string;
   status: EventStatus;
   startTime: number;
   endTime: number;
   availability: IEventAvailability;
-  attendees: Types.ObjectId[];
+  attendees: string[];
   location: string;
 }
 
 interface EventResponseDTO {
-  id: Types.ObjectId;
+  id: string;
   title: string;
   description: string;
   status: EventStatus;
   startTime: number;
   endTime: number;
   availability: IEventAvailability;
-  attendees: Types.ObjectId[];
+  attendees: string[];
   location: string;
 }
 
@@ -71,7 +72,9 @@ export async function createEvent(
   const rules = Joi.object<CreateEventDTO>({
     title: validators.title().required(),
   });
+
   const formData = validate(rules, req.body, { allowUnknown: true });
+  formData._id = randomUUID();
 
   const eventDoc = await EventModel.create(formData);
   res.status(StatusCodes.CREATED).send({

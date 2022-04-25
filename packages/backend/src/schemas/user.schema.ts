@@ -7,7 +7,6 @@ export interface IUser {
   email?: string;
   events: Types.ObjectId[];
 }
-const schema = new Schema({});
 
 const userSchema = new Schema<IUser>({
   firstName: {
