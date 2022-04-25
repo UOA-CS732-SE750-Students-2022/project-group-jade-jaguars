@@ -7,31 +7,33 @@ export interface IUser {
   email?: string;
   events: Types.ObjectId[];
 }
-const schema = new Schema({});
 
-const userSchema = new Schema<IUser>({
-  firstName: {
-    type: String,
-    required: true,
+const userSchema = new Schema<IUser>(
+  {
+    _id: {
+      type: String,
+      required: true,
+    },
+    firstName: {
+      type: String,
+      required: true,
+    },
+    lastName: {
+      type: String,
+      required: true,
+    },
+    email: {
+      type: String,
+      required: false,
+    },
+    events: {
+      type: [Schema.Types.ObjectId],
+      ref: 'Event',
+      required: true,
+      default: [],
+    },
   },
-  lastName: {
-    type: String,
-    required: true,
-  },
-  events: {
-    type: [Schema.Types.ObjectId],
-    ref: 'Event',
-    required: true,
-    default: [],
-  },
-  email: {
-    type: String,
-    required: false,
-  },
-  _id: {
-    type: String,
-    required: true,
-  },
-});
+  { timestamps: true },
+);
 
 export const UserModel: Model<IUser> = model<IUser>('User', userSchema);

@@ -1,6 +1,6 @@
 import { StatusCodes } from 'http-status-codes';
 import { Request, Response, NextFunction } from 'express';
-import { DecodedIdToken, getAuth } from 'firebase-admin/auth';
+import { getAuth, DecodedIdToken } from 'firebase-admin/auth';
 
 export async function isAuthenticated(
   req: Request,
