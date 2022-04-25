@@ -1,4 +1,4 @@
-import { Avatar, Group, Navbar } from '@mantine/core';
+import { Avatar, Group, Image, Navbar } from '@mantine/core';
 import { useViewportSize } from '@mantine/hooks';
 import React, { useState } from 'react';
 import { CalendarEvent, LayoutDashboard, Users } from 'tabler-icons-react';
@@ -14,13 +14,13 @@ export const CustomNavbar = () => {
   return (
     <Navbar height={height} width={{ base: 100 }}>
       <Navbar.Section>
-        <Group direction="column" align="center">
-          <Avatar src={null} color="teal">
-            SC
+        <Group direction="column" align="center" mt={50}>
+          <Avatar color="teal" radius="lg" size={70}>
+            Logo
           </Avatar>
         </Group>
       </Navbar.Section>
-      <Navbar.Section>
+      <Navbar.Section grow mt={100}>
         <Group direction="column" align="center" spacing="xs">
           {linkData.map((link, index) => {
             return (
