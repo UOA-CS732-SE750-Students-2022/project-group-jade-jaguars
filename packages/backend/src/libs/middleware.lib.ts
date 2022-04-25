@@ -1,6 +1,7 @@
 import { StatusCodes } from 'http-status-codes';
 import { Request, Response, NextFunction } from 'express';
 import { getAuth, DecodedIdToken } from 'firebase-admin/auth';
+import { returnError } from './error.lib';
 
 export async function isAuthenticated(
   req: Request,
@@ -9,9 +10,11 @@ export async function isAuthenticated(
 ) {
   try {
     if (!req.headers.authorization) {
-      return res
-        .status(StatusCodes.UNAUTHORIZED)
-        .json({ message: 'Unauthenticated' });
+      return returnError(
+        Error('No authorization header'),
+        res,
+        StatusCodes.UNAUTHORIZED,
+      );
     }
 
     const token = req.headers.authorization.split(' ')[1];
@@ -22,21 +25,21 @@ export async function isAuthenticated(
       return next();
     }
 
-    return res
-      .status(StatusCodes.UNAUTHORIZED)
-      .json({ message: 'Unauthenticated' });
+    return returnError(Error('Unauthenticated'), res, StatusCodes.UNAUTHORIZED);
   } catch (error) {
-    console.log(error);
-
     if (error.code === 'auth/id-token-expired') {
-      return res
-        .status(StatusCodes.UNAUTHORIZED)
-        .json({ message: 'Token expired' });
+      return returnError(Error('Token expired'), res, StatusCodes.UNAUTHORIZED);
     }
 
-    return res
-      .status(StatusCodes.INTERNAL_SERVER_ERROR)
-      .json({ message: 'Internal Server Error' });
+    if (error.code === 'auth/argument-error') {
+      return returnError(
+        Error('Malformed Auth Token'),
+        res,
+        StatusCodes.UNAUTHORIZED,
+      );
+    }
+
+    return returnError(Error('Unknown Error'), res);
   }
 }
 
