@@ -122,6 +122,7 @@ export async function createEvent(
   req: TypedRequestBody<CreateEventDTO>,
   res: Response<EventResponseDTO>,
 ) {
+  console.log('hit create endpoint!');
   // TODO: create/use remainder of validation rules
   const rules = Joi.object<CreateEventDTO>({
     title: validators.title().required(),

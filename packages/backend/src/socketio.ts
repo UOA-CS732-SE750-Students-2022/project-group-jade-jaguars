@@ -2,8 +2,10 @@ import http from 'http';
 import express from 'express';
 import { Server, Socket } from 'socket.io';
 
+const BASE_URL: string = process.env.BASE_URL;
+
 const socket = (server: http.Server, app: express.Application) => {
-  const io = new Server(server, { path: '/socketio/' });
+  const io = new Server(server, { path: `${BASE_URL}/socketio/` });
 
   io.on('connection', (socket: Socket) => {
     console.log('client connected');

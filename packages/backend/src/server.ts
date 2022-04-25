@@ -16,6 +16,7 @@ dotenv.config({ path: `.env.${process.env.ENV_PATH}` });
 const PORT: number = parseInt(process.env.PORT);
 const NODE_PATH: string = process.env.NODE_PATH;
 const BASE_URL: string = process.env.BASE_URL;
+const DATABASE_URL: string = process.env.DATABASE_URL;
 
 const indexRouter = express.Router();
 
@@ -33,6 +34,7 @@ class Server extends http.Server {
     this.app.use(BASE_URL, eventsRouter);
     this.app.use(BASE_URL, usersRouter);
     this.app.use(BASE_URL, teamRouter);
+    console.log('set all routers');
   }
 
   private setMiddleware() {
@@ -56,8 +58,8 @@ class Server extends http.Server {
   }
 
   private async setDatabase() {
-    if (process.env.NODE_PATH !== 'test') {
-      await mongoose.connect(process.env.DATABASE_URL as string);
+    if (NODE_PATH !== 'test') {
+      await mongoose.connect(DATABASE_URL);
     }
   }
 
@@ -65,12 +67,12 @@ class Server extends http.Server {
     this.setMiddleware();
     await this.setDatabase();
     // When we are testing so no need to start socketio
-    if (process.env.NODE_PATH !== 'test') {
+    if (NODE_PATH !== 'test') {
       socket(this, this.app);
       console.log(`socketio: http://localhost:${PORT}${BASE_URL}/socketio`);
 
       // Supertest means that we don't have to listen when testing
-      this.app.listen(this.app.get('port'), () => {
+      this.app.listen(PORT, () => {
         console.log(`server: http://localhost:${PORT}`);
       });
     } else {
