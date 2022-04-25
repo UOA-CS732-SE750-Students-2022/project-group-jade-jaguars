@@ -1,6 +1,6 @@
 import type { NextPage } from 'next';
+import TeamDetailsCard from '../components/TeamDetailsCard';
 import TeamDetails from '../types/TeamDetails';
-import TeamCard from '../components/TeamCard';
 
 const team: TeamDetails = {
   title: 'SOFTENG 750',
@@ -51,7 +51,13 @@ const team: TeamDetails = {
 const Home: NextPage = () => {
   return (
     <>
-      <TeamCard {...team} />
+      <TeamDetailsCard
+        team={team}
+        editTeam={() => console.log('Editing team...')}
+        deleteTeam={() => console.log('Deleting team...')}
+        addUser={() => console.log('Adding user...')}
+        deleteUser={() => console.log('Deleting user...')}
+      />
     </>
   );
 };
