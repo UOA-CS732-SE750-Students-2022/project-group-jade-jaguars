@@ -1,3 +1,7 @@
 # Environment Files
 .env.*
 !.env.*.template
+
+# Coverage reports
+coverage/
+.nyc_output/

@@ -238,13 +238,16 @@ function AvailabilitySelector(props: {
   return (
     <div>
       <div
-        className="dayList"
+        className="grid h-[20px] ml-[30px]"
         style={{ gridTemplateColumns: 'repeat(' + numCols + ', 60px)' }}
       >
         {timeList.map((timeBracket, index) => {
           const startDate = new Date(timeBracket.startTime);
           return (
-            <div className="day" key={index}>
+            <div
+              className="w-[60px] h-[20px] text-[12px] z-1 block text-black text-center"
+              key={index}
+            >
               {startDate.getDate()}/{startDate.getMonth() + 1}
             </div>
           );
@@ -252,22 +255,25 @@ function AvailabilitySelector(props: {
       </div>
       <div style={{ display: 'flex' }}>
         <div
-          className="hourList"
+          className="grid w-[30px] m-0 p-0"
           style={{ gridTemplateColumns: 'repeat(1, 30px)' }}
         >
           {hourList.map((hour, index) => (
-            <div className="hour" key={index}>
+            <div
+              className="w-[30px] h-[20px] text-[12px] z-1 block text-black text-center"
+              key={index}
+            >
               {hour}
             </div>
           ))}
         </div>
         <div
-          className="timeslotContainer"
+          className="grid m-0"
           style={{ gridTemplateColumns: 'repeat(' + numCols + ', 60px)' }}
         >
           {timeSlots.map((timeSlot, index) => (
             <div
-              className="timeslot"
+              className="w-px-60 h-px-20 block border border-solid border-black z-1"
               key={index}
               style={{
                 backgroundColor: (() => {

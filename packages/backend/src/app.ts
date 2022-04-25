@@ -1,70 +1,49 @@
+import { isAuthenticated } from './libs/middleware.lib';
 import express from 'express';
-import dotenv from 'dotenv';
 import swaggerUi from 'swagger-ui-express';
-import swaggerJsdoc from 'swagger-jsdoc';
-import { EVENTS_ROUTER } from './routes/eventsRoute';
-import { PORT, BASE_URL, VERBOSE } from './config';
-import { mongoService } from './services/mongoService';
+import { usersRouter, eventsRouter } from './routes/routes.module';
+import { PORT, BASE_URL, VERBOSE } from './configs/backend.config';
+import mongoose from 'mongoose';
+import bodyParser from 'body-parser';
+import { teamRouter } from './routes/team.route';
+import { initializeApp, applicationDefault } from 'firebase-admin/app';
+import swaggerDocument from './docs/swagger.json';
+import dotenv from 'dotenv';
 
-dotenv.config({ path: `.env.${process.env.NODE_ENV}` });
+const app = express();
+app.use(bodyParser.json());
 
-const APP = express();
-const ROUTER = express.Router();
+const router = express.Router();
 
-// Swagger definition
-const definition = {
-  openapi: '3.0.0',
-  info: {
-    title: 'Count Me In',
-    version: '1.0.0',
-    description: '',
-    license: {
-      name: 'GPL-3.0',
-      url: 'https://choosealicense.com/licenses/gpl-3.0/',
-    },
-  },
-  servers: [
-    {
-      url: `http://localhost:${PORT}/`,
-    },
-  ],
-  host: `localhost:${PORT}`,
-  securityDefinitions: {
-    bearerAuth: {
-      type: 'apiKey',
-      name: 'Authorization',
-      scheme: 'bearer',
-      in: 'header',
-    },
-  },
-};
+async function initialize() {
+  dotenv.config({ path: `.env.${process.env.ENV_PATH}` });
 
-const options = {
-  definition,
-  apis: ['**/*.ts'],
-};
-
-function initialize() {
-  APP.use(BASE_URL, ROUTER);
-  APP.use(BASE_URL, EVENTS_ROUTER);
-  APP.use(express.json());
-
-  APP.use(
-    `${BASE_URL}/docs`,
-    swaggerUi.serve,
-    swaggerUi.setup(swaggerJsdoc(options)),
-  );
-
-  // ROUTER.get('/', () => {});
-
-  APP.listen(PORT, () => {
-    if (!VERBOSE) {
-      console.clear();
-    }
-    console.log(`app on - https://localhost:${PORT}`);
+  initializeApp({
+    credential: applicationDefault(),
   });
+  app.use(express.json());
 
-  mongoService.connect();
+  // Initialize endpoints
+  app.use(BASE_URL, isAuthenticated, router);
+  app.use(BASE_URL, eventsRouter);
+  app.use(BASE_URL, usersRouter);
+  app.use(BASE_URL, teamRouter);
+
+  if (process.env.NODE_ENV !== 'testing') {
+    app.use(`/docs`, swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+    console.log(`serving swagger on: http://localhost:${PORT}/docs`);
+
+    await mongoose.connect(process.env.DATABASE_URL);
+    console.log(`Database connected: ${process.env.DATABASE_URL}`);
+    app.listen(PORT, () => {
+      if (!VERBOSE) {
+        console.clear();
+      }
+      console.log(`app on - https://localhost:${PORT}`);
+    });
+  }
 }
 
 initialize();
+
+export default app;

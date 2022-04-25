@@ -1,8 +1,5 @@
 import type { NextPage } from 'next';
-import Head from 'next/head';
-import Image from 'next/image';
 import AvailabilitySelector from '../components/AvailabilitySelector';
-import styles from '../styles/Home.module.css';
 import TimeBracket from '../types/TimeBracket';
 import {
   AvailabilityBlock,
