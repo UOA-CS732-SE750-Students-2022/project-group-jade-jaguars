@@ -45,7 +45,7 @@ export interface SearchEventDTO {
 
 // TODO: For now include userId in this payload, eventually this property should be removed and instead using the authToken we look up the userId
 export interface AddUserAvalabilityDTO {
-  userId: Types.ObjectId;
+  userId: string;
   startDate: Date;
   endDate: Date;
   status?: AvailabilityStatus;
@@ -317,8 +317,8 @@ export async function addUserAvailabilityById(
   }
 
   const userEventAvailabilityIndex =
-    eventDoc.availability.attendeeAvailability.findIndex((x) =>
-      x.attendee._id.equals(formData.userId),
+    eventDoc.availability.attendeeAvailability.findIndex(
+      (x) => x.attendee === formData.userId,
     );
   if (userEventAvailabilityIndex == -1) {
     eventDoc.availability.attendeeAvailability.push({
@@ -350,10 +350,11 @@ export async function removeUserAvalabilityById(
   req: Request,
   res: Response<EventResponseDTO | string>,
 ) {
-  let eventId, userId: Types.ObjectId;
+  let eventId: Types.ObjectId;
+  let userId: string;
   try {
     eventId = convertToObjectId(req.params.eventId);
-    userId = convertToObjectId(req.query.userId as string);
+    userId = req.query.userId as string;
   } catch (e: unknown) {
     if (!(e instanceof ServerError)) throw e;
     res.status(e.status).send(e.message);
@@ -380,8 +381,8 @@ export async function removeUserAvalabilityById(
   }
 
   const userEventAvailabilityIndex =
-    eventDoc.availability.attendeeAvailability.findIndex((x) =>
-      x.attendee._id.equals(userId),
+    eventDoc.availability.attendeeAvailability.findIndex(
+      (x) => x.attendee === userId,
     );
 
   // Can't remove availability timebracket if it doesn't exist for the user

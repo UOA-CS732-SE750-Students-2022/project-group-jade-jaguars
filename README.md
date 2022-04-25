@@ -17,7 +17,13 @@ cp ./packages/backend/.env.production.template ./packages/backend/.env.productio
 # Fill .env.development and .env.production with appropriate secrets
 ```
 
-3. Run application
+Download the firebase credentials from firebase console or request them from a developer and add a reference to it in your environment variables.
+
+eg
+
+`export GOOGLE_APPLICATION_CREDENTIALS="<PATH TO REPO>/packages/backend/src/firebase/firebase.credentials.json"`
+
+1. Run application
 
 ```bash
 npm run start

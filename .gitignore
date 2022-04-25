@@ -114,3 +114,7 @@ dist
 
 .vscode/
 .idea/
+
+
+**/*.firebase.creds.json
+.env

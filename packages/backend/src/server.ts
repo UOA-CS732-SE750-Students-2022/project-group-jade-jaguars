@@ -1,22 +1,17 @@
 import express from 'express';
 import http from 'http';
-import path from 'path';
-import cors from 'cors';
-import {
-  PORT,
-  BASE_URL,
-  VERBOSE,
-  DATABASE_URL,
-} from './configs/backend.config';
-import socketio from 'socket.io';
+import { PORT, BASE_URL, VERBOSE } from './configs/backend.config';
 import swaggerUi from 'swagger-ui-express';
-import swaggerJsdoc from 'swagger-jsdoc';
 import bodyParser from 'body-parser';
 import { eventsRouter } from './routes/event.route';
 import { usersRouter } from './routes/user.route';
 import { teamRouter } from './routes/team.route';
 import mongoose from 'mongoose';
 import socket from './socketio';
+import dotenv from 'dotenv';
+import { isAuthenticated } from './libs/middleware.lib';
+import swaggerDocument from './docs/swagger.json';
+import * as firebase from 'firebase-admin';
 
 const indexRouter = express.Router();
 
@@ -29,54 +24,30 @@ class Server extends http.Server {
     this.app = app;
   }
 
+  private setEnvironment() {
+    dotenv.config({ path: `.env.${process.env.ENV_PATH}` });
+  }
+
   private setRouter() {
-    this.app.use(BASE_URL, indexRouter);
+    this.app.use(BASE_URL, isAuthenticated, indexRouter);
     this.app.use(BASE_URL, eventsRouter);
     this.app.use(BASE_URL, usersRouter);
     this.app.use(BASE_URL, teamRouter);
   }
 
   private setMiddleware() {
+    firebase.initializeApp({
+      credential: firebase.credential.applicationDefault(),
+    });
+
     this.app.use(express.json());
     this.app.use(bodyParser.json());
 
-    if (process.env.NODE_ENV !== 'testing') {
-      const definition = {
-        openapi: '3.0.0',
-        info: {
-          title: 'Count Me In',
-          version: '1.0.0',
-          description: '',
-          license: {
-            name: 'GPL-3.0',
-            url: 'https://choosealicense.com/licenses/gpl-3.0/',
-          },
-        },
-        servers: [
-          {
-            url: `http://localhost:${PORT}${BASE_URL}`,
-          },
-        ],
-        host: `localhost:${PORT}${BASE_URL}`,
-        securityDefinitions: {
-          bearerAuth: {
-            type: 'apiKey',
-            name: 'Authorization',
-            scheme: 'bearer',
-            in: 'header',
-          },
-        },
-      };
-
-      const options = {
-        definition,
-        apis: ['**/*.ts'],
-      };
-
+    if (process.env.NODE_PATH !== 'test') {
       this.app.use(
         `${BASE_URL}/docs`,
         swaggerUi.serve,
-        swaggerUi.setup(swaggerJsdoc(options)),
+        swaggerUi.setup(swaggerDocument),
       );
       console.log(`swagger: http://localhost:${PORT}${BASE_URL}/docs`);
     }
@@ -85,22 +56,23 @@ class Server extends http.Server {
   }
 
   private async setDatabase() {
-    if (process.env.NODE_ENV !== 'testing') {
-      await mongoose.connect(DATABASE_URL);
+    if (process.env.NODE_PATH !== 'test') {
+      await mongoose.connect(process.env.DATABASE_URL as string);
     }
   }
 
   async start() {
-    this.app.set('port', PORT);
+    this.setEnvironment();
     this.setMiddleware();
     await this.setDatabase();
-    if (process.env.NODE_ENV !== 'testing') {
-      // When testing socket io is started with a different http server to avoid port listen conflict when running jest
+    // When we are testing so no need to start socketio
+    if (process.env.NODE_PATH !== 'test') {
       socket(this, this.app);
       console.log(`socketio: http://localhost:${PORT}${BASE_URL}/socketio`);
-      // Swagger only needed when not testing
+
+      // Supertest means that we don't have to listen when testing
       this.app.listen(this.app.get('port'), () => {
-        console.log(`server: http://localhost:${this.app.get('port')}`);
+        console.log(`server: http://localhost:${PORT}`);
       });
     } else {
     }

@@ -20,7 +20,7 @@ import { Server } from 'socket.io';
 import { AddressInfo } from 'net';
 import socket from '../socketio';
 
-describe('Events', () => {
+describe.skip('Events', () => {
   it('Get', async () => {
     const eventDoc = await EventModel.create({
       title: 'title',
