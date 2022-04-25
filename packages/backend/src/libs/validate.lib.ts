@@ -8,8 +8,8 @@ const title = () => Joi.string().min(3);
 const description = () => Joi.string().min(3);
 const firstName = () => Joi.string().min(1);
 const lastName = () => Joi.string().min(1);
-const objectId = () => Joi.string().hex().length(24);
-const objectIds = () => Joi.array().items(Joi.string().hex().length(24));
+const objectId = () => Joi.string().min(28).max(32);
+const objectIds = () => Joi.array().items(Joi.string().min(28).max(32));
 
 export const validators = {
   username,
