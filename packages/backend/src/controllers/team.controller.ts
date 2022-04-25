@@ -123,7 +123,7 @@ export async function deleteTeamById(req: Request, res: Response) {
   if (result.deletedCount === 0) {
     throw new ServerError('team not found', StatusCodes.NOT_FOUND, result);
   } else {
-    res.status(StatusCodes.NO_CONTENT).send();
+    res.sendStatus(StatusCodes.NO_CONTENT);
   }
 }
 
@@ -134,6 +134,6 @@ export async function addMemberById(req: Request, res: Response) {
   if (result.deletedCount === 0) {
     throw new ServerError('team not found', StatusCodes.NOT_FOUND, result);
   } else {
-    res.status(StatusCodes.NO_CONTENT).send();
+    res.sendStatus(StatusCodes.NO_CONTENT);
   }
 }

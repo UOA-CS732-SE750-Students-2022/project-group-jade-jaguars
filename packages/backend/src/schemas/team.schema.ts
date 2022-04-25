@@ -17,43 +17,46 @@ export interface ITeam {
   events?: string[];
 }
 
-const teamSchema = new Schema({
   _id: {
     type: String,
     required: true,
   },
-  title: {
-    type: String,
-    required: true,
+const teamSchema = new Schema(
+  {
+    title: {
+      type: String,
+      required: true,
+    },
+    description: {
+      type: String,
+      required: true,
+      default: 'description',
+    },
+    color: {
+      type: String,
+      enum: Colour,
+      required: true,
+      default: randomEnum(Colour),
+    },
+    admin: {
+      type: Types.ObjectId,
+      ref: 'User',
+      required: true,
+    },
+    members: {
+      type: [Types.ObjectId],
+      ref: 'User',
+      required: true,
+      default: [],
+    },
+    events: {
+      type: [Types.ObjectId],
+      ref: 'Event',
+      required: true,
+      default: [],
+    },
   },
-  description: {
-    type: String,
-    required: true,
-    default: 'description',
-  },
-  color: {
-    type: String,
-    enum: Colour,
-    required: true,
-    default: randomEnum(Colour),
-  },
-  admin: {
-    type: String,
-    ref: 'User',
-    required: true,
-  },
-  members: {
-    type: [String],
-    ref: 'User',
-    required: true,
-    default: [],
-  },
-  events: {
-    type: [String],
-    ref: 'Event',
-    required: true,
-    default: [],
-  },
-});
+  { timestamps: true },
+);
 
 export const TeamModel: Model<ITeam> = model<ITeam>('Team', teamSchema);
