@@ -47,8 +47,37 @@ const team: TeamDetails = {
   ],
   events: ['event1'],
 };
+import Head from 'next/head';
+import Image from 'next/image';
+import CheckBoxList from '../components/CheckBoxList';
+import EventCard from '../components/EventCard/EventCard';
+import styles from '../styles/Home.module.css';
 
 const Home: NextPage = () => {
+  const participants = [
+    {
+      name: 'Amy',
+      profilePic:
+        'https://media-exp1.licdn.com/dms/image/C4E0BAQHUo_h0JGtwYw/company-logo_200_200/0/1606490589727?e=2147483647&v=beta&t=TO869IrmjUEr7VSFzSHaqcEN4_-TTctFucuyBv8cqDA',
+    },
+    {
+      name: 'Bob',
+      profilePic:
+        'https://img.pixers.pics/pho_wat(s3:700/FO/23/80/66/66/700_FO23806666_a4cd1ba91572617e8833dcbd1d17a44c.jpg,700,700,cms:2018/10/5bd1b6b8d04b8_220x50-watermark.png,over,480,650,jpg)/wall-murals-the-letter-b.jpg.jpg',
+    },
+    {
+      name: 'Carlie',
+      // profilePic: '',
+    },
+    {
+      name: 'David',
+      // profilePic: '',
+    },
+    {
+      name: 'Eric',
+      // profilePic: '',
+    },
+  ];
   return (
     <>
       <TeamDetailsCard
@@ -58,6 +87,18 @@ const Home: NextPage = () => {
         addUser={() => console.log('Adding user...')}
         deleteUser={() => console.log('Deleting user...')}
       />
+      <div className="flex items-center justify-center w-screen h-screen bg-backgroundgrey">
+        <EventCard
+          title={'This is a very very very very very long event title'}
+          date={new Date('01/01/2020')}
+          timeRange={[
+            new Date('01/01/2020, 13:30'),
+            new Date('01/01/2020, 15:30'),
+          ]}
+          participants={participants}
+          description={'this is a description'}
+        />
+      </div>
     </>
   );
 };
