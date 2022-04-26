@@ -3,6 +3,7 @@ import GroupAvailability from '../components/GroupAvailability';
 import TimeBracket from '../types/TimeBracket';
 import {
   AttendeeAvailability,
+  AttendeeStatus,
   AvailabilityStatus,
 } from '../types/Availability';
 
@@ -67,11 +68,16 @@ const availabilities: AttendeeAvailability[] = [
   },
 ];
 
+const handleHover = (info: { people: AttendeeStatus[]; numPeople: number }) => {
+  console.log(info);
+};
+
 const Home: NextPage = () => {
   return (
     <GroupAvailability
       timeOptions={timeOptions}
       availabilities={availabilities}
+      onHover={handleHover}
     />
   );
 };

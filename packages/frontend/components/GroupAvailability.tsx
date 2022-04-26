@@ -1,7 +1,8 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, MouseEventHandler } from 'react';
 import {
   AttendeeAvailability,
   AvailabilityStatus,
+  AttendeeStatus,
 } from '../types/Availability';
 import TimeBracket from '../types/TimeBracket';
 
@@ -14,6 +15,7 @@ import TimeBracket from '../types/TimeBracket';
 function GroupAvailability(props: {
   timeOptions: TimeBracket[];
   availabilities: AttendeeAvailability[];
+  onHover: (info: { people: AttendeeStatus[]; numPeople: number }) => void;
 }) {
   const [timeList, setTimeList] = useState<TimeBracket[]>([]);
   const [hourList, setHourList] = useState<string[]>([]);
@@ -24,6 +26,7 @@ function GroupAvailability(props: {
       row: number;
       col: number;
       percentAvailable: number;
+      people: AttendeeStatus[];
     }[]
   >([]);
 
@@ -82,6 +85,7 @@ function GroupAvailability(props: {
       row: number;
       col: number;
       percentAvailable: number;
+      people: AttendeeStatus[];
     }[] = [];
 
     const numDays = timeList.length;
@@ -113,6 +117,7 @@ function GroupAvailability(props: {
         );
 
         let percentAvailable = 0;
+        let people: AttendeeStatus[] = [];
         // Check whether each user is available at this time.
         for (let i in props.availabilities) {
           for (let j in props.availabilities[i].availability) {
@@ -133,8 +138,16 @@ function GroupAvailability(props: {
                 AvailabilityStatus.Available
               ) {
                 percentAvailable += 1 / numPeople;
+                people.push({
+                  uuid: props.availabilities[i].uuid,
+                  status: AvailabilityStatus.Available,
+                });
               } else {
                 percentAvailable += 1 / (2 * numPeople);
+                people.push({
+                  uuid: props.availabilities[i].uuid,
+                  status: AvailabilityStatus.Tentative,
+                });
               }
               break;
             }
@@ -144,6 +157,7 @@ function GroupAvailability(props: {
           row: i,
           col: j,
           percentAvailable: percentAvailable,
+          people: people,
         });
       }
     }
@@ -184,6 +198,17 @@ function GroupAvailability(props: {
     setTimeSlots(initialTimeSlots);
     setNumPeople(numPeople);
   }, [props]);
+
+  function handleHover(row: number, col: number) {
+    const timeSlot = timeSlots.find(
+      (timeSlot) => timeSlot.row === row && timeSlot.col === col,
+    );
+    const info = {
+      people: timeSlot!.people,
+      numPeople: numPeople,
+    };
+    props.onHover(info);
+  }
 
   return (
     <div>
@@ -241,6 +266,7 @@ function GroupAvailability(props: {
                   }
                 })(),
               }}
+              onMouseEnter={() => handleHover(timeSlot.row, timeSlot.col)}
             ></div>
           ))}
         </div>

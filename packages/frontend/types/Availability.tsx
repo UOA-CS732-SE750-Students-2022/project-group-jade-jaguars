@@ -14,3 +14,8 @@ export interface AttendeeAvailability {
   uuid: string; // uuid of the attendee
   availability: AvailabilityBlock[];
 }
+
+export interface AttendeeStatus {
+  uuid: string;
+  status: AvailabilityStatus;
+}
