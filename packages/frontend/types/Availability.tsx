@@ -9,3 +9,8 @@ export enum AvailabilityStatus {
   Unavailable,
   Tentative,
 }
+
+export interface AttendeeAvailability {
+  uuid: string; // uuid of the attendee
+  availability: AvailabilityBlock[];
+}
