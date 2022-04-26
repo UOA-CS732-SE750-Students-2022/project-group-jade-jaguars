@@ -45,12 +45,8 @@ class Server extends http.Server {
     this.app.use(bodyParser.json());
 
     if (process.env.NODE_PATH !== 'test') {
-      this.app.use(
-        `${BASE_URL}/docs`,
-        swaggerUi.serve,
-        swaggerUi.setup(swaggerDocument),
-      );
-      console.log(`swagger: http://localhost:${PORT}${BASE_URL}/docs`);
+      this.app.use(`/docs`, swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+      console.log(`swagger: http://localhost:${PORT}/docs`);
     }
 
     this.setRouter();
