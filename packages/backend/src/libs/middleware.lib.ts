@@ -53,10 +53,6 @@ export async function getFirebaseUser(
 
     return decodedValue;
   } catch (error) {
-    console.log(error);
-
-    res
-      .status(StatusCodes.INTERNAL_SERVER_ERROR)
-      .json({ message: 'Internal Server Error' });
+    returnError(error, res);
   }
 }

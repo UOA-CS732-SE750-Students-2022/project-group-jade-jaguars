@@ -101,8 +101,9 @@ export async function getEventById(
   res: Response<EventResponseDTO | string>,
 ) {
   try {
+    let eventId: string;
     try {
-    eventId = req.params.eventId;
+      eventId = req.params.eventId;
     } catch (err) {
       return returnError(err, res, err.status);
     }
@@ -147,8 +148,10 @@ export async function patchEventById(
   res: Response<EventResponseDTO | string>,
 ) {
   try {
+    let eventId: string;
+
     try {
-    eventId = req.params.eventId;
+      eventId = req.params.eventId;
     } catch (err) {
       return returnError(err, res, err.status);
     }
@@ -181,8 +184,10 @@ export async function patchEventById(
 
 export async function deleteEventById(req: Request, res: Response) {
   try {
+    let eventId: string;
+
     try {
-    eventId = req.params.eventId;
+      eventId = req.params.eventId;
     } catch (err) {
       return returnError(err, res, err);
     }
@@ -294,8 +299,10 @@ export async function addUserAvailabilityById(
   res: Response<EventResponseDTO | string>,
 ) {
   try {
+    let eventId: string;
+
     try {
-    eventId = req.params.eventId;
+      eventId = req.params.eventId;
     } catch (err) {
       return returnError(err, res, err);
     }
@@ -365,10 +372,6 @@ export async function removeUserAvalabilityById(
   try {
     eventId = req.params.eventId;
     userId = req.query.userId as string;
-  } catch (e: unknown) {
-    if (!(e instanceof ServerError)) throw e;
-    res.status(e.status).send(e.message);
-  }
 
     const checkDatePayload = {
       startDate: new Date(req.query.startDate as string),
@@ -467,7 +470,7 @@ export async function setEventAvailabilityConfirmation(
 ) {
   let eventId: string;
   try {
-    eventId = convertToObjectId(req.params.eventId);
+    eventId = req.params.eventId;
 
     const rules = Joi.object<SetEventAvailabilityConfirmationDTO>({
       userId: validators.objectId().required(),
@@ -511,7 +514,7 @@ export async function getEventAvailabilityConfirmations(
 ) {
   let eventId: string;
   try {
-    eventId = convertToObjectId(req.params.eventId);
+    eventId = req.params.eventId;
 
     const eventDoc = await EventModel.findOne({ _id: eventId });
     if (!eventDoc) {
