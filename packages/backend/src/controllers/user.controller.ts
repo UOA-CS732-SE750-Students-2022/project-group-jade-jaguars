@@ -1,7 +1,6 @@
 import { getFirebaseUser } from '../libs/middleware.lib';
 import { IUser, UserModel } from '../schemas/user.schema';
 import { Request, Response } from 'express';
-import { Types } from 'mongoose';
 import { ServerError, TypedRequestBody } from '../libs/utils.lib';
 import Joi from 'joi';
 import { validate, validators } from '../libs/validate.lib';
@@ -13,14 +12,14 @@ interface CreateUserDTO {
   _id: string;
   lastName: string;
   email?: string;
-  events?: Types.ObjectId[];
+  events?: String[];
 }
 
 interface UserResponseDTO {
   id: string;
   firstName: string;
   lastName: string;
-  events: Types.ObjectId[];
+  events: String[];
 }
 
 interface UpdateUserDTO extends Partial<IUser> {}

@@ -1,33 +1,30 @@
+import { randomUUID } from 'crypto';
 import { Colour, ITeam, TeamModel } from '../schemas/team.schema';
 import { Request, Response } from 'express';
-import { Types } from 'mongoose';
-import {
-  convertToObjectId,
-  ServerError,
-  TypedRequestBody,
-} from '../libs/utils.lib';
+import { ServerError, TypedRequestBody } from '../libs/utils.lib';
 import Joi from 'joi';
 import { validate, validators } from '../libs/validate.lib';
 import { StatusCodes } from 'http-status-codes';
 import { returnError } from '../libs/error.lib';
 
 interface CreateTeamDTO {
+  _id: string;
   title: string;
   description?: string;
   color?: Colour;
-  admin: Types.ObjectId;
-  members?: Types.ObjectId[];
-  events?: Types.ObjectId[];
+  admin: string;
+  members?: string[];
+  events?: string[];
 }
 
 interface TeamResponseDTO {
-  id: Types.ObjectId;
+  id: string;
   title: string;
   description: string;
   color: Colour;
-  admin: Types.ObjectId;
-  members: Types.ObjectId[];
-  events: Types.ObjectId[];
+  admin: string;
+  members: string[];
+  events: string[];
 }
 
 interface UpdateUserDTO extends Partial<ITeam> {}
@@ -37,7 +34,7 @@ export async function getTeamById(
   res: Response<TeamResponseDTO>,
 ) {
   try {
-  const teamId = convertToObjectId(req.params.id);
+  const teamId = req.params.id;
   const teamDoc = await TeamModel.findById(teamId);
     if (!teamDoc) {
       return returnError(Error('Team Not Found'), res, StatusCodes.NOT_FOUND);
@@ -69,7 +66,8 @@ export async function createTeam(
       events: validators.objectIds().optional(),
     });
 
-    const formData = validate(rules, req.body, { allowUnknown: true });
+  const formData = validate(rules, req.body, { allowUnknown: true });
+  formData._id = randomUUID();
 
     formData._id = randomUUID();
 
@@ -103,7 +101,7 @@ export async function updateTeamById(
     });
     const formData = validate(rules, req.body, { allowUnknown: true });
 
-  const teamId = convertToObjectId(req.params.id);
+  const teamId = req.params.id;
   const teamDoc = await TeamModel.findOneAndUpdate(
     { _id: teamId },
     { $set: formData },
@@ -129,8 +127,8 @@ export async function updateTeamById(
 
 export async function deleteTeamById(req: Request, res: Response) {
   try {
-    // TODO: Add auth middleware to this
-  const teamId = convertToObjectId(req.params.id);
+  // TODO: Add auth middleware to this
+  const teamId = req.params.id;
   const result = await TeamModel.deleteOne({ _id: teamId });
     if (result.deletedCount === 0) {
       return returnError(Error('Team Not Found'), res, StatusCodes.NOT_FOUND);
@@ -146,7 +144,7 @@ export async function deleteTeamById(req: Request, res: Response) {
 export async function addMemberById(req: Request, res: Response) {
   // TODO: Add auth middleware to this
   try {
-  const teamId = convertToObjectId(req.params.id);
+  const teamId = req.params.id;
   const result = await TeamModel.deleteOne({ _id: teamId });
     if (result.deletedCount === 0) {
       return returnError(Error('Team Not Found'), res, StatusCodes.NOT_FOUND);

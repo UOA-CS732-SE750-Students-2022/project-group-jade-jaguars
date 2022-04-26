@@ -1,5 +1,4 @@
-import { required } from 'joi';
-import { Model, model, Types, Schema } from 'mongoose';
+import { Model, model, Schema } from 'mongoose';
 import { identifier } from '../service/models.service';
 
 export enum EventStatus {
@@ -37,6 +36,7 @@ export interface IEventAvailability {
 }
 
 export interface IEvent {
+  _id: string;
   title: string;
   description?: string;
   status: EventStatus;
@@ -45,11 +45,15 @@ export interface IEvent {
   availability: IEventAvailability;
   location?: string;
   identifier: string;
-  team?: Types.ObjectId;
+  team?: string;
 }
 
 const eventSchema = new Schema<IEvent>(
   {
+    _id: {
+      type: String,
+      required: true,
+    },
     title: {
       type: String,
       required: true,
@@ -164,17 +168,12 @@ const eventSchema = new Schema<IEvent>(
       default: identifier(10),
     },
     team: {
-      type: Schema.Types.ObjectId,
+      type: String,
       required: false,
       ref: 'Team',
     },
   },
   { timestamps: true },
 );
-
-// eventSchema.post('save', (doc, next) => {
-
-//   next();
-// });
 
 export const EventModel: Model<IEvent> = model<IEvent>('Event', eventSchema);
