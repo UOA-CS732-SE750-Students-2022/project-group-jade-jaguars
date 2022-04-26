@@ -1,4 +1,5 @@
-import { Model, model, Types, Schema } from 'mongoose';
+import { Model, model, Schema } from 'mongoose';
+import { identifier } from '../service/models.service';
 
 export enum EventStatus {
   Pending = 'Pending',
@@ -8,20 +9,9 @@ export enum EventStatus {
 }
 
 export interface ITimeBracket {
-  startTime: Date;
-  endTime: Date;
+  startDate: Date;
+  endDate: Date;
 }
-
-const timeBracketSchema = new Schema<ITimeBracket>({
-  startTime: {
-    type: Date,
-    required: true,
-  },
-  endTime: {
-    type: Date,
-    required: true,
-  },
-});
 
 export enum AvailabilityStatus {
   Available = 'Available',
@@ -33,37 +23,11 @@ export interface IAvailabilityBlock extends ITimeBracket {
   status: AvailabilityStatus;
 }
 
-const availabilityBlockSchema = new Schema<IAvailabilityBlock>({
-  startTime: {
-    type: Date,
-    required: true,
-  },
-  endTime: {
-    type: Date,
-    required: true,
-  },
-  status: {
-    type: String,
-    enum: Object.values(AvailabilityStatus),
-    required: true,
-  },
-});
-
 export interface IAttendeeAvailability {
-  attendee: Types.ObjectId;
+  attendee: string;
   availability: IAvailabilityBlock[];
+  confirmed: Boolean;
 }
-
-const attendeeAvailabilitySchema = new Schema<IAttendeeAvailability>({
-  attendee: {
-    type: Schema.Types.ObjectId,
-    required: true,
-  },
-  availability: {
-    type: [availabilityBlockSchema],
-    required: true,
-  },
-});
 
 export interface IEventAvailability {
   potentialTimes: ITimeBracket[];
@@ -71,65 +35,145 @@ export interface IEventAvailability {
   attendeeAvailability: IAttendeeAvailability[];
 }
 
-const eventAvailabilitySchema = new Schema<IEventAvailability>({
-  potentialTimes: {
-    type: [timeBracketSchema],
-    required: true,
-  },
-  finalisedTime: {
-    type: timeBracketSchema,
-    required: false,
-  },
-  attendeeAvailability: {
-    type: [attendeeAvailabilitySchema],
-    required: true,
-  },
-});
-
 export interface IEvent {
+  _id: string;
   title: string;
-  description: string;
+  description?: string;
   status: EventStatus;
-  startTime: number;
-  endTime: number;
+  startDate: Date;
+  endDate: Date;
   availability: IEventAvailability;
-  attendees: Types.ObjectId[];
-  location: string;
+  location?: string;
+  identifier: string;
+  team?: string;
 }
 
-const eventSchema = new Schema<IEvent>({
-  title: {
-    type: String,
-    required: true,
+const eventSchema = new Schema<IEvent>(
+  {
+    _id: {
+      type: String,
+      required: true,
+    },
+    title: {
+      type: String,
+      required: true,
+    },
+    status: {
+      type: String,
+      enum: Object.values(EventStatus),
+      required: true,
+      default: EventStatus.Pending,
+    },
+    startDate: {
+      type: Date,
+      required: true,
+    },
+    endDate: {
+      type: Date,
+      required: true,
+    },
+    availability: {
+      type: {
+        potentialTimes: {
+          type: [
+            {
+              startDate: {
+                type: Date,
+                required: true,
+              },
+              endDate: {
+                type: Date,
+                required: true,
+              },
+              isAddedByAdmin: {
+                type: Boolean,
+                required: true,
+                default: false,
+              },
+            },
+          ],
+        },
+        finalisedTime: {
+          type: {
+            startDate: {
+              type: Date,
+              required: true,
+            },
+            endDate: {
+              type: Date,
+              required: true,
+            },
+          },
+          required: false,
+          default: null,
+        },
+        attendeeAvailability: {
+          type: [
+            {
+              attendee: {
+                type: Schema.Types.String,
+                ref: 'User',
+              },
+              availability: {
+                type: [
+                  {
+                    startDate: {
+                      type: Date,
+                      required: true,
+                    },
+                    endDate: {
+                      type: Date,
+                      required: true,
+                    },
+                    status: {
+                      type: String,
+                      enum: Object.values(AvailabilityStatus),
+                      required: true,
+                      default: AvailabilityStatus.Available,
+                    },
+                  },
+                ],
+                required: true,
+                default: [],
+              },
+              confirmed: {
+                type: Boolean,
+                required: true,
+                default: false,
+              },
+            },
+          ],
+          required: true,
+          default: [],
+        },
+      },
+      required: true,
+      default: {
+        potentialTimes: [],
+        attendeeAvailability: [],
+        finalisedTime: null,
+      },
+    },
+    description: {
+      type: String,
+      required: false,
+    },
+    location: {
+      type: String,
+      required: false,
+    },
+    identifier: {
+      type: String,
+      required: true,
+      default: identifier(10),
+    },
+    team: {
+      type: String,
+      required: false,
+      ref: 'Team',
+    },
   },
-  status: {
-    type: String,
-    enum: Object.values(EventStatus),
-    required: true,
-  },
-  startTime: {
-    type: Number,
-    required: true,
-  },
-  endTime: {
-    type: Number,
-    required: true,
-  },
-  availability: eventAvailabilitySchema,
-  attendees: {
-    type: [Types.ObjectId],
-    ref: 'User',
-    required: true,
-    default: [],
-  },
-  description: {
-    type: String,
-    required: true,
-  },
-  location: {
-    type: String,
-    required: true,
-  },
-});
+  { timestamps: true },
+);
 
 export const EventModel: Model<IEvent> = model<IEvent>('Event', eventSchema);

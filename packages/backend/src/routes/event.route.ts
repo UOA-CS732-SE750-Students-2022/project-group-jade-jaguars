@@ -1,16 +1,37 @@
 import express from 'express';
 import {
   createEvent,
-  updateEventById,
+  patchEventById,
   deleteEventById,
   getEventById,
+  addUserAvailabilityById,
+  removeUserAvalabilityById,
+  searchEvent,
+  setEventAvailabilityConfirmation,
+  getEventAvailabilityConfirmations,
 } from '../controllers/event.controller';
+
 export const eventsRouter = express.Router();
 
-eventsRouter.get('/event/:id', getEventById);
+// Search
+eventsRouter.post('/event/search', searchEvent);
 
+// Availability
+eventsRouter.post('/event/:eventId/availability', addUserAvailabilityById);
+eventsRouter.delete('/event/:eventId/availability', removeUserAvalabilityById);
+
+// Confirm availability
+eventsRouter.get(
+  '/event/:eventId/availability/confirm',
+  getEventAvailabilityConfirmations,
+);
+eventsRouter.patch(
+  '/event/:eventId/availability/confirm',
+  setEventAvailabilityConfirmation,
+);
+
+// CRUD
+eventsRouter.get('/event/:eventId', getEventById);
 eventsRouter.post('/event', createEvent);
-
-eventsRouter.put('/event/:id', updateEventById);
-
-eventsRouter.delete('/event/:id', deleteEventById);
+eventsRouter.patch('/event/:eventId', patchEventById);
+eventsRouter.delete('/event/:eventId', deleteEventById);

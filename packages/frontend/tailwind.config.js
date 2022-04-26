@@ -17,11 +17,17 @@ module.exports = {
       primary: '#99C08B', // primary green
       primarylight: '#FAF1E6', // light green
       secondary: '#FFE074', // secondary yellow
-      secondarylight: '#FFF6D7', // light yellow
+      secondarylight: '#FFF6D7',
+      highlight: '#FAF1E6',
       backgroundgrey: '#F9F9F9',
       cardgrey: '#FAFAFA',
     },
-    extend: {},
+    extend: {
+      width: {
+        196: '32rem',
+        218: '45rem',
+      },
+    },
   },
-  plugins: [],
+  plugins: [require('@tailwindcss/line-clamp')],
 };

@@ -63,6 +63,30 @@ const availability: AvailabilityBlock[] = [
 ];
 
 const Home: NextPage = () => {
+  const participants = [
+    {
+      name: 'Amy',
+      profilePic:
+        'https://media-exp1.licdn.com/dms/image/C4E0BAQHUo_h0JGtwYw/company-logo_200_200/0/1606490589727?e=2147483647&v=beta&t=TO869IrmjUEr7VSFzSHaqcEN4_-TTctFucuyBv8cqDA',
+    },
+    {
+      name: 'Bob',
+      profilePic:
+        'https://img.pixers.pics/pho_wat(s3:700/FO/23/80/66/66/700_FO23806666_a4cd1ba91572617e8833dcbd1d17a44c.jpg,700,700,cms:2018/10/5bd1b6b8d04b8_220x50-watermark.png,over,480,650,jpg)/wall-murals-the-letter-b.jpg.jpg',
+    },
+    {
+      name: 'Carlie',
+      // profilePic: '',
+    },
+    {
+      name: 'David',
+      // profilePic: '',
+    },
+    {
+      name: 'Eric',
+      // profilePic: '',
+    },
+  ];
   return (
     <AvailabilitySelector
       timeOptions={timeOptions}

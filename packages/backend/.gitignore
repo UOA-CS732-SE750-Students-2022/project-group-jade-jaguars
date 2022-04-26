@@ -1,7 +1,8 @@
 # Environment Files
 .env.*
 !.env.*.template
-
+!.env.template
+firebase.credentials.json
 # Coverage reports
 coverage/
 .nyc_output/

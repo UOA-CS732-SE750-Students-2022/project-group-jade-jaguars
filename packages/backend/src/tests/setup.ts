@@ -1,5 +1,6 @@
 import mongoose from 'mongoose';
 import { MongoMemoryServer } from 'mongodb-memory-server';
+import server from '../app';
 
 let mongoServer, databaseURI;
 
@@ -13,6 +14,11 @@ beforeAll(async () => {
 });
 
 beforeEach(async () => {
+  // The following is to make sure the database is clean before a test starts
+  await mongoose.connection.db.dropDatabase();
+});
+
+afterEach(async () => {
   // The following is to make sure the database is clean before a test starts
   await mongoose.connection.db.dropDatabase();
 });
