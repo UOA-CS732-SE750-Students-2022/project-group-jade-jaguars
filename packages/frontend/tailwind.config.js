@@ -22,6 +22,14 @@ module.exports = {
       cardgrey: '#FAFAFA',
     },
     extend: {},
+    fontSize: {
+      '2.5xl': '1.56rem',
+    },
+    extend: {
+      width: {
+        218: '45rem',
+      },
+    },
   },
-  plugins: [],
+  plugins: [require('@tailwindcss/line-clamp')],
 };
