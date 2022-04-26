@@ -1,14 +1,15 @@
 import mongoose from 'mongoose';
+import dotenv from 'dotenv';
 import { MongoMemoryServer } from 'mongodb-memory-server';
-import server from '../app';
 
+dotenv.config({ path: `.env.${process.env.ENV_PATH}` });
 let mongoServer, databaseURI;
 
-beforeAll(async () => {
-  jest.setTimeout(100000);
-
+before(async () => {
+  console.log('hit before');
   mongoServer = await MongoMemoryServer.create();
   databaseURI = mongoServer.getUri() + 'tests';
+  console.log(databaseURI);
 
   await mongoose.connect(databaseURI, {});
 });
@@ -23,6 +24,6 @@ afterEach(async () => {
   await mongoose.connection.db.dropDatabase();
 });
 
-afterAll(async () => {
+after(async () => {
   await mongoServer.stop();
 });
