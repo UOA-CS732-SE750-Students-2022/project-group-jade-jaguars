@@ -9,8 +9,8 @@ import TimeBracket from '../types/TimeBracket';
 /*
  *  Assumption: no more than 7 days sent through as timeOptions.
  *  Props: timeOptions: a list of times that can be selected.
- *         availability: a list of times that the user has previously specified their availability for (can be empty).
- *         status: the current selection status.
+ *         availabilities: a list of availabilities for all users.
+ *         onHover: a function returning the info about the timeslot to the page.
  */
 function GroupAvailability(props: {
   timeOptions: TimeBracket[];
@@ -20,7 +20,7 @@ function GroupAvailability(props: {
   const [timeList, setTimeList] = useState<TimeBracket[]>([]);
   const [hourList, setHourList] = useState<string[]>([]);
 
-  // The status of the grid upon mouse release.
+  // The status of the grid.
   const [timeSlots, setTimeSlots] = useState<
     {
       row: number;
