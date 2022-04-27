@@ -7,7 +7,7 @@ interface ShareLinkButtonProp {
   eventLink: string;
 }
 
-export const ShareLinkButton = (eventLink: ShareLinkButtonProp) => {
+export const ShareLinkButton = ({ eventLink }: ShareLinkButtonProp) => {
   const clipboard = useClipboard();
   return (
     <Tooltip
