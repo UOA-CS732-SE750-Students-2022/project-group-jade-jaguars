@@ -1,10 +1,6 @@
 import server from '../app';
 import request from 'supertest';
-import {
-  AvailabilityStatus,
-  EventModel,
-  EventStatus,
-} from '../schemas/event.schema';
+import { AvailabilityStatus, EventModel } from '../schemas/event.schema';
 import { StatusCodes } from 'http-status-codes';
 import { identifier } from '../service/models.service';
 import { UserModel } from '../schemas/user.schema';
@@ -12,15 +8,15 @@ import { TeamModel } from '../schemas/team.schema';
 import {
   EventResponseDTO,
   GetEventAvailabilityConfirmationsResponseDTO,
-} from 'src/controllers/event.controller';
-// import { io } from 'socket.io-client';
+} from '../controllers/event.controller';
 import { createServer, Server as HttpServer } from 'http';
 import { io as Client } from 'socket.io-client';
 import { Server } from 'socket.io';
 import { AddressInfo } from 'net';
 import socket from '../socketio';
+// import { io } from 'socket.io-client';
 
-describe.skip('Events', () => {
+describe('Events', () => {
   it('Get', async () => {
     const eventDoc = await EventModel.create({
       title: 'title',
@@ -93,6 +89,7 @@ describe.skip('Events', () => {
 
     beforeEach(async () => {
       const userDoc = await UserModel.create({
+        _id: identifier(32),
         firstName: 'firstName',
         lastName: 'lastName',
       });
@@ -112,6 +109,7 @@ describe.skip('Events', () => {
         endDate: new Date('2000'),
         team: teamId,
       });
+      console.log(eventDoc);
       eventId = eventDoc._id;
     });
 
@@ -168,7 +166,7 @@ describe.skip('Events', () => {
       expect(searchResponse).toHaveLength(1);
       expect(searchResponse[0].id).toBe(eventId.toString());
     });
-    it('Limit', async () => {
+    it.only('Limit', async () => {
       // Create a second identical event
       await EventModel.create({
         title: 'title',
@@ -207,6 +205,7 @@ describe.skip('Events', () => {
     const endDate = new Date('2000');
     beforeEach(async () => {
       const userDoc = await UserModel.create({
+        _id: identifier(32),
         firstName: 'firstName',
         lastName: 'lastName',
       });
@@ -389,6 +388,7 @@ describe.skip('Events', () => {
 
       // Create second user
       const secondUser = await UserModel.create({
+        _id: identifier(32),
         firstName: 'firstName',
         lastName: 'lastName',
       });
@@ -435,7 +435,7 @@ describe.skip('Events', () => {
     //   console.log('running test');
     // });
 
-    describe('Socket io test', () => {
+    describe.skip('Socket io test', () => {
       let io: Server;
       let client;
       let httpServer: HttpServer;

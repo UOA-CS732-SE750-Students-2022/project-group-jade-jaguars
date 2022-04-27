@@ -1,4 +1,5 @@
-import { Model, model, Schema } from 'mongoose';
+import { randomUUID } from 'crypto';
+import { Model, model, Schema, Types } from 'mongoose';
 import { identifier } from '../service/models.service';
 
 export enum EventStatus {
@@ -53,6 +54,7 @@ const eventSchema = new Schema<IEvent>(
     _id: {
       type: String,
       required: true,
+      default: randomUUID(),
     },
     title: {
       type: String,

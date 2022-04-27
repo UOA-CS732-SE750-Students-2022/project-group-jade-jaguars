@@ -10,8 +10,10 @@ const description = () => Joi.string().min(3);
 const location = () => Joi.string().min(1);
 const firstName = () => Joi.string().min(1);
 const lastName = () => Joi.string().min(1);
-const objectId = () => Joi.string().min(28).max(32);
-const objectIds = () => Joi.array().items(Joi.string().min(28).max(32));
+// ObjectIds are of string length 24, randomUUID is 36, firebase is 32?
+// I seriously don't know why we changed to using strings here when you could have just used a composite key, so much hassle for no gain?
+const id = () => Joi.string().min(24).max(36);
+const ids = () => Joi.array().items(Joi.string().min(24).max(36));
 const startDate = () => Joi.date().iso().required();
 const endDate = () => Joi.date().iso().greater(Joi.ref('startDate')).required();
 const eventStatus = () => Joi.string().valid(...Object.values(EventStatus));
@@ -26,8 +28,8 @@ export const validators = {
   location,
   firstName,
   lastName,
-  objectId,
-  objectIds,
+  id,
+  ids,
   startDate,
   endDate,
   eventStatus,

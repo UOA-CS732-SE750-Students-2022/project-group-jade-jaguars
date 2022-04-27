@@ -1,4 +1,3 @@
-import { randomUUID } from 'crypto';
 import { Colour, ITeam, TeamModel } from '../schemas/team.schema';
 import { Request, Response } from 'express';
 import { ServerError, TypedRequestBody } from '../libs/utils.lib';
@@ -55,13 +54,12 @@ export async function createTeam(
   const rules = Joi.object<CreateTeamDTO>({
     title: validators.title().required(),
     description: validators.description().required(),
-    admin: validators.objectId().required(),
-    members: validators.objectIds().optional(),
-    events: validators.objectIds().optional(),
+    admin: validators.id().required(),
+    members: validators.ids().optional(),
+    events: validators.ids().optional(),
   });
 
   const formData = validate(rules, req.body, { allowUnknown: true });
-  formData._id = randomUUID();
 
   const teamDoc = await TeamModel.create(formData);
   res.status(StatusCodes.CREATED).send({
@@ -83,9 +81,9 @@ export async function updateTeamById(
   const rules = Joi.object<UpdateUserDTO>({
     title: validators.title().optional(),
     description: validators.description().optional(),
-    admin: validators.objectId().optional(),
-    members: validators.objectIds().optional(),
-    events: validators.objectIds().optional(),
+    admin: validators.id().optional(),
+    members: validators.ids().optional(),
+    events: validators.ids().optional(),
   });
   const formData = validate(rules, req.body, { allowUnknown: true });
 

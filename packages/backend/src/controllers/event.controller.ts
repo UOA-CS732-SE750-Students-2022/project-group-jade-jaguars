@@ -1,4 +1,3 @@
-import { randomUUID } from 'crypto';
 import {
   IEventAvailability,
   EventModel,
@@ -99,15 +98,12 @@ export async function getEventById(
   req: Request,
   res: Response<EventResponseDTO | string>,
 ) {
-  let eventId;
-  try {
-    eventId = req.params.eventId;
-  } catch (e: unknown) {
-    if (!(e instanceof ServerError)) throw e;
-    res.status(e.status).send(e.message);
-  }
+  const rules = Joi.object({
+    eventId: validators.id().required(),
+  });
+  const formData = validate(rules, req.params, { allowUnknown: true });
 
-  const eventDoc = await EventModel.findById(eventId);
+  const eventDoc = await EventModel.findById(formData.eventId);
   if (!eventDoc) {
     res.status(StatusCodes.NOT_FOUND).send('event not found');
   }
@@ -118,7 +114,6 @@ export async function createEvent(
   req: TypedRequestBody<CreateEventDTO>,
   res: Response<EventResponseDTO>,
 ) {
-  console.log('hit create endpoint!');
   // TODO: create/use remainder of validation rules
   const rules = Joi.object<CreateEventDTO>({
     title: validators.title().required(),
@@ -127,11 +122,10 @@ export async function createEvent(
     startDate: validators.startDate().required(),
     endDate: validators.endDate().required(),
     location: validators.location().optional(),
-    team: validators.objectId().optional(),
+    team: validators.id().optional(),
   });
 
   const formData = validate(rules, req.body, { allowUnknown: true });
-  formData._id = randomUUID();
 
   const eventDoc = await EventModel.create(formData);
   res.status(StatusCodes.CREATED).send(eventDocToResponseDTO(eventDoc));
@@ -156,7 +150,7 @@ export async function patchEventById(
     startDate: validators.startDate().optional(),
     endDate: validators.endDate().optional(),
     location: validators.location().optional(),
-    team: validators.objectId().optional(),
+    team: validators.id().optional(),
   });
 
   const formData = validate(rules, req.body, { allowUnknown: true });
@@ -195,7 +189,7 @@ export async function searchEvent(
   res: Response<EventResponseDTO[] | string>,
 ) {
   const rules = Joi.object<SearchEventDTO>({
-    teamId: validators.objectId().optional(),
+    teamId: validators.id().optional(),
     titleSubStr: Joi.string().optional(),
     descriptionSubStr: Joi.string().optional(),
   }).oxor('teamId', 'titleSubStr', 'descriptionSubStr');
@@ -296,7 +290,7 @@ export async function addUserAvailabilityById(
   };
 
   const rules = Joi.object<AddUserAvalabilityDTO>({
-    userId: validators.objectId().required(),
+    userId: validators.id().required(),
     startDate: validators.startDate().required(),
     endDate: validators.endDate().required(),
     status: validators.availabilityStatus().optional(),
@@ -462,7 +456,7 @@ export async function setEventAvailabilityConfirmation(
   }
 
   const rules = Joi.object<SetEventAvailabilityConfirmationDTO>({
-    userId: validators.objectId().required(),
+    userId: validators.id().required(),
     confirmed: Joi.boolean().required(),
   });
   const formData = validate(rules, req.body, { allowUnknown: true });

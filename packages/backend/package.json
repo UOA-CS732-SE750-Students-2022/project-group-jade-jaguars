@@ -49,6 +49,7 @@
     "eslint": "^8.0.1",
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-prettier": "^4.0.0",
+    "firebase-tools": "^10.7.1",
     "jest": "^27.5.1",
     "mongodb-memory-server": "^8.4.2",
     "nodemon": "^2.0.15",
@@ -59,26 +60,6 @@
     "ts-node": "^10.7.0",
     "tsconfig-paths": "^3.10.1",
     "typescript": "^4.6.2"
-  },
-  "jest": {
-    "moduleFileExtensions": [
-      "js",
-      "json",
-      "ts"
-    ],
-    "rootDir": "src",
-    "testRegex": ".*\\.test\\.ts$",
-    "transform": {
-      "^.+\\.(t|j)s$": "ts-jest"
-    },
-    "collectCoverageFrom": [
-      "**/*.(t|j)s"
-    ],
-    "coverageDirectory": "../coverage",
-    "testEnvironment": "node",
-    "setupFilesAfterEnv": [
-      "<rootDir>/tests/setup.ts"
-    ]
   },
   "nyc": {
     "extension": [

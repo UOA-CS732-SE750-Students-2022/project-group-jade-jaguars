@@ -1,5 +1,8 @@
-import { Model, model, Schema } from 'mongoose';
+import { Model, model, Schema, Types } from 'mongoose';
+import { identifier } from '../service/event.service';
 import { randomEnum } from '..//libs/utils.lib';
+import mongoose from 'mongoose';
+import { randomUUID } from 'crypto';
 
 // TODO: Replace this with a appropriate library or expand to whatever we need
 export enum Colour {
@@ -22,6 +25,7 @@ const teamSchema = new Schema(
     _id: {
       type: String,
       required: true,
+      default: randomUUID(),
     },
     title: {
       type: String,
