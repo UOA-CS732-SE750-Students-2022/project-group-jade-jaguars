@@ -120,7 +120,7 @@
 }
 
 .rbc-event {
-  background-color: var(--primary) !important;
+  /* background-color: var(--primary) !important; */
   padding-left: 8px !important;
 }
 
@@ -134,7 +134,7 @@
 
 .rbc-day-slot .rbc-event,
 .rbc-day-slot .rbc-background-event {
-  border-color: var(--primary-dark) !important;
+  border-color: var(--cardgrey) !important;
   gap: 4px;
 }
 

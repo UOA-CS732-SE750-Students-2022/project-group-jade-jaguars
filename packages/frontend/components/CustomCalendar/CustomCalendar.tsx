@@ -18,20 +18,32 @@ interface CustomCalendarInterface {
     end: Date;
   }[];
   localizer?: DateLocalizer;
+  teamHexColour?: string;
 }
 
 const CustomCalendar = (props: CustomCalendarInterface) => {
-  const { localizer } = props;
+  const { localizer, teamHexColour } = props;
   const calLocalizer = localizer ? localizer : momentLocalizer(moment);
+  const defaultColour = '#99c08b';
 
   const onSelectEvent = (event: Object) => {
     console.log(event);
   };
 
+  const eventStyleGetter = () => {
+    let style = {
+      backgroundColor: teamHexColour ? teamHexColour : defaultColour,
+    }
+    return {
+      style: style
+    }
+  }
+
   return (
-    <div className="h-full w-full">
+    <div className="w-full h-full">
       <Calendar
         events={events}
+        eventPropGetter={eventStyleGetter}
         defaultView={Views.WEEK}
         views={[Views.MONTH, Views.WEEK, Views.DAY]}
         localizer={calLocalizer}
