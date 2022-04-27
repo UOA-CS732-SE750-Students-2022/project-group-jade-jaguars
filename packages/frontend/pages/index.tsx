@@ -5,6 +5,7 @@ import {
   AvailabilityBlock,
   AvailabilityStatus,
 } from '../types/AvailabilityBlock';
+import { TimeOptionsList } from '../components/TimeOptionsList';
 
 const timeOptions: TimeBracket[] = [
   {
@@ -88,11 +89,14 @@ const Home: NextPage = () => {
     },
   ];
   return (
-    <AvailabilitySelector
-      timeOptions={timeOptions}
-      availability={availability}
-      status={AvailabilityStatus.Available}
-    />
+    <>
+      <AvailabilitySelector
+        timeOptions={timeOptions}
+        availability={availability}
+        status={AvailabilityStatus.Available}
+      />
+      <TimeOptionsList />
+    </>
   );
 };
 
