@@ -131,8 +131,7 @@ const eventSchema = new Schema<IEvent>(
       required: true,
       // This is cannot be shortened to randomUUID() otherwise entropy doesn't work
       default: () => {
-        const id = randomUUID();
-        return id;
+        return randomUUID();
       },
     },
     title: {
