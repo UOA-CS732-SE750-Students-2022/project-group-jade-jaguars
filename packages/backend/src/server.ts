@@ -31,7 +31,7 @@ class Server extends http.Server {
 
   private setRouter() {
     // Makes all endpoints to require authentication
-    // this.app.use(BASE_URL, isAuthenticated, indexRouter);
+    this.app.use(BASE_URL, isAuthenticated, indexRouter);
     this.app.use(BASE_URL, eventsRouter);
     this.app.use(BASE_URL, usersRouter);
     this.app.use(BASE_URL, teamRouter);

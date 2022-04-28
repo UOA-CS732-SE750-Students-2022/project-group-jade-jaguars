@@ -244,9 +244,9 @@ describe('Events', () => {
       eventId = eventDoc._id.toString();
     });
 
-    it('Virtual field check', async () => {
-      const eventDoc: any = await EventModel.findById(eventId);
-      console.log(eventDoc.availability.potentialTimes);
+    it.only('Virtual field check', async () => {
+      const eventDoc = await EventModel.findById(eventId);
+      expect(eventDoc.availability.potentialTimes).toBeTruthy();
     });
 
     it('Add user availability', async () => {
