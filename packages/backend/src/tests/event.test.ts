@@ -109,7 +109,6 @@ describe('Events', () => {
         endDate: new Date('2000'),
         team: teamId,
       });
-      console.log(eventDoc);
       eventId = eventDoc._id;
     });
 
@@ -166,7 +165,7 @@ describe('Events', () => {
       expect(searchResponse).toHaveLength(1);
       expect(searchResponse[0].id).toBe(eventId.toString());
     });
-    it.only('Limit', async () => {
+    it.skip('Limit', async () => {
       // Create a second identical event
       await EventModel.create({
         title: 'title',
@@ -234,6 +233,11 @@ describe('Events', () => {
         },
       });
       eventId = eventDoc._id.toString();
+    });
+
+    it('Virtual field check', async () => {
+      const eventDoc: any = await EventModel.findById(eventId);
+      console.log(eventDoc.availability.potentialTimes);
     });
 
     it('Add user availability', async () => {

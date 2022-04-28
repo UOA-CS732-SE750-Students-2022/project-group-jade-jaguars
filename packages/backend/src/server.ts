@@ -46,10 +46,6 @@ class Server extends http.Server {
     this.app.use(bodyParser.json());
 
     if (process.env.NODE_ENV !== 'test') {
-      console.log('================');
-      console.log(process.env.ENV_PATH);
-      console.log(process.env.NODE_ENV);
-      console.log('================');
       this.app.use(`/docs`, swaggerUi.serve, swaggerUi.setup(swaggerDocument));
       console.log(`swagger: http://localhost:${PORT}/docs`);
     }

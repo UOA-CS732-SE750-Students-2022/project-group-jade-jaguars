@@ -11,13 +11,13 @@ export enum Colour {
 }
 
 export interface ITeam {
-  _id: string;
+  _id: string; // uuid
   title: string;
   description?: string;
   color?: Colour;
-  admin: string;
-  members?: string[];
-  events?: string[];
+  admin: string; // uuid
+  members?: string[]; //uuids
+  events?: string[]; // uuids
 }
 
 const teamSchema = new Schema(
