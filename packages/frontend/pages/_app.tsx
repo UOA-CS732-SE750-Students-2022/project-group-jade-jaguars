@@ -3,6 +3,7 @@ import Head from 'next/head';
 import { MantineProvider } from '@mantine/core';
 import '../styles/globals.css';
 import 'antd/dist/antd.css';
+import { AuthProvider } from '../src/context/AuthContext';
 export default function App(props: AppProps) {
   const { Component, pageProps } = props;
 
@@ -25,7 +26,9 @@ export default function App(props: AppProps) {
           fontFamily: 'Poppins, sans-serif',
         }}
       >
-        <Component {...pageProps} />
+        <AuthProvider>
+          <Component {...pageProps} />
+        </AuthProvider>
       </MantineProvider>
     </>
   );

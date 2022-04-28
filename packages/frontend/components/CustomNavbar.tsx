@@ -12,7 +12,12 @@ export const CustomNavbar = () => {
   const { height, width } = useViewportSize();
   const [active, setActive] = useState(2);
   return (
-    <Navbar height={height} width={{ base: 100 }}>
+    <Navbar
+      fixed
+      position={{ top: 0, left: 0 }}
+      height={height}
+      width={{ base: 100 }}
+    >
       <Navbar.Section>
         <Group direction="column" align="center" mt={50}>
           <Avatar color="teal" radius="lg" size={70}>
