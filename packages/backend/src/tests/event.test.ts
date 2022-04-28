@@ -165,7 +165,16 @@ describe('Events', () => {
       expect(searchResponse).toHaveLength(1);
       expect(searchResponse[0].id).toBe(eventId.toString());
     });
-    it.skip('Limit', async () => {
+    it('Create second event', async () => {
+      // Create a second identical event
+      await EventModel.create({
+        title: 'title',
+        startDate: new Date('1900'),
+        endDate: new Date('2000'),
+        team: teamId,
+      });
+    });
+    it('Limit', async () => {
       // Create a second identical event
       await EventModel.create({
         title: 'title',

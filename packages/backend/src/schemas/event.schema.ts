@@ -129,7 +129,11 @@ const eventSchema = new Schema<IEvent>(
     _id: {
       type: String,
       required: true,
-      default: randomUUID(),
+      // This is cannot be shortened to randomUUID() otherwise entropy doesn't work
+      default: () => {
+        const id = randomUUID();
+        return id;
+      },
     },
     title: {
       type: String,
