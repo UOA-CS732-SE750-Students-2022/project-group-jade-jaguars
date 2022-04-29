@@ -1,4 +1,14 @@
 import type { NextPage } from 'next';
+
+import TeamDetailsCard from '../components/TeamDetailsCard';
+import TeamDetails from '../types/TeamDetails';
+import Head from 'next/head';
+import Image from 'next/image';
+import CheckBoxList from '../components/CheckBoxList';
+import EventCard from '../components/EventCard/EventCard';
+import styles from '../styles/Home.module.css';
+import { ShareLinkButton } from '../components/ShareLinkButton';
+import AvailabilitySelector from '../components/AvailabilitySelector';
 import GroupAvailability from '../components/GroupAvailability';
 import TimeBracket from '../types/TimeBracket';
 import {
@@ -74,11 +84,9 @@ const handleHover = (info: { people: AttendeeStatus[]; numPeople: number }) => {
 
 const Home: NextPage = () => {
   return (
-    <GroupAvailability
-      timeOptions={timeOptions}
-      availabilities={availabilities}
-      onHover={handleHover}
-    />
+    <>
+      <ShareLinkButton eventLink={'http'} />
+    </>
   );
 };
 
