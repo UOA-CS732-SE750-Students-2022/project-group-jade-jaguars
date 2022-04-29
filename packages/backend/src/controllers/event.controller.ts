@@ -183,7 +183,7 @@ export async function deleteEventById(req: Request, res: Response) {
     const eventId = req.params.eventId;
 
     const rules = Joi.object<{ eventId: string }>({
-      eventId: validators.title().required(),
+      eventId: validators.id().required(),
     });
     const formData = validate(res, rules, { eventId }, { allowUnknown: true });
 
@@ -520,7 +520,7 @@ export async function getEventAvailabilityConfirmations(
     const eventId = req.params.eventId;
 
     const rules = Joi.object<{ eventId: string }>({
-      eventId: validators.title().required(),
+      eventId: validators.id().required(),
     });
     const formData = validate(res, rules, { eventId }, { allowUnknown: true });
 
