@@ -29,33 +29,33 @@ export const CustomNavbar = () => {
       clearListener();
     };
   }, [setUser]);
-  return (
-    isLogin && (
-      <Navbar height={height} width={{ base: 100 }} className="border-1">
-        <Navbar.Section>
-          <div className="w-[100px]">
-            <Group direction="column" align="center" mt={50}>
-              <Avatar color="teal" radius="lg" size={70}>
-                Logo
-              </Avatar>
-            </Group>
-          </div>
-        </Navbar.Section>
-        <Navbar.Section grow mt={100}>
-          <Group direction="column" align="center" spacing="xs">
-            {linkData.map((link, index) => {
-              return (
-                <NavbarLink
-                  {...link}
-                  key={link.label}
-                  active={index === active}
-                  onClick={() => setActive(index)}
-                />
-              );
-            })}
+  return isLogin ? (
+    <Navbar height={height} width={{ base: 100 }} className="border-1">
+      <Navbar.Section>
+        <div className="w-[100px]">
+          <Group direction="column" align="center" mt={50}>
+            <Avatar color="teal" radius="lg" size={70}>
+              Logo
+            </Avatar>
           </Group>
-        </Navbar.Section>
-      </Navbar>
-    )
+        </div>
+      </Navbar.Section>
+      <Navbar.Section grow mt={100}>
+        <Group direction="column" align="center" spacing="xs">
+          {linkData.map((link, index) => {
+            return (
+              <NavbarLink
+                {...link}
+                key={link.label}
+                active={index === active}
+                onClick={() => setActive(index)}
+              />
+            );
+          })}
+        </Group>
+      </Navbar.Section>
+    </Navbar>
+  ) : (
+    <div></div>
   );
 };

@@ -5,8 +5,6 @@ import '../styles/globals.css';
 import 'antd/dist/antd.css';
 import { AuthProvider, useAuth } from '../src/context/AuthContext';
 import { CustomNavbar } from '../components/CustomNavbar';
-import { useEffect, useState } from 'react';
-import { getAuth } from 'firebase/auth';
 
 export default function App(props: AppProps) {
   const { Component, pageProps } = props;
