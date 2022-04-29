@@ -101,12 +101,7 @@ export async function getEventById(
   res: Response<EventResponseDTO | string>,
 ) {
   try {
-    let eventId: string;
-    try {
-      eventId = req.params.eventId;
-    } catch (err) {
-      return returnError(err, res, err.status);
-    }
+    const eventId = req.params.eventId;
 
     const eventDoc = await EventModel.findById(eventId);
     if (!eventDoc) {
@@ -148,13 +143,7 @@ export async function patchEventById(
   res: Response<EventResponseDTO | string>,
 ) {
   try {
-    let eventId: string;
-
-    try {
-      eventId = req.params.eventId;
-    } catch (err) {
-      return returnError(err, res, err.status);
-    }
+    const eventId = req.params.eventId;
 
     const rules = Joi.object<PatchEventDTO>({
       title: validators.title().optional(),
@@ -184,13 +173,7 @@ export async function patchEventById(
 
 export async function deleteEventById(req: Request, res: Response) {
   try {
-    let eventId: string;
-
-    try {
-      eventId = req.params.eventId;
-    } catch (err) {
-      return returnError(err, res, err);
-    }
+    const eventId = req.params.eventId;
 
     const deleteResult = await EventModel.deleteOne({ _id: eventId });
     if (deleteResult.deletedCount === 0) {
@@ -299,13 +282,7 @@ export async function addUserAvailabilityById(
   res: Response<EventResponseDTO | string>,
 ) {
   try {
-    let eventId: string;
-
-    try {
-      eventId = req.params.eventId;
-    } catch (err) {
-      return returnError(err, res, err);
-    }
+    let eventId = req.params.eventId;
 
     const payload = {
       eventId,
@@ -367,11 +344,9 @@ export async function removeUserAvalabilityById(
   req: Request,
   res: Response<EventResponseDTO | string>,
 ) {
-  let eventId: string;
-  let userId: string;
   try {
-    eventId = req.params.eventId;
-    userId = req.query.userId as string;
+    const eventId = req.params.eventId;
+    const userId = req.query.userId as string;
 
     const checkDatePayload = {
       startDate: new Date(req.query.startDate as string),
@@ -468,9 +443,8 @@ export async function setEventAvailabilityConfirmation(
   req: TypedRequestBody<SetEventAvailabilityConfirmationDTO>,
   res: Response,
 ) {
-  let eventId: string;
   try {
-    eventId = req.params.eventId;
+    const eventId = req.params.eventId;
 
     const rules = Joi.object<SetEventAvailabilityConfirmationDTO>({
       userId: validators.objectId().required(),
@@ -512,9 +486,8 @@ export async function getEventAvailabilityConfirmations(
   req: Request,
   res: Response<GetEventAvailabilityConfirmationsResponseDTO | string>,
 ) {
-  let eventId: string;
   try {
-    eventId = req.params.eventId;
+    const eventId = req.params.eventId;
 
     const eventDoc = await EventModel.findOne({ _id: eventId });
     if (!eventDoc) {
