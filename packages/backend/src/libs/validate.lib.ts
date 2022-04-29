@@ -1,7 +1,8 @@
+import { Response } from 'express';
 import { StatusCodes } from 'http-status-codes';
 import Joi from 'joi';
 import { AvailabilityStatus, EventStatus } from '../schemas/event.schema';
-import { ServerError } from './utils.lib';
+import { returnError } from './error.lib';
 
 const username = () => Joi.string().min(3).alphanum();
 const password = () => Joi.string().min(6);
@@ -37,6 +38,7 @@ export const validators = {
 };
 
 export function validate<T>(
+  res: Response,
   rules: Joi.AnySchema<T>,
   data: unknown,
   options?: Joi.ValidationOptions,
@@ -44,11 +46,7 @@ export function validate<T>(
   const result = rules.validate(data, options);
 
   if (result.error) {
-    throw new ServerError(
-      result.error.message,
-      StatusCodes.BAD_REQUEST,
-      result,
-    );
+    returnError(new Error('Failed To Validate'), res, StatusCodes.BAD_REQUEST);
   } else {
     return result.value;
   }

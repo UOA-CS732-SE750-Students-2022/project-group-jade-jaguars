@@ -6,6 +6,7 @@ import { UserModel } from '../schemas/user.schema';
 describe.skip('Users', () => {
   it('Get', async () => {
     const userDoc = await UserModel.create({
+      _id: 'x'.repeat(28), // firebaseId
       firstName: 'firstName',
       lastName: 'lastName',
     });
@@ -22,6 +23,7 @@ describe.skip('Users', () => {
     await request(server)
       .post('/api/v1/user')
       .send({
+        _id: 'x'.repeat(28), // firebaseId
         firstName: 'firstName',
         lastName: 'lastName',
       })
@@ -30,6 +32,7 @@ describe.skip('Users', () => {
 
   it('Update', async () => {
     const userDoc = await UserModel.create({
+      _id: 'x'.repeat(28), // firebaseId
       firstName: 'firstName',
       lastName: 'lastName',
     });
@@ -48,6 +51,7 @@ describe.skip('Users', () => {
 
   it('Delete', async () => {
     const userDoc = await UserModel.create({
+      _id: 'x'.repeat(28), // firebaseId
       firstName: 'first',
       lastName: 'last',
     });

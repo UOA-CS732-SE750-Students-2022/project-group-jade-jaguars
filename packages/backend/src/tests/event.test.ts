@@ -16,7 +16,7 @@ import { AddressInfo } from 'net';
 import socket from '../socketio';
 // import { io } from 'socket.io-client';
 
-describe('Events', () => {
+describe.only('Events', () => {
   it('Get', async () => {
     const eventDoc = await EventModel.create({
       title: 'title',
@@ -244,7 +244,7 @@ describe('Events', () => {
       eventId = eventDoc._id.toString();
     });
 
-    it.only('Virtual field check', async () => {
+    it('Virtual field check', async () => {
       const eventDoc = await EventModel.findById(eventId);
       expect(eventDoc.availability.potentialTimes).toBeTruthy();
     });
