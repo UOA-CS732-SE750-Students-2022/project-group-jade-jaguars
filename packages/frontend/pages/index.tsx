@@ -84,16 +84,9 @@ const handleHover = (info: { people: AttendeeStatus[]; numPeople: number }) => {
 
 const Home: NextPage = () => {
   return (
-
     <>
-      <AvailabilitySelector
-        timeOptions={timeOptions}
-        availability={availability}
-        status={AvailabilityStatus.Available}
-      />
+      <ShareLinkButton eventLink={'http'} />
     </>
-
-
   );
 };
 
