@@ -10,6 +10,7 @@ import moment from 'moment';
 import Basic from '../components/CustomCalendar/CustomCalendar';
 import { useMemo } from 'react';
 import CustomCalendar from '../components/CustomCalendar/CustomCalendar';
+import EventForm from '../components/EventForm';
 
 const CalendarPage: NextPage = () => {
   const localizer = momentLocalizer(moment);
@@ -17,31 +18,11 @@ const CalendarPage: NextPage = () => {
 
   return (
     <div className="h-[80vh] w-[750px] m-20">
-      {/* <CustomCalendar /> */}
-      {/* <Calendar
-            localizer={localizer}
-            events={events}
-            startAccessor="start"
-            endAccessor="end"
-        /> */}
-      {/* <Calendar
-        defaultDate={defaultDate}
-        defaultView={Views.WEEK}
-        events={events}
-        localizer={localizer}
-        step={15}
-        timeslots={8}
-      /> */}
-      {/* <Basic localizer={localizer} /> */}
-      {/* <BigCalendar 
-        selectable
-        localizer={localizer}
-        events={events}
-        defaultView={Views.MONTH}
-        views={[Views.MONTH, Views.WEEK, Views.DAY]}
-        defaultDate={new Date()}
-      /> */}
-      <CustomCalendar />
+      <EventForm
+        onSelectChange={(value) => {
+          console.log(value);
+        }}
+      />
     </div>
   );
 };

@@ -37,6 +37,10 @@
   display: none;
 }
 
+p {
+  margin-bottom: 0 !important;
+}
+
 .rbc-day-slot .rbc-time-slot {
   border: unset;
 }

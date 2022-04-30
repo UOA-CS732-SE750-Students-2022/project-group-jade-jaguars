@@ -5,22 +5,21 @@ import DeleteIcon from '../../assets/Delete.svg';
 import ShareIcon from '../../assets/Share.svg';
 import EditIcon from '../../assets/Edit.svg';
 import { formatTimeRange } from '../../helpers/timeFormatter';
+import Member from '../../types/Member';
 
 interface EventDetailsCardInterface {
   title: string;
-  date: Date;
-  timeRange: [Date, Date];
-  description: string;
-  location: string;
-  participants: {
-    name: string;
-    profilePic?: string;
-  }[];
-  onEdit: (props?: any) => void;
-  onDelete: (props?: any) => void;
-  onShare: (props?: any) => void;
-  onSelectChange: (props?: any) => void;
+  date: Date | undefined;
+  timeRange: [Date | undefined, Date | undefined];
+  description?: string;
+  location?: string;
+  reminder?: string;
+  participants: Member[];
+  onEdit?: (props?: any) => void;
+  onDelete?: (props?: any) => void;
+  onShare?: (props?: any) => void;
   onParticipantClick: (props?: any) => void;
+  isModal?: boolean;
 }
 
 const reminderOptions = [
@@ -60,16 +59,23 @@ const EventDetailsCard = (props: EventDetailsCardInterface) => {
     timeRange,
     description,
     location,
+    reminder,
     participants,
+    isModal,
     onEdit,
     onDelete,
     onShare,
-    onSelectChange,
     onParticipantClick,
   } = props;
 
   return (
-    <div className="p-10 bg-white h-fit w-196 rounded-xl">
+    <div
+      className={
+        isModal
+          ? 'px-10 pb-10 h-fit w-196'
+          : 'p-10 bg-white h-fit w-196 rounded-xl'
+      }
+    >
       <div id="header" className="flex flex-row items-start justify-between">
         <p
           id="title"
@@ -78,20 +84,26 @@ const EventDetailsCard = (props: EventDetailsCardInterface) => {
           {title}
         </p>
         <div id="tools" className="flex flex-row gap-5 mt-2">
-          <div onClick={onEdit} className="cursor-pointer">
-            <EditIcon />
-          </div>
-          <div onClick={onDelete} className="cursor-pointer">
-            <DeleteIcon />
-          </div>
-          <div onClick={onShare} className="cursor-pointer">
-            <ShareIcon />
-          </div>
+          {onEdit && (
+            <div onClick={onEdit} className="cursor-pointer">
+              <EditIcon />
+            </div>
+          )}
+          {onDelete && (
+            <div onClick={onDelete} className="cursor-pointer">
+              <DeleteIcon />
+            </div>
+          )}
+          {onShare && (
+            <div onClick={onShare} className="cursor-pointer">
+              <ShareIcon />
+            </div>
+          )}
         </div>
       </div>
       <div id="details" className="flex flex-col gap-5 mt-2">
         <div>
-          {date.toLocaleDateString()}, {formatTimeRange(timeRange)} NZDT
+          {date?.toLocaleDateString()}, {formatTimeRange(timeRange)} NZDT
         </div>
         <div id="description" className="overflow-scroll h-44">
           {description}
