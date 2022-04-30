@@ -14,6 +14,7 @@ import Joi from 'joi';
 import { validate, validators } from '../libs/validate.lib';
 import { UserModel } from '../schemas/user.schema';
 import { TeamModel } from '../schemas/team.schema';
+import server from '../app';
 
 export interface CreateEventDTO {
   _id: string;
@@ -165,6 +166,10 @@ export async function patchEventById(
     if (!eventDoc) {
       return returnError(Error('Event Not Found'), res, StatusCodes.NOT_FOUND);
     }
+
+    // Send updated event via socket IO
+    server.webSocket.send(`event:${eventId}`, eventDoc);
+
     res.status(StatusCodes.OK).send(eventDocToResponseDTO(eventDoc));
   } catch (err) {
     returnError(err, res);
@@ -289,7 +294,6 @@ export async function addUserAvailabilityById(
       ...req.body,
     };
 
-    const rules = Joi.object<AddUserAvalabilityDTO>({
     const rules = Joi.object<AddUserAvailabilityDTO>({
       userId: validators.objectId().required(),
       startDate: validators.startDate().required(),
@@ -335,6 +339,9 @@ export async function addUserAvailabilityById(
     }
 
     await eventDoc.save();
+
+    // Send updated event via socket IO
+    server.webSocket.send(`event:${eventId}`, eventDoc);
     res.status(StatusCodes.OK).send(eventDocToResponseDTO(eventDoc));
   } catch (err) {
     returnError(err, res);
@@ -434,6 +441,10 @@ export async function removeUserAvailabilityById(
       userEventAvailabilityIndex
     ].availability = adjustedAttendeeAvailability;
     await eventDoc.save();
+
+    // Send updated event via socket IO
+    server.webSocket.send(`event:${eventId}`, eventDoc);
+
     res.sendStatus(StatusCodes.OK);
   } catch (err) {
     returnError(err, res);
@@ -476,6 +487,9 @@ export async function setEventAvailabilityConfirmation(
     if (!eventDoc) {
       return returnError(Error('Event Not Found'), res, StatusCodes.NOT_FOUND);
     }
+
+    // Send updated event via socket IO
+    server.webSocket.send(`event:${eventId}`, eventDoc);
 
     res.sendStatus(StatusCodes.OK);
   } catch (err) {
