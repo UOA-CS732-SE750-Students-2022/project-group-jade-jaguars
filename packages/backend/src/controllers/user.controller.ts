@@ -1,7 +1,7 @@
 import { getFirebaseUser } from '../libs/middleware.lib';
 import { IUser, UserModel } from '../schemas/user.schema';
 import { Request, Response } from 'express';
-import { ServerError, TypedRequestBody } from '../libs/utils.lib';
+import { TypedRequestBody } from '../libs/utils.lib';
 import Joi from 'joi';
 import { validate, validators } from '../libs/validate.lib';
 import { StatusCodes } from 'http-status-codes';
@@ -71,8 +71,9 @@ export async function createUser(
       );
     }
 
-    const formData = validate(rules, req.body, { allowUnknown: true });
+    const formData = validate(res, rules, req.body, { allowUnknown: true });
 
+    // _id corresponds to a prior created firebase ID and cannot be generated
     formData._id = firebaseUser.uid;
     formData.email = firebaseUser.email;
 
@@ -101,7 +102,7 @@ export async function updateUserById(
       firstName: validators.firstName().optional(),
       lastName: validators.lastName().optional(),
     });
-    const formData = validate(rules, req.body, { allowUnknown: true });
+    const formData = validate(res, rules, req.body, { allowUnknown: true });
 
     if (firebaseUser.uid !== formData._id) {
       // return Not found as its more secure to not tell the user if the UID exists or not

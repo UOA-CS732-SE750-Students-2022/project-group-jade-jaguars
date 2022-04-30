@@ -7,10 +7,10 @@ import {
 } from '../controllers/team.controller';
 export const teamRouter = express.Router();
 
-teamRouter.get('/team/:id', getTeamById);
+teamRouter.get('/team/:teamId', getTeamById);
 
 teamRouter.post('/team', createTeam);
 
-teamRouter.put('/team/:id', updateTeamById);
+teamRouter.put('/team/:teamId', updateTeamById);
 
-teamRouter.delete('/team/:id', deleteTeamById);
+teamRouter.delete('/team/:teamId', deleteTeamById);

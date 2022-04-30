@@ -1,5 +1,8 @@
-import { Model, model, Schema } from 'mongoose';
+import { Model, model, Schema, Types } from 'mongoose';
+import { identifier } from '../service/event.service';
 import { randomEnum } from '..//libs/utils.lib';
+import mongoose from 'mongoose';
+import { randomUUID } from 'crypto';
 
 // TODO: Replace this with a appropriate library or expand to whatever we need
 export enum Colour {
@@ -8,13 +11,13 @@ export enum Colour {
 }
 
 export interface ITeam {
-  _id: string;
+  _id: string; // uuid
   title: string;
   description?: string;
   color?: Colour;
-  admin: string;
-  members?: string[];
-  events?: string[];
+  admin: string; // uuid
+  members?: string[]; //uuids
+  events?: string[]; // uuids
 }
 
 const teamSchema = new Schema(
@@ -22,6 +25,10 @@ const teamSchema = new Schema(
     _id: {
       type: String,
       required: true,
+      // This is cannot be shortened to randomUUID() otherwise entropy doesn't work
+      default: () => {
+        return randomUUID();
+      },
     },
     title: {
       type: String,
