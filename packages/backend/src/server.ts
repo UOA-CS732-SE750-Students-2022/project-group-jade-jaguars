@@ -6,7 +6,7 @@ import { eventsRouter } from './routes/event.route';
 import { usersRouter } from './routes/user.route';
 import { teamRouter } from './routes/team.route';
 import mongoose from 'mongoose';
-import socket from './socketio';
+import WebSocket from './socketio';
 import dotenv from 'dotenv';
 import { isAuthenticated } from './libs/middleware.lib';
 import swaggerDocument from './docs/swagger.json';
@@ -22,6 +22,7 @@ const indexRouter = express.Router();
 
 class Server extends http.Server {
   public app: express.Application;
+  public webSocket: WebSocket;
   public server: http.Server;
 
   constructor() {
@@ -62,15 +63,15 @@ class Server extends http.Server {
   async start() {
     this.setMiddleware();
     await this.setDatabase();
-    // When we are testing so no need to start socketio
+    // When we are testing so no need to start socketIO
     if (NODE_PATH !== 'test') {
       // Supertest means that we don't have to listen when testing
       this.server = this.app.listen(PORT, () => {
-        console.log(`server: http://localhost:${PORT}`);
+        console.log(`server: http://localhost:${PORT}${BASE_URL}`);
       });
 
-      socket(this.server);
-      console.log(`socketio: http://localhost:${PORT}${BASE_URL}/socketio`);
+      this.webSocket = new WebSocket(this.server);
+      console.log(`socketIO: http://localhost:${PORT}`);
     } else {
     }
   }
