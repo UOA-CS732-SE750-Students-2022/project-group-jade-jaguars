@@ -13,8 +13,7 @@ import { createServer, Server as HttpServer } from 'http';
 import { io as Client } from 'socket.io-client';
 import { Server } from 'socket.io';
 import { AddressInfo } from 'net';
-import socket from '../socketio';
-// import { io } from 'socket.io-client';
+import WebSocket from '../socketio';
 
 describe.only('Events', () => {
   it('Get', async () => {
@@ -437,17 +436,6 @@ describe.only('Events', () => {
       expect(confirmedFinal).toBe(1);
     });
 
-    // TODO: Implement socketio endpoint
-    // it('Fetch team availability via socket.io', async (done) => {
-    //   const socket = io('http://localhost:3000/api/v1/socketio');
-    //   socket.connect();
-    //   socket.on('connect', () => {
-    //     console.log(socket.id);
-    //     done();
-    //   });
-    //   console.log('running test');
-    // });
-
     describe.skip('Socket io test', () => {
       let io: Server;
       let client;
@@ -455,8 +443,7 @@ describe.only('Events', () => {
 
       beforeEach((done) => {
         httpServer = createServer();
-        socket(httpServer, server.app);
-        io = server.app.get('socketio');
+        const websocket = new WebSocket(httpServer);
 
         httpServer.listen(() => {
           const port = (httpServer.address() as AddressInfo).port;
