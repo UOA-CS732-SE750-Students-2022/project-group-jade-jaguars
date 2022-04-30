@@ -10,10 +10,9 @@ import {
   GetEventAvailabilityConfirmationsResponseDTO,
 } from '../controllers/event.controller';
 import { createServer, Server as HttpServer } from 'http';
-import { io as Client } from 'socket.io-client';
-import { Server } from 'socket.io';
+import { Server, Socket } from 'socket.io';
+import Client from 'socket.io-client';
 import { AddressInfo } from 'net';
-import WebSocket from '../socketio';
 
 describe.only('Events', () => {
   it('Get', async () => {
@@ -205,6 +204,7 @@ describe.only('Events', () => {
       }).rejects.toThrow('I should fail');
     });
   });
+
   describe('User event availability', () => {
     let userId, eventId;
 
@@ -436,38 +436,54 @@ describe.only('Events', () => {
       expect(confirmedFinal).toBe(1);
     });
 
-    describe.skip('Socket io test', () => {
+    describe('Socket io test', () => {
       let io: Server;
-      let client;
-      let httpServer: HttpServer;
+      let serverSocket: Socket;
+      let clientSocket;
 
-      beforeEach((done) => {
-        httpServer = createServer();
-        const websocket = new WebSocket(httpServer);
+      beforeAll((done) => {
+        const httpServer = createServer();
+        io = new Server(httpServer);
 
         httpServer.listen(() => {
-          const port = (httpServer.address() as AddressInfo).port;
-          client = Client(`http://localhost:${port}`, { path: '/socketio/' });
-          client.on('connect', () => {
-            done();
+          const port = (<AddressInfo>httpServer.address()).port;
+
+          clientSocket = Client(`http://localhost:${port}`);
+
+          io.on('connection', (socket) => {
+            serverSocket = socket;
           });
+          clientSocket.on('connect', done);
         });
       });
 
-      afterEach(() => {
-        client.close();
-        httpServer.close();
-      });
       afterAll(() => {
         io.close();
+        clientSocket.close();
       });
 
-      it('should work', (done) => {
-        client.on('test', (arg) => {
-          console.log(arg);
-          done();
+      test('Socket IO connection', () => {
+        clientSocket.on(`test`, (arg) => {
+          expect(arg).toBe('TEST MESSAGE');
         });
-        client.emit('test', 'message from client');
+
+        serverSocket.emit('test', 'TEST MESSAGE');
+      });
+
+      test('Socket IO Called', async () => {
+        const spy = jest.spyOn(server.webSocket, 'send');
+
+        const eventDoc = await EventModel.create({
+          title: 'title',
+          startDate: new Date('1900'),
+          endDate: new Date('2000'),
+        });
+
+        const eventId = eventDoc._id.toString();
+
+        await request(server).patch(`/api/v1/event/${eventId}`);
+
+        expect(spy).toHaveBeenCalled();
       });
     });
   });
