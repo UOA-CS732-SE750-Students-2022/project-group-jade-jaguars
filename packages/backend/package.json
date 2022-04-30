@@ -11,8 +11,8 @@
     "start": "cross-env ENV_PATH=prod ts-node ./src/app.ts",
     "start:dev": "cross-env ENV_PATH=dev nodemon",
     "start:prod": "node dist/app",
-    "test": "cross-env ENV_PATH=test jest --maxWorkers=1 --verbose",
-    "test:dev": "cross-env ENV_PATH=test jest --maxWorkers=1 --verbose --watch",
+    "test": "cross-env ENV_PATH=test jest --runInBand --verbose --force-exit",
+    "test:dev": "cross-env ENV_PATH=test jest --runInBand --verbose --watch",
     "coverage": "cross-env ENV_PATH=test nyc npm run test"
   },
   "dependencies": {
