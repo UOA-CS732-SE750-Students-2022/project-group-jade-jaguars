@@ -23,6 +23,12 @@ jobs:
 
       - name: build
         run: npm run build
+      - name: 'create env.test file'
+        run: |
+          cd ./packages/backend/
+          touch .env.test
+          echo BASE_URL="/api/v1" >> .env.test
+          echo VERBOSE=true >> .env.test
       - name: test
-        continue-on-error: true
+        # continue-on-error: true
         run: npm run test
