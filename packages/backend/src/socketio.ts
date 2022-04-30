@@ -1,16 +1,22 @@
 import http from 'http';
-import express from 'express';
-import { Server, Socket } from 'socket.io';
+import { Socket, Server } from 'socket.io';
 
 const BASE_URL: string = process.env.BASE_URL;
 
-const socket = (server: http.Server, app: express.Application) => {
-  const io = new Server(server, { path: `${BASE_URL}/socketio/` });
+const socket = (server: http.Server) => {
+  const corsOptions = {
+    origin: '*',
+    optionsSuccessStatus: 200,
+  };
+
+  const io = new Server(server, { cors: corsOptions });
 
   io.on('connection', (socket: Socket) => {
     console.log('client connected');
 
-    socket.on('test', (arg) => {
+    socket.emit('message', 'message from server');
+
+    socket.on('message', (arg) => {
       console.log(arg);
       socket.emit('test', 'message from server');
     });
@@ -20,7 +26,7 @@ const socket = (server: http.Server, app: express.Application) => {
     });
   });
 
-  app.set('socketio', io);
+  // app.set('socketio', io);
 };
 
 export default socket;

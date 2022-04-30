@@ -22,6 +22,7 @@ const indexRouter = express.Router();
 
 class Server extends http.Server {
   public app: express.Application;
+  public server: http.Server;
 
   constructor() {
     const app: express.Application = express();
@@ -63,13 +64,13 @@ class Server extends http.Server {
     await this.setDatabase();
     // When we are testing so no need to start socketio
     if (NODE_PATH !== 'test') {
-      socket(this, this.app);
-      console.log(`socketio: http://localhost:${PORT}${BASE_URL}/socketio`);
-
       // Supertest means that we don't have to listen when testing
-      this.app.listen(PORT, () => {
+      this.server = this.app.listen(PORT, () => {
         console.log(`server: http://localhost:${PORT}`);
       });
+
+      socket(this.server);
+      console.log(`socketio: http://localhost:${PORT}${BASE_URL}/socketio`);
     } else {
     }
   }
