@@ -41,7 +41,7 @@ export interface SearchEventDTO {
 }
 
 // TODO: For now include userId in this payload, eventually this property should be removed and instead using the authToken we look up the userId
-export interface AddUserAvalabilityDTO {
+export interface AddUserAvailabilityDTO {
   userId: string;
   startDate: Date;
   endDate: Date;
@@ -278,7 +278,7 @@ export async function searchEvent(
 }
 
 export async function addUserAvailabilityById(
-  req: TypedRequestBody<AddUserAvalabilityDTO>,
+  req: TypedRequestBody<AddUserAvailabilityDTO>,
   res: Response<EventResponseDTO | string>,
 ) {
   try {
@@ -290,6 +290,7 @@ export async function addUserAvailabilityById(
     };
 
     const rules = Joi.object<AddUserAvalabilityDTO>({
+    const rules = Joi.object<AddUserAvailabilityDTO>({
       userId: validators.objectId().required(),
       startDate: validators.startDate().required(),
       endDate: validators.endDate().required(),
@@ -340,7 +341,7 @@ export async function addUserAvailabilityById(
   }
 }
 
-export async function removeUserAvalabilityById(
+export async function removeUserAvailabilityById(
   req: Request,
   res: Response<EventResponseDTO | string>,
 ) {
