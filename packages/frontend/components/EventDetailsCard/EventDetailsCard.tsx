@@ -22,19 +22,6 @@ interface EventDetailsCardInterface {
   isModal?: boolean;
 }
 
-const reminderOptions = [
-  { value: 'none', label: 'None' },
-  { value: 'At time', label: 'At time of event' },
-  { value: '5 minutes', label: '5 minutes before' },
-  { value: '10 minutes', label: '10 minutes before' },
-  { value: '15 minutes', label: '15 minutes before' },
-  { value: '30 minutes', label: '30 minutes before' },
-  { value: '1 hour', label: '1 hour before' },
-  { value: '2 hours', label: '2 hours before' },
-  { value: '1 day', label: '1 day before' },
-  { value: '2 days', label: '2 days before' },
-];
-
 /**
  * This is the component to display all event details,
  * including event title, description, time, date, location, reminder,
@@ -105,25 +92,19 @@ const EventDetailsCard = (props: EventDetailsCardInterface) => {
         <div>
           {date?.toLocaleDateString()}, {formatTimeRange(timeRange)} NZDT
         </div>
-        <div id="description" className="overflow-scroll h-44">
-          {description}
+        <div id="description" className="overflow-scroll max-h-44">
+          {description ? description : 'No description'}
         </div>
       </div>
       <div id="location" className="mt-5">
         <p className="font-medium text-[18px]">Location</p>
         <p className="max-w-full overflow-scroll max-h-10 text-ellipsis">
-          {location}
+          {location ? location : 'No location'}
         </p>
       </div>
       <div id="reminder" className="mt-5">
         <p className="font-medium text-[18px]">Reminder</p>
-        <div className="mt-1 w-52">
-          <Select
-            placeholder="Set a reminder"
-            data={reminderOptions}
-            onChange={(value) => onSelectChange(value)}
-          />
-        </div>
+        <p className="max-w-full w-fit h-fit">{reminder ? reminder : 'None'}</p>
       </div>
       <div id="participants" className="flex flex-col gap-3 mt-5">
         <p className="font-medium text-[18px]">Participants</p>
