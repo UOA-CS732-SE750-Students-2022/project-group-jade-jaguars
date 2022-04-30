@@ -7,20 +7,40 @@ import {
   Group,
   InputWrapper,
   Paper,
+  Select,
   Textarea,
   TextInput,
 } from '@mantine/core';
 import { useForm } from '@mantine/hooks';
 import { TimePicker } from 'antd';
 import moment from 'moment';
+
+const reminderOptions = [
+  { value: 'none', label: 'None' },
+  { value: 'At time', label: 'At time of event' },
+  { value: '5 minutes', label: '5 minutes before' },
+  { value: '10 minutes', label: '10 minutes before' },
+  { value: '15 minutes', label: '15 minutes before' },
+  { value: '30 minutes', label: '30 minutes before' },
+  { value: '1 hour', label: '1 hour before' },
+  { value: '2 hours', label: '2 hours before' },
+  { value: '1 day', label: '1 day before' },
+  { value: '2 days', label: '2 days before' },
+];
+
 interface FormValues {
   title: string;
   dateRange: [Date | null, Date | null];
   timeRange: [Date, Date];
   description?: string;
   location?: string;
+  reminder?: string;
 }
-const EventForm = () => {
+interface EventFormInterface {
+  onSelectChange: (props?: any) => void;
+}
+const EventForm = (props: EventFormInterface) => {
+  const { onSelectChange } = props;
   const form = useForm<FormValues>({
     initialValues: {
       title: '',
@@ -103,6 +123,18 @@ const EventForm = () => {
                 form.setFieldValue('location', e.currentTarget.value)
               }
             />
+          </Grid.Col>
+          <Grid.Col>
+            <div>
+              <p className="font-medium text-sm">Reminder</p>
+              <div className="mt-1 w-52">
+                <Select
+                  placeholder="Set a reminder"
+                  data={reminderOptions}
+                  onChange={(value) => onSelectChange(value)}
+                />
+              </div>
+            </div>
           </Grid.Col>
           <Grid.Col span={12}>
             <Group position="right" mt="lg">
