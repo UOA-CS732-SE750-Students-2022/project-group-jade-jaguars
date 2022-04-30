@@ -1,8 +1,13 @@
 import { Group } from '@mantine/core';
 import React, { useState } from 'react';
 import { Search } from 'tabler-icons-react';
-export const SearchBar = () => {
-  const [value, setValue] = useState('');
+
+interface SearchBarProp {
+  value: string;
+  setValue: React.Dispatch<React.SetStateAction<string>>;
+}
+
+export const SearchBar = ({ value, setValue }: SearchBarProp) => {
   return (
     <div className="border-2 w-fit rounded-lg pr-4 py-1">
       <Group>
