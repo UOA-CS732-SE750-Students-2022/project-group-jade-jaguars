@@ -1,46 +1,38 @@
-import { useState, useEffect, useRef } from 'react';
-import { AvailabilityBlock, AvailabilityStatus } from '../types/Availability';
+import { useState, useEffect, useRef, MouseEventHandler } from 'react';
+import {
+  AttendeeAvailability,
+  AvailabilityStatus,
+  AttendeeStatus,
+} from '../types/Availability';
 import TimeBracket from '../types/TimeBracket';
 
 /*
  *  Assumption: no more than 7 days sent through as timeOptions.
  *  Props: timeOptions: a list of times that can be selected.
- *         availability: a list of times that the user has previously specified their availability for (can be empty).
- *         status: the current selection status.
+ *         availabilities: a list of availabilities for all users.
+ *         onHover: a function returning the info about the timeslot to the page.
  */
-function AvailabilitySelector(props: {
+function GroupAvailability(props: {
   timeOptions: TimeBracket[];
-  availability: AvailabilityBlock[];
-  status: AvailabilityStatus;
+  availabilities: AttendeeAvailability[];
+  onHover: (info: { people: AttendeeStatus[]; numPeople: number }) => void;
 }) {
-  const [selecting, setSelecting] = useState<Boolean>(false);
-  const [start, setStart] = useState<number[]>([-1, -1]); // The row and column of the click.
-  const [newStatus, setNewStatus] = useState<AvailabilityStatus>(
-    AvailabilityStatus.Unavailable,
-  );
-
   const [timeList, setTimeList] = useState<TimeBracket[]>([]);
   const [hourList, setHourList] = useState<string[]>([]);
 
-  // The status of the grid upon mouse release.
+  // The status of the grid.
   const [timeSlots, setTimeSlots] = useState<
     {
       row: number;
       col: number;
-      status: AvailabilityStatus;
-    }[]
-  >([]);
-
-  // The status of the grid when dragging.
-  const [selection, setSelection] = useState<
-    {
-      row: number;
-      col: number;
-      status: AvailabilityStatus;
+      percentAvailable: number;
+      people: AttendeeStatus[];
     }[]
   >([]);
 
   const [numCols, setNumCols] = useState<number>(0);
+
+  const [numPeople, setNumPeople] = useState<number>(0);
 
   // Initialise the grid.
   useEffect(() => {
@@ -92,10 +84,12 @@ function AvailabilitySelector(props: {
     let initialTimeSlots: {
       row: number;
       col: number;
-      status: AvailabilityStatus;
+      percentAvailable: number;
+      people: AttendeeStatus[];
     }[] = [];
 
     const numDays = timeList.length;
+    const numPeople = props.availabilities.length;
 
     // Map the time slots to grid items.
     for (let i = 0; i < halfHours; i++) {
@@ -121,24 +115,49 @@ function AvailabilitySelector(props: {
           hours,
           mins,
         );
-        let currentStatus = AvailabilityStatus.Unavailable;
-        // Check whether user is available at this time.
-        for (let index in props.availability) {
-          if (
-            props.availability[index].status == AvailabilityStatus.Unavailable
-          )
-            continue;
-          const startDT = new Date(props.availability[index].startTime);
-          const endDT = new Date(props.availability[index].endTime);
-          if (dateTime >= startDT && dateTime < endDT) {
-            currentStatus = props.availability[index].status;
-            break;
+
+        let percentAvailable = 0;
+        let people: AttendeeStatus[] = [];
+        // Check whether each user is available at this time.
+        for (let i in props.availabilities) {
+          for (let j in props.availabilities[i].availability) {
+            if (
+              props.availabilities[i].availability[j].status ==
+              AvailabilityStatus.Unavailable
+            )
+              continue;
+            const startDT = new Date(
+              props.availabilities[i].availability[j].startTime,
+            );
+            const endDT = new Date(
+              props.availabilities[i].availability[j].endTime,
+            );
+            if (dateTime >= startDT && dateTime < endDT) {
+              if (
+                props.availabilities[i].availability[j].status ==
+                AvailabilityStatus.Available
+              ) {
+                percentAvailable += 1 / numPeople;
+                people.push({
+                  uuid: props.availabilities[i].uuid,
+                  status: AvailabilityStatus.Available,
+                });
+              } else {
+                percentAvailable += 1 / (2 * numPeople);
+                people.push({
+                  uuid: props.availabilities[i].uuid,
+                  status: AvailabilityStatus.Tentative,
+                });
+              }
+              break;
+            }
           }
         }
         initialTimeSlots.push({
           row: i,
           col: j,
-          status: currentStatus,
+          percentAvailable: percentAvailable,
+          people: people,
         });
       }
     }
@@ -177,59 +196,18 @@ function AvailabilitySelector(props: {
     setNumCols(numDays);
     setTimeList(timeList);
     setTimeSlots(initialTimeSlots);
-    setSelection(initialTimeSlots);
-  }, [props.timeOptions, props.availability]);
+    setNumPeople(numPeople);
+  }, [props]);
 
-  // Change grid on mouse down.
-  function startDrag(newStart: number[]) {
-    setSelecting(true);
-    setStart(newStart);
-    let newTimeSlots: {
-      row: number;
-      col: number;
-      status: AvailabilityStatus;
-    }[] = timeSlots.map((object) => ({ ...object }));
-    const index = numCols * newStart[0] + newStart[1];
-    if (newTimeSlots[index].status === props.status) {
-      newTimeSlots[index].status = AvailabilityStatus.Unavailable;
-    } else if (props.status === AvailabilityStatus.Available) {
-      newTimeSlots[index].status = AvailabilityStatus.Available;
-    } else {
-      newTimeSlots[index].status = AvailabilityStatus.Tentative;
-    }
-    setSelection(newTimeSlots);
-    setNewStatus(newTimeSlots[index].status);
-  }
-
-  // Change grid when mouse over div.
-  function updateSelection(end: number[]) {
-    const row1 = Math.min(start[0], end[0]);
-    const row2 = Math.max(start[0], end[0]);
-    const col1 = Math.min(start[1], end[1]);
-    const col2 = Math.max(start[1], end[1]);
-
-    let newTimeSlots: {
-      row: number;
-      col: number;
-      status: AvailabilityStatus;
-    }[] = timeSlots.map((object) => ({ ...object }));
-
-    // Update all divs between first mouse down and current mouse position.
-    for (let i = row1; i <= row2; i++) {
-      for (let j = col1; j <= col2; j++) {
-        const index = numCols * i + j;
-        newTimeSlots[index].status = newStatus;
-      }
-    }
-
-    setSelection(newTimeSlots);
-  }
-
-  // Note: if someone releases the mouse outside the component, need to turn off selection mode.
-
-  function finaliseSelection() {
-    setTimeSlots(selection);
-    setSelecting(false);
+  function handleHover(row: number, col: number) {
+    const timeSlot = timeSlots.find(
+      (timeSlot) => timeSlot.row === row && timeSlot.col === col,
+    );
+    const info = {
+      people: timeSlot!.people,
+      numPeople: numPeople,
+    };
+    props.onHover(info);
   }
 
   return (
@@ -274,29 +252,21 @@ function AvailabilitySelector(props: {
               key={index}
               style={{
                 backgroundColor: (() => {
-                  if (
-                    selection[index].status === AvailabilityStatus.Available
-                  ) {
-                    return 'green';
-                  } else if (
-                    selection[index].status === AvailabilityStatus.Tentative
-                  ) {
-                    return 'yellow';
-                  } else {
+                  if (timeSlot.percentAvailable === 0) {
                     return 'white';
+                  } else {
+                    return 'green';
+                  }
+                })(),
+                opacity: (() => {
+                  if (timeSlot.percentAvailable === 0) {
+                    return 1;
+                  } else {
+                    return timeSlot.percentAvailable;
                   }
                 })(),
               }}
-              onMouseDown={(e) => {
-                e.preventDefault();
-                startDrag([timeSlot.row, timeSlot.col]);
-              }}
-              onMouseEnter={() => {
-                if (selecting) {
-                  updateSelection([timeSlot.row, timeSlot.col]);
-                }
-              }}
-              onMouseUp={() => finaliseSelection()}
+              onMouseEnter={() => handleHover(timeSlot.row, timeSlot.col)}
             ></div>
           ))}
         </div>
@@ -305,4 +275,4 @@ function AvailabilitySelector(props: {
   );
 }
 
-export default AvailabilitySelector;
+export default GroupAvailability;
