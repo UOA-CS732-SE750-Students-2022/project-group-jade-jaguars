@@ -2,8 +2,12 @@ import { ScrollArea } from '@mantine/core';
 import React, { useState } from 'react';
 import { TimeOptionCheckBox } from './TimeOptionCheckBox';
 
-export const TimeOptionsList = () => {
-  const options = [
+interface TimeOptionsListProp {
+  options: string[];
+}
+
+export const TimeOptionsList = ({ options }: TimeOptionsListProp) => {
+  const optionDummy = [
     'Monday 3rd March,3:00PM - 5:00PM',
     'Monday 4rd March,3:00PM - 5:00PM',
     'Monday 3rd March,3:30PM - 5:00PM',
