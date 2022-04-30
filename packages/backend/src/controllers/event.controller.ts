@@ -1,5 +1,3 @@
-import { returnError } from '../libs/error.lib';
-import { randomUUID } from 'crypto';
 import {
   IEventAvailability,
   EventModel,
@@ -9,7 +7,8 @@ import {
 } from '../schemas/event.schema';
 import { Request, Response } from 'express';
 import { StatusCodes } from 'http-status-codes';
-import { ServerError, TypedRequestBody } from '../libs/utils.lib';
+import { TypedRequestBody } from '../libs/utils.lib';
+import { returnError } from '../libs/error.lib';
 import Joi from 'joi';
 import { validate, validators } from '../libs/validate.lib';
 import { UserModel } from '../schemas/user.schema';
@@ -41,7 +40,6 @@ export interface SearchEventDTO {
   limit?: number;
 }
 
-// TODO: For now include userId in this payload, eventually this property should be removed and instead using the authToken we look up the userId
 export interface AddUserAvailabilityDTO {
   userId: string;
   startDate: Date;
@@ -82,6 +80,7 @@ export interface EventResponseDTO {
   team: string;
 }
 
+// Helper function for mapping a event document to a response object
 function eventDocToResponseDTO(eventDoc: any): EventResponseDTO {
   return {
     id: eventDoc._id,
@@ -104,7 +103,12 @@ export async function getEventById(
   try {
     const eventId = req.params.eventId;
 
-    const eventDoc = await EventModel.findById(eventId);
+    const rules = Joi.object<{ eventId: string }>({
+      eventId: validators.title().required(),
+    });
+    const formData = validate(res, rules, { eventId }, { allowUnknown: true });
+
+    const eventDoc = await EventModel.findById(formData.eventId);
     if (!eventDoc) {
       return returnError(Error('Event Not Found'), res, StatusCodes.NOT_FOUND);
     }
@@ -119,7 +123,6 @@ export async function createEvent(
   res: Response<EventResponseDTO>,
 ) {
   try {
-    // TODO: create/use remainder of validation rules
     const rules = Joi.object<CreateEventDTO>({
       title: validators.title().required(),
       description: validators.description().optional(),
@@ -127,11 +130,10 @@ export async function createEvent(
       startDate: validators.startDate().required(),
       endDate: validators.endDate().required(),
       location: validators.location().optional(),
-      team: validators.objectId().optional(),
+      team: validators.id().optional(),
     });
 
-    const formData = validate(rules, req.body, { allowUnknown: true });
-
+    const formData = validate(res, rules, req.body, { allowUnknown: true });
     const eventDoc = await EventModel.create(formData);
     res.status(StatusCodes.CREATED).send(eventDocToResponseDTO(eventDoc));
   } catch (err) {
@@ -146,23 +148,28 @@ export async function patchEventById(
   try {
     const eventId = req.params.eventId;
 
-    const rules = Joi.object<PatchEventDTO>({
+    const rules = Joi.object<PatchEventDTO & { eventId: string }>({
+      eventId: validators.id().required(),
       title: validators.title().optional(),
       description: validators.description().optional(),
       status: validators.availabilityStatus().optional(),
       startDate: validators.startDate().optional(),
       endDate: validators.endDate().optional(),
       location: validators.location().optional(),
-      team: validators.objectId().optional(),
+      team: validators.id().optional(),
     });
+    const formData = validate(
+      res,
+      rules,
+      { ...req.body, eventId },
+      { allowUnknown: true },
+    );
 
-    const formData = validate(rules, req.body, { allowUnknown: true });
     const eventDoc = await EventModel.findOneAndUpdate(
       { _id: eventId },
       { $set: formData },
       { new: true },
     );
-
     if (!eventDoc) {
       return returnError(Error('Event Not Found'), res, StatusCodes.NOT_FOUND);
     }
@@ -180,7 +187,12 @@ export async function deleteEventById(req: Request, res: Response) {
   try {
     const eventId = req.params.eventId;
 
-    const deleteResult = await EventModel.deleteOne({ _id: eventId });
+    const rules = Joi.object<{ eventId: string }>({
+      eventId: validators.id().required(),
+    });
+    const formData = validate(res, rules, { eventId }, { allowUnknown: true });
+
+    const deleteResult = await EventModel.deleteOne({ _id: formData.eventId });
     if (deleteResult.deletedCount === 0) {
       return returnError(Error('Event Not Found'), res, StatusCodes.NOT_FOUND);
     }
@@ -197,12 +209,12 @@ export async function searchEvent(
 ) {
   try {
     const rules = Joi.object<SearchEventDTO>({
-      teamId: validators.objectId().optional(),
+      teamId: validators.id().optional(),
       titleSubStr: Joi.string().optional(),
       descriptionSubStr: Joi.string().optional(),
     }).oxor('teamId', 'titleSubStr', 'descriptionSubStr');
 
-    let formData = validate(rules, req.body, { allowUnknown: true });
+    let formData = validate(res, rules, req.body, { allowUnknown: true });
 
     let events: EventResponseDTO[] = [];
     // Search for events belonging to a team
@@ -246,7 +258,7 @@ export async function searchEvent(
         endDate: validators.startDate().optional(),
       }).and('startDate', 'endDate');
 
-      formData = validate(dateRules, req.body, { allowUnknown: true });
+      formData = validate(res, dateRules, req.body, { allowUnknown: true });
 
       const eventDocs = (
         await EventModel.find({
@@ -260,16 +272,19 @@ export async function searchEvent(
     }
     // Exactly one of cases above must be called, otherwise Joi validation has failed to detect malformed payload
     else {
-      res
-        .status(StatusCodes.INTERNAL_SERVER_ERROR)
-        .send('server error: xor search payload fail');
+      returnError(
+        new Error('XOR Search Payload Fail'),
+        res,
+        StatusCodes.INTERNAL_SERVER_ERROR,
+      );
+      return;
     }
 
     //XXX: Workaround with limitation of Joi single rule application
     const limitRules = Joi.object<SearchEventDTO>({
       limit: Joi.number().greater(0).optional(),
     });
-    formData = validate(limitRules, req.body, { allowUnknown: true });
+    formData = validate(res, limitRules, req.body, { allowUnknown: true });
 
     // Limit the number of returned events
     if (formData.limit && events.length >= formData.limit) {
@@ -289,25 +304,24 @@ export async function addUserAvailabilityById(
   try {
     let eventId = req.params.eventId;
 
-    const payload = {
-      eventId,
-      ...req.body,
-    };
-
-    const rules = Joi.object<AddUserAvailabilityDTO>({
-      userId: validators.objectId().required(),
+    const rules = Joi.object<AddUserAvailabilityDTO & { eventId: string }>({
+      userId: validators.id().required(),
       startDate: validators.startDate().required(),
       endDate: validators.endDate().required(),
       status: validators.availabilityStatus().optional(),
     });
-
-    const formData = validate(rules, payload, { allowUnknown: true });
+    const formData = validate(
+      res,
+      rules,
+      { ...req.body, eventId },
+      { allowUnknown: true },
+    );
 
     if (!(await UserModel.exists({ _id: formData.userId }))) {
       return returnError(Error('User Not Found'), res, StatusCodes.NOT_FOUND);
     }
 
-    let eventDoc = await EventModel.findById(eventId);
+    let eventDoc = await EventModel.findById(formData.eventId);
     if (!eventDoc) {
       return returnError(Error('Event Not Found'), res, StatusCodes.NOT_FOUND);
     }
@@ -356,28 +370,37 @@ export async function removeUserAvailabilityById(
     const eventId = req.params.eventId;
     const userId = req.query.userId as string;
 
-    const checkDatePayload = {
+    const payload = {
+      eventId,
+      userId,
       startDate: new Date(req.query.startDate as string),
       endDate: new Date(req.query.endDate as string),
     };
 
-    const rules = Joi.object({
+    const rules = Joi.object<{
+      startDate: Date;
+      endDate: Date;
+      eventId: string;
+      userId: string;
+    }>({
+      eventId: validators.id().required(),
+      userId: validators.id().required(),
       startDate: validators.startDate().required(),
       endDate: validators.endDate().required(),
     });
 
-    const removeBracket = validate(rules, checkDatePayload, {
+    const formData = validate(res, rules, payload, {
       allowUnknown: true,
     });
 
-    let eventDoc = await EventModel.findById(eventId);
+    let eventDoc = await EventModel.findById(formData.eventId);
     if (!eventDoc) {
       return returnError(Error('Event Not Found'), res, StatusCodes.NOT_FOUND);
     }
 
     const userEventAvailabilityIndex =
       eventDoc.availability.attendeeAvailability.findIndex(
-        (x) => x.attendee === userId,
+        (x) => x.attendee === formData.userId,
       );
 
     // Can't remove availability timebracket if it doesn't exist for the user
@@ -393,40 +416,40 @@ export async function removeUserAvailabilityById(
     ].availability.forEach((ts) => {
       // Existing bracket falls entirely within removal bracket
       if (
-        ts.startDate >= removeBracket.startDate &&
-        ts.endDate <= removeBracket.endDate
+        ts.startDate >= formData.startDate &&
+        ts.endDate <= formData.endDate
       ) {
       }
       // Existing bracket starting left side removed
       else if (
-        ts.startDate >= removeBracket.startDate &&
-        ts.endDate >= removeBracket.endDate
+        ts.startDate >= formData.startDate &&
+        ts.endDate >= formData.endDate
       ) {
-        ts.startDate = removeBracket.endDate;
+        ts.startDate = formData.endDate;
         adjustedAttendeeAvailability.push(ts);
       }
       // Existing bracket ending right side removed
       else if (
-        ts.startDate <= removeBracket.startDate &&
-        ts.endDate <= removeBracket.endDate
+        ts.startDate <= formData.startDate &&
+        ts.endDate <= formData.endDate
       ) {
-        ts.endDate = removeBracket.startDate;
+        ts.endDate = formData.startDate;
         adjustedAttendeeAvailability.push(ts);
       }
       // Middle removed
       else if (
-        ts.startDate <= removeBracket.startDate &&
-        ts.endDate >= removeBracket.endDate
+        ts.startDate <= formData.startDate &&
+        ts.endDate >= formData.endDate
       ) {
         // Start left block
         adjustedAttendeeAvailability.push({
           startDate: ts.startDate,
-          endDate: removeBracket.startDate,
+          endDate: formData.startDate,
           status: ts.status,
         });
         // End right block
         adjustedAttendeeAvailability.push({
-          startDate: removeBracket.endDate,
+          startDate: formData.endDate,
           endDate: ts.endDate,
           status: ts.status,
         });
@@ -457,12 +480,19 @@ export async function setEventAvailabilityConfirmation(
 ) {
   try {
     const eventId = req.params.eventId;
-
-    const rules = Joi.object<SetEventAvailabilityConfirmationDTO>({
-      userId: validators.objectId().required(),
+    const rules = Joi.object<
+      SetEventAvailabilityConfirmationDTO & { eventId: string }
+    >({
+      eventId: validators.id().required(),
+      userId: validators.id().required(),
       confirmed: Joi.boolean().required(),
     });
-    const formData = validate(rules, req.body, { allowUnknown: true });
+    const formData = validate(
+      res,
+      rules,
+      { ...req.body, eventId },
+      { allowUnknown: true },
+    );
 
     // Check documents exist
     if (!(await UserModel.exists({ id: formData.userId }))) {
@@ -471,7 +501,7 @@ export async function setEventAvailabilityConfirmation(
 
     const eventDoc = await EventModel.findOneAndUpdate(
       {
-        _id: eventId,
+        _id: formData.eventId,
         'availability.attendeeAvailability': {
           $elemMatch: { attendee: formData.userId },
         },
@@ -504,7 +534,12 @@ export async function getEventAvailabilityConfirmations(
   try {
     const eventId = req.params.eventId;
 
-    const eventDoc = await EventModel.findOne({ _id: eventId });
+    const rules = Joi.object<{ eventId: string }>({
+      eventId: validators.id().required(),
+    });
+    const formData = validate(res, rules, { eventId }, { allowUnknown: true });
+
+    const eventDoc = await EventModel.findOne({ _id: formData.eventId });
     if (!eventDoc) {
       return returnError(Error('Event Not Found'), res, StatusCodes.NOT_FOUND);
     }
