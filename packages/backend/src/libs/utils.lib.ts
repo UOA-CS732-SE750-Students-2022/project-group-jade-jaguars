@@ -1,16 +1,6 @@
 import { Request } from 'express';
 import { ParamsDictionary } from 'express-serve-static-core';
 
-export class ServerError extends Error {
-  public constructor(
-    message: string,
-    public status: number,
-    public context?: unknown,
-  ) {
-    super(message);
-  }
-}
-
 export type TypedRequestBody<T> = Request<ParamsDictionary, any, T>;
 
 export function randomEnum<T>(anEnum: T): T[keyof T] {
