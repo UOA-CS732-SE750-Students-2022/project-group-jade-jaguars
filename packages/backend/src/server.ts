@@ -67,17 +67,15 @@ class Server extends http.Server {
   async start() {
     this.setMiddleware();
     await this.setDatabase();
-    // When we are testing so no need to start socketIO
     if (NODE_ENV !== 'test') {
       // Supertest means that we don't have to listen when testing
       this.server = this.app.listen(PORT, () => {
         console.log(`server: http://localhost:${PORT}${BASE_URL}`);
       });
-
-      this.webSocket = new WebSocket(this.server);
-      console.log(`socketIO: http://localhost:${PORT}`);
-    } else {
     }
+
+    this.webSocket = new WebSocket(this.server);
+    console.log(`socketIO: http://localhost:${PORT}`);
   }
 }
 
