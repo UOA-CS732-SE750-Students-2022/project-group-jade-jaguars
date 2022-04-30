@@ -9,7 +9,6 @@ import {
 import { events } from './sampleEvents';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 import moment from 'moment';
-import { formatTimeRange } from '../../helpers/timeFormatter';
 import Member from '../../types/Member';
 import EventDetailsCard from '../EventDetailsCard/EventDetailsCard';
 export interface EventInterface {
@@ -30,6 +29,15 @@ interface CustomCalendarInterface {
   onParticipantClick: (props?: any) => void;
 }
 
+/**
+ * This is the custom calendar component for displaying scheduled events
+ * @param events A list of events with all required information with type EventInterface
+ * @param localizer A localizer required by the react-big-calendar component
+ * @param teamHexColour Hex code of the custom team colour
+ * @param onParticipantClick Function required for the EventDetailsCard component
+ *
+ * @author Raina Song (rainasong)
+ */
 const CustomCalendar = (props: CustomCalendarInterface) => {
   const { localizer, teamHexColour, onParticipantClick } = props;
   const calLocalizer = localizer ? localizer : momentLocalizer(moment);
