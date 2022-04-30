@@ -130,18 +130,6 @@ export default [
     end: now,
   },
   {
-    id: 15,
-    title: 'Point in Time Event',
-    start: now,
-    end: now,
-  },
-  {
-    id: 15,
-    title: 'Point in Time Event',
-    start: now,
-    end: now,
-  },
-  {
     id: 16,
     title: 'Video Record',
     start: new Date(2015, 3, 14, 15, 30, 0),

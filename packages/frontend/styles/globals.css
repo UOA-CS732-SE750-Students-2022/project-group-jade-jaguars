@@ -29,6 +29,10 @@
   --font-black: 900;
 }
 
+::selection {
+  background: var(--primary) !important;
+}
+
 ::-webkit-scrollbar {
   display: none;
 }
