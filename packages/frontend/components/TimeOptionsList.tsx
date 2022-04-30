@@ -7,20 +7,6 @@ interface TimeOptionsListProp {
 }
 
 export const TimeOptionsList = ({ options }: TimeOptionsListProp) => {
-  const optionDummy = [
-    'Monday 3rd March,3:00PM - 5:00PM',
-    'Monday 4rd March,3:00PM - 5:00PM',
-    'Monday 3rd March,3:30PM - 5:00PM',
-    'Monday 3rd March,3:00PM - 5:00PM',
-    'Monday 3rd March,3:00PM - 5:00PM',
-    'Monday 3rd March,3:00PM - 5:00PM',
-    'Monday 3rd March,3:00PM - 5:00PM',
-    'Monday 3rd March,3:00PM - 5:00PM',
-    'Monday 3rd March,3:00PM - 5:00PM',
-    'Monday 3rd March,3:00PM - 5:00PM',
-    'Monday 3rd March,3:00PM - 5:00PM',
-    'Monday 3rd March,3:00PM - 5:00PM',
-  ];
   const [active, setActive] = useState(0);
   return (
     <div>
