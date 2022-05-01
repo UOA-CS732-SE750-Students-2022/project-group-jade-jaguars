@@ -46,6 +46,8 @@ describe.only('Events', () => {
   });
 
   it('Patch', async () => {
+    const spy = jest.spyOn(server.webSocket, 'send');
+
     const eventDoc = await EventModel.create({
       title: 'title',
       startDate: new Date('1900'),
@@ -61,6 +63,7 @@ describe.only('Events', () => {
       .expect(StatusCodes.OK);
 
     expect(eventUpdateResponse.body.title).toEqual('changed');
+    expect(spy).toHaveBeenCalled();
   });
 
   it('Delete', async () => {
@@ -249,6 +252,8 @@ describe.only('Events', () => {
     });
 
     it('Add user availability', async () => {
+      const spy = jest.spyOn(server.webSocket, 'send');
+
       const eventResponseDTO: EventResponseDTO = (
         await request(server)
           .post(`/api/v1/event/${eventId}/availability`)
@@ -275,9 +280,12 @@ describe.only('Events', () => {
       expect(attendeeAvailability[0].availability[1].status).toEqual(
         AvailabilityStatus.Available,
       );
+      expect(spy).toHaveBeenCalled();
     });
 
     it('Remove user availability entirely', async () => {
+      const spy = jest.spyOn(server.webSocket, 'send');
+
       await request(server)
         .delete(
           `/api/v1/event/${eventId}/availability?userId=${userId}&startDate=${new Date(
@@ -291,9 +299,12 @@ describe.only('Events', () => {
       expect(
         eventDoc.availability.attendeeAvailability[0].availability,
       ).toHaveLength(0);
+      expect(spy).toHaveBeenCalled();
     });
 
     it('Remove user availability left side', async () => {
+      const spy = jest.spyOn(server.webSocket, 'send');
+
       await request(server)
         .delete(
           `/api/v1/event/${eventId}/availability?userId=${userId}&startDate=${new Date(
@@ -313,9 +324,13 @@ describe.only('Events', () => {
       expect(
         eventDoc.availability.attendeeAvailability[0].availability[0].endDate,
       ).toEqual(endDate);
+
+      expect(spy).toHaveBeenCalled();
     });
 
     it('Remove user availability right side', async () => {
+      const spy = jest.spyOn(server.webSocket, 'send');
+
       await request(server)
         .delete(
           `/api/v1/event/${eventId}/availability?userId=${userId}&startDate=${new Date(
@@ -335,9 +350,12 @@ describe.only('Events', () => {
       expect(
         eventDoc.availability.attendeeAvailability[0].availability[0].endDate,
       ).toEqual(new Date('1950'));
+      expect(spy).toHaveBeenCalled();
     });
 
     it('Remove user availability middle', async () => {
+      const spy = jest.spyOn(server.webSocket, 'send');
+
       await request(server)
         .delete(
           `/api/v1/event/${eventId}/availability?userId=${userId}&startDate=${new Date(
@@ -367,9 +385,13 @@ describe.only('Events', () => {
       expect(
         eventDoc.availability.attendeeAvailability[0].availability[1].endDate,
       ).toEqual(endDate);
+
+      expect(spy).toHaveBeenCalled();
     });
 
     it('Confirm user availability', async () => {
+      const spy = jest.spyOn(server.webSocket, 'send');
+
       await request(server)
         .patch(`/api/v1/event/${eventId}/availability/confirm`)
         .send({
@@ -382,9 +404,12 @@ describe.only('Events', () => {
         (await EventModel.findById(eventId)).availability
           .attendeeAvailability[0].confirmed,
       ).toBe(true);
+      expect(spy).toHaveBeenCalled();
     });
 
     it('Get user availability confirmation count', async () => {
+      const spy = jest.spyOn(server.webSocket, 'send');
+
       // Initially the confirmation count will be zero
       const {
         confirmed: confirmedInitial,
@@ -434,6 +459,7 @@ describe.only('Events', () => {
       ).body;
 
       expect(confirmedFinal).toBe(1);
+      expect(spy).toHaveBeenCalled();
     });
 
     describe('Socket io test', () => {
@@ -468,22 +494,6 @@ describe.only('Events', () => {
         });
 
         serverSocket.emit('test', 'TEST MESSAGE');
-      });
-
-      test('Socket IO Called', async () => {
-        const spy = jest.spyOn(server.webSocket, 'send');
-
-        const eventDoc = await EventModel.create({
-          title: 'title',
-          startDate: new Date('1900'),
-          endDate: new Date('2000'),
-        });
-
-        const eventId = eventDoc._id.toString();
-
-        await request(server).patch(`/api/v1/event/${eventId}`);
-
-        expect(spy).toHaveBeenCalled();
       });
     });
   });
