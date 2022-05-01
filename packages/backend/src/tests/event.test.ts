@@ -10,11 +10,9 @@ import {
   GetEventAvailabilityConfirmationsResponseDTO,
 } from '../controllers/event.controller';
 import { createServer, Server as HttpServer } from 'http';
-import { io as Client } from 'socket.io-client';
-import { Server } from 'socket.io';
+import { Server, Socket } from 'socket.io';
+import Client from 'socket.io-client';
 import { AddressInfo } from 'net';
-import socket from '../socketio';
-// import { io } from 'socket.io-client';
 
 describe.only('Events', () => {
   it('Get', async () => {
@@ -48,6 +46,8 @@ describe.only('Events', () => {
   });
 
   it('Patch', async () => {
+    const spy = jest.spyOn(server.webSocket, 'send');
+
     const eventDoc = await EventModel.create({
       title: 'title',
       startDate: new Date('1900'),
@@ -63,6 +63,7 @@ describe.only('Events', () => {
       .expect(StatusCodes.OK);
 
     expect(eventUpdateResponse.body.title).toEqual('changed');
+    expect(spy).toHaveBeenCalled();
   });
 
   it('Delete', async () => {
@@ -206,6 +207,7 @@ describe.only('Events', () => {
       }).rejects.toThrow('I should fail');
     });
   });
+
   describe('User event availability', () => {
     let userId, eventId;
 
@@ -250,6 +252,8 @@ describe.only('Events', () => {
     });
 
     it('Add user availability', async () => {
+      const spy = jest.spyOn(server.webSocket, 'send');
+
       const eventResponseDTO: EventResponseDTO = (
         await request(server)
           .post(`/api/v1/event/${eventId}/availability`)
@@ -276,9 +280,12 @@ describe.only('Events', () => {
       expect(attendeeAvailability[0].availability[1].status).toEqual(
         AvailabilityStatus.Available,
       );
+      expect(spy).toHaveBeenCalled();
     });
 
     it('Remove user availability entirely', async () => {
+      const spy = jest.spyOn(server.webSocket, 'send');
+
       await request(server)
         .delete(
           `/api/v1/event/${eventId}/availability?userId=${userId}&startDate=${new Date(
@@ -292,9 +299,12 @@ describe.only('Events', () => {
       expect(
         eventDoc.availability.attendeeAvailability[0].availability,
       ).toHaveLength(0);
+      expect(spy).toHaveBeenCalled();
     });
 
     it('Remove user availability left side', async () => {
+      const spy = jest.spyOn(server.webSocket, 'send');
+
       await request(server)
         .delete(
           `/api/v1/event/${eventId}/availability?userId=${userId}&startDate=${new Date(
@@ -314,9 +324,13 @@ describe.only('Events', () => {
       expect(
         eventDoc.availability.attendeeAvailability[0].availability[0].endDate,
       ).toEqual(endDate);
+
+      expect(spy).toHaveBeenCalled();
     });
 
     it('Remove user availability right side', async () => {
+      const spy = jest.spyOn(server.webSocket, 'send');
+
       await request(server)
         .delete(
           `/api/v1/event/${eventId}/availability?userId=${userId}&startDate=${new Date(
@@ -336,9 +350,12 @@ describe.only('Events', () => {
       expect(
         eventDoc.availability.attendeeAvailability[0].availability[0].endDate,
       ).toEqual(new Date('1950'));
+      expect(spy).toHaveBeenCalled();
     });
 
     it('Remove user availability middle', async () => {
+      const spy = jest.spyOn(server.webSocket, 'send');
+
       await request(server)
         .delete(
           `/api/v1/event/${eventId}/availability?userId=${userId}&startDate=${new Date(
@@ -368,9 +385,13 @@ describe.only('Events', () => {
       expect(
         eventDoc.availability.attendeeAvailability[0].availability[1].endDate,
       ).toEqual(endDate);
+
+      expect(spy).toHaveBeenCalled();
     });
 
     it('Confirm user availability', async () => {
+      const spy = jest.spyOn(server.webSocket, 'send');
+
       await request(server)
         .patch(`/api/v1/event/${eventId}/availability/confirm`)
         .send({
@@ -383,9 +404,12 @@ describe.only('Events', () => {
         (await EventModel.findById(eventId)).availability
           .attendeeAvailability[0].confirmed,
       ).toBe(true);
+      expect(spy).toHaveBeenCalled();
     });
 
     it('Get user availability confirmation count', async () => {
+      const spy = jest.spyOn(server.webSocket, 'send');
+
       // Initially the confirmation count will be zero
       const {
         confirmed: confirmedInitial,
@@ -435,52 +459,41 @@ describe.only('Events', () => {
       ).body;
 
       expect(confirmedFinal).toBe(1);
+      expect(spy).toHaveBeenCalled();
     });
 
-    // TODO: Implement socketio endpoint
-    // it('Fetch team availability via socket.io', async (done) => {
-    //   const socket = io('http://localhost:3000/api/v1/socketio');
-    //   socket.connect();
-    //   socket.on('connect', () => {
-    //     console.log(socket.id);
-    //     done();
-    //   });
-    //   console.log('running test');
-    // });
-
-    describe.skip('Socket io test', () => {
+    describe('Socket io test', () => {
       let io: Server;
-      let client;
-      let httpServer: HttpServer;
+      let serverSocket: Socket;
+      let clientSocket;
 
-      beforeEach((done) => {
-        httpServer = createServer();
-        socket(httpServer, server.app);
-        io = server.app.get('socketio');
+      beforeAll((done) => {
+        const httpServer = createServer();
+        io = new Server(httpServer);
 
         httpServer.listen(() => {
-          const port = (httpServer.address() as AddressInfo).port;
-          client = Client(`http://localhost:${port}`, { path: '/socketio/' });
-          client.on('connect', () => {
-            done();
+          const port = (<AddressInfo>httpServer.address()).port;
+
+          clientSocket = Client(`http://localhost:${port}`);
+
+          io.on('connection', (socket) => {
+            serverSocket = socket;
           });
+          clientSocket.on('connect', done);
         });
       });
 
-      afterEach(() => {
-        client.close();
-        httpServer.close();
-      });
       afterAll(() => {
         io.close();
+        clientSocket.close();
       });
 
-      it('should work', (done) => {
-        client.on('test', (arg) => {
-          console.log(arg);
-          done();
+      test('Socket IO connection', () => {
+        clientSocket.on(`test`, (arg) => {
+          expect(arg).toBe('TEST MESSAGE');
         });
-        client.emit('test', 'message from client');
+
+        serverSocket.emit('test', 'TEST MESSAGE');
       });
     });
   });

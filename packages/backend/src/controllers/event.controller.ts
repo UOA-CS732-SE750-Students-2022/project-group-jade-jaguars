@@ -13,6 +13,7 @@ import Joi from 'joi';
 import { validate, validators } from '../libs/validate.lib';
 import { UserModel } from '../schemas/user.schema';
 import { TeamModel } from '../schemas/team.schema';
+import server from '../app';
 
 export interface CreateEventDTO {
   _id: string;
@@ -39,7 +40,7 @@ export interface SearchEventDTO {
   limit?: number;
 }
 
-export interface AddUserAvalabilityDTO {
+export interface AddUserAvailabilityDTO {
   userId: string;
   startDate: Date;
   endDate: Date;
@@ -79,7 +80,7 @@ export interface EventResponseDTO {
   team: string;
 }
 
-// Helper function for mapping a event documetn to a respone object
+// Helper function for mapping a event document to a response object
 function eventDocToResponseDTO(eventDoc: any): EventResponseDTO {
   return {
     id: eventDoc._id,
@@ -172,6 +173,10 @@ export async function patchEventById(
     if (!eventDoc) {
       return returnError(Error('Event Not Found'), res, StatusCodes.NOT_FOUND);
     }
+
+    // Send updated event via socket IO
+    server.webSocket.send(`event:${eventId}`, eventDoc);
+
     res.status(StatusCodes.OK).send(eventDocToResponseDTO(eventDoc));
   } catch (err) {
     returnError(err, res);
@@ -293,13 +298,13 @@ export async function searchEvent(
 }
 
 export async function addUserAvailabilityById(
-  req: TypedRequestBody<AddUserAvalabilityDTO>,
+  req: TypedRequestBody<AddUserAvailabilityDTO>,
   res: Response<EventResponseDTO | string>,
 ) {
   try {
     let eventId = req.params.eventId;
 
-    const rules = Joi.object<AddUserAvalabilityDTO & { eventId: string }>({
+    const rules = Joi.object<AddUserAvailabilityDTO & { eventId: string }>({
       userId: validators.id().required(),
       startDate: validators.startDate().required(),
       endDate: validators.endDate().required(),
@@ -348,13 +353,16 @@ export async function addUserAvailabilityById(
     }
 
     await eventDoc.save();
+
+    // Send updated event via socket IO
+    server.webSocket.send(`event:${eventId}`, eventDoc);
     res.status(StatusCodes.OK).send(eventDocToResponseDTO(eventDoc));
   } catch (err) {
     returnError(err, res);
   }
 }
 
-export async function removeUserAvalabilityById(
+export async function removeUserAvailabilityById(
   req: Request,
   res: Response<EventResponseDTO | string>,
 ) {
@@ -456,6 +464,10 @@ export async function removeUserAvalabilityById(
       userEventAvailabilityIndex
     ].availability = adjustedAttendeeAvailability;
     await eventDoc.save();
+
+    // Send updated event via socket IO
+    server.webSocket.send(`event:${eventId}`, eventDoc);
+
     res.sendStatus(StatusCodes.OK);
   } catch (err) {
     returnError(err, res);
@@ -505,6 +517,9 @@ export async function setEventAvailabilityConfirmation(
     if (!eventDoc) {
       return returnError(Error('Event Not Found'), res, StatusCodes.NOT_FOUND);
     }
+
+    // Send updated event via socket IO
+    server.webSocket.send(`event:${eventId}`, eventDoc);
 
     res.sendStatus(StatusCodes.OK);
   } catch (err) {
