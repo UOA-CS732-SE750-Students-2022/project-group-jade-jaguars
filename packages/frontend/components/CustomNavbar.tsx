@@ -23,23 +23,6 @@ export const CustomNavbar = () => {
     !user && router.push('/');
   }, [user]);
 
-  useEffect(() => {
-    const clearListener = getAuth().onAuthStateChanged((user) => {
-      setUser(user);
-      const updateToken = async () => {
-        const token = await user?.getIdToken();
-        const userId = await user?.uid;
-        token ? token : '';
-        userId ? userId : '';
-        localStorage.setItem('userID', userId!);
-        localStorage.setItem('authToken', token!);
-      };
-      updateToken().catch(console.error);
-    });
-    return () => {
-      clearListener();
-    };
-  }, [setUser]);
   return isLogin ? (
     <Navbar height={height} width={{ base: 100 }} className="border-1">
       <Navbar.Section>

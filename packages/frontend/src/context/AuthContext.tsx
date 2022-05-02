@@ -7,6 +7,10 @@ import {
 import React, { createContext, useEffect, useState } from 'react';
 import { auth } from '../config/firebase.config';
 interface authContext {
+  authToken: string;
+  setAuthToken: React.Dispatch<React.SetStateAction<string>>;
+  userId: string;
+  setUserId: React.Dispatch<React.SetStateAction<string>>;
   authLoaded: boolean;
   setAuthLoaded: React.Dispatch<React.SetStateAction<boolean>>;
   signedIn: boolean;
@@ -17,6 +21,10 @@ interface authContext {
 }
 
 const AuthContext = createContext<authContext>({
+  authToken: '',
+  setAuthToken: () => '',
+  userId: '',
+  setUserId: () => '',
   authLoaded: false,
   setAuthLoaded: () => false,
   user: null,
@@ -31,6 +39,8 @@ const AuthContext = createContext<authContext>({
 export const AuthProvider: React.FC<{}> = ({ children }) => {
   const [authLoaded, setAuthLoaded] = useState(false);
   const [user, setUser] = useState<User | null>(null);
+  const [authToken, setAuthToken] = useState<string>('');
+  const [userId, setUserId] = useState<string>('');
   const provider = new GoogleAuthProvider();
   const login = () => {
     signInWithPopup(auth, provider)
@@ -61,18 +71,26 @@ export const AuthProvider: React.FC<{}> = ({ children }) => {
 
   useEffect(() => {
     onAuthStateChanged(auth, (user) => {
-      if (user) {
-        const uid = user.uid;
-        console.log({ uid });
-      } else {
-        console.log('no user');
-      }
+      const updateToken = async () => {
+        const authToken = await user?.getIdToken();
+        const userId = user?.uid;
+        authToken ? authToken : '';
+        userId ? userId : '';
+        setUserId(userId!);
+        setAuthToken(authToken!);
+        setUser(user);
+      };
+      updateToken();
     });
   }, []);
 
   return (
     <AuthContext.Provider
       value={{
+        authToken,
+        setAuthToken,
+        userId,
+        setUserId,
         authLoaded,
         setAuthLoaded,
         user,
