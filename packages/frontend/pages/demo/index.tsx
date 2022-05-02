@@ -6,6 +6,10 @@ import { getAuth } from 'firebase/auth';
 
 const Demo: NextPage = () => {
   const { user, logout, signedIn, setUser } = useAuth();
+  const id = localStorage.getItem('userID');
+  const authtoken = localStorage.getItem('authToken');
+  console.log(id);
+  console.log(authtoken);
   useEffect(() => {
     !signedIn && router.push('/');
   }, [signedIn]);
@@ -20,7 +24,6 @@ const Demo: NextPage = () => {
 
   return (
     <div>
-      index
       <button onClick={logout}>Logout</button>
     </div>
   );

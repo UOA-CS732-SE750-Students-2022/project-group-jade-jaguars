@@ -26,6 +26,15 @@ export const CustomNavbar = () => {
   useEffect(() => {
     const clearListener = getAuth().onAuthStateChanged((user) => {
       setUser(user);
+      const updateToken = async () => {
+        const token = await user?.getIdToken();
+        const userId = await user?.uid;
+        token ? token : '';
+        userId ? userId : '';
+        localStorage.setItem('userID', userId!);
+        localStorage.setItem('authToken', token!);
+      };
+      updateToken().catch(console.error);
     });
     return () => {
       clearListener();
