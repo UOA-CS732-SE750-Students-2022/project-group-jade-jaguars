@@ -6,7 +6,6 @@ import {
   momentLocalizer,
   DateLocalizer,
 } from 'react-big-calendar';
-import { events } from './sampleEvents';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 import moment from 'moment';
 import Member from '../../types/Member';
@@ -39,7 +38,7 @@ interface CustomCalendarInterface {
  * @author Raina Song (rainasong)
  */
 const CustomCalendar = (props: CustomCalendarInterface) => {
-  const { localizer, teamHexColour, onParticipantClick } = props;
+  const { localizer, teamHexColour, onParticipantClick, events } = props;
   const calLocalizer = localizer ? localizer : momentLocalizer(moment);
   const defaultColour = '#99c08b';
   const [modalOpen, setModalOpen] = useState(false);
