@@ -9,7 +9,7 @@ const Home: NextPage = () => {
   const { user, login, logout, signedIn, setUser } = useAuth();
   const router = useRouter();
   useEffect(() => {
-    signedIn ? router.push('/demo') : router.push('/');
+    signedIn ? router.push('/create') : router.push('/');
   }, [signedIn]);
 
   return (
