@@ -8,7 +8,6 @@ import { CustomNavbar } from '../components/CustomNavbar';
 
 export default function App(props: AppProps) {
   const { Component, pageProps } = props;
-  const { user, setUser } = useAuth();
 
   return (
     <>
