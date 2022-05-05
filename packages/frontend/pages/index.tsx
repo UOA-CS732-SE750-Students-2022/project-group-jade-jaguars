@@ -11,7 +11,7 @@ const Home: NextPage = () => {
   useEffect(() => {
     const checkUserOnMongo = async () => {
       const response = await fetch(
-        `http://149.28.170.219/api/v1/user/${userId}`,
+        `http://localhost:3000/api/v1/user/${userId}`,
         {
           headers: new Headers({
             Authorization: 'Bearer ' + authToken,
@@ -24,7 +24,7 @@ const Home: NextPage = () => {
         const lastName = nameArray[1];
 
         const createUserResponse = await fetch(
-          'http://149.28.170.219/api/v1/user',
+          'http://localhost:3000/api/v1/user',
           {
             method: 'POST',
             headers: new Headers({
