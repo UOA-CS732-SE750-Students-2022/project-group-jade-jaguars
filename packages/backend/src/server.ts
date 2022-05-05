@@ -1,7 +1,6 @@
 import express from 'express';
 import http from 'http';
 import swaggerUi from 'swagger-ui-express';
-import bodyParser from 'body-parser';
 import { eventsRouter } from './routes/event.route';
 import { usersRouter } from './routes/user.route';
 import { teamRouter } from './routes/team.route';
@@ -52,7 +51,6 @@ class Server extends http.Server {
     });
 
     this.app.use(express.json());
-    this.app.use(bodyParser.json());
 
     if (process.env.NODE_ENV !== 'test') {
       this.app.use(`/docs`, swaggerUi.serve, swaggerUi.setup(swaggerDocument));
