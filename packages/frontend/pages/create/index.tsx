@@ -35,11 +35,11 @@ const CreateEventPage: NextPage = () => {
       newTeamName: '',
     },
   });
-  useEffect(() => {
-    console.log(form.values);
-  }, [form]);
+  //   useEffect(() => {
+  //     console.log(form.values);
+  //   }, [form]);
   const createNewTeam = async () => {
-    console.log(form.values);
+    //console.log(form.values);
     const response = await fetch('http://localhost:3000/api/v1/team', {
       method: 'POST',
       headers: {
@@ -52,12 +52,19 @@ const CreateEventPage: NextPage = () => {
         description: 'a new team',
       }),
     });
-    console.log(response);
-    return response;
+    const data = await response.json();
+    return await data;
   };
   const onCreateEvent = async () => {
-    form.values.newTeam && createNewTeam();
-    //console.log(form.values);
+    let teamId;
+    if (form.values.newTeam) {
+      const data = await createNewTeam();
+      teamId = data.id;
+    } else {
+      teamId = teamData.find((o) => o.label == form.values.teamName)!.id;
+    }
+    //TODO post request to create event
+    console.log(teamId);
   };
   return (
     <Container>

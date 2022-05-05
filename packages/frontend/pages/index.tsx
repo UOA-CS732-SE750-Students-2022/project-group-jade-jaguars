@@ -18,6 +18,7 @@ const Home: NextPage = () => {
           }),
         },
       );
+      console.log(await response.json());
       if (response.status == 404) {
         const nameArray = user!.displayName!.split(' ');
         const firstName = nameArray[0];
