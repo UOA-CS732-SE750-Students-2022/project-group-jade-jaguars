@@ -27,10 +27,14 @@ const Home: NextPage = () => {
           'http://localhost:3000/api/v1/user',
           {
             method: 'POST',
-            headers: new Headers({
+            headers: {
               Authorization: 'Bearer ' + authToken,
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              firstName: firstName,
+              lastName: lastName,
             }),
-            body: JSON.stringify({ firstName: firstName, lastName: lastName }),
           },
         );
         console.log(createUserResponse);
