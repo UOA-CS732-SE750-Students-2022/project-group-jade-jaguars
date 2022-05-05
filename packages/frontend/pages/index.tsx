@@ -6,7 +6,7 @@ import { useRouter } from 'next/router';
 import { getAuth } from 'firebase/auth';
 import Image from 'next/image';
 const Home: NextPage = () => {
-  const { login, signedIn, userId, authToken } = useAuth();
+  const { login, signedIn, userId, authToken, user } = useAuth();
   const router = useRouter();
   useEffect(() => {
     const checkUserOnMongo = async () => {
@@ -18,7 +18,23 @@ const Home: NextPage = () => {
           }),
         },
       );
-      console.log(response);
+      if (response.status == 404) {
+        const nameArray = user!.displayName!.split(' ');
+        const firstName = nameArray[0];
+        const lastName = nameArray[1];
+
+        const createUserResponse = await fetch(
+          'http://149.28.170.219/api/v1/user',
+          {
+            method: 'POST',
+            headers: new Headers({
+              Authorization: 'Bearer ' + authToken,
+            }),
+            body: JSON.stringify({ firstName: firstName, lastName: lastName }),
+          },
+        );
+        console.log(createUserResponse);
+      }
     };
     userId && checkUserOnMongo();
     signedIn ? router.push('/demo') : router.push('/');
