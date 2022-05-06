@@ -68,4 +68,28 @@ describe('Team', () => {
 
     expect(await TeamModel.findById(teamId)).toBeNull();
   });
+
+  it('Add member to team', async () => {
+    const teamDoc = await TeamModel.create({
+      title: 'title',
+      admin: adminDoc._id,
+    });
+    const teamId = teamDoc._id.toString();
+
+    const userDoc = await UserModel.create({
+      _id: 'x'.repeat(28), // firebaseId
+      firstName: 'firstName',
+      lastName: 'lastName',
+    });
+
+    const userId = userDoc._id.toString();
+
+    await request(server)
+      .put(`/api/v1/team/${teamId}/member`)
+      .send({ userId })
+      .expect(StatusCodes.OK);
+
+    const teamDoc2 = await TeamModel.findById(teamId);
+    expect(teamDoc2.members).toContain(userId);
+  });
 });

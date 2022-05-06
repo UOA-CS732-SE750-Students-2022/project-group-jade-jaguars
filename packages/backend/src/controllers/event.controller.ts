@@ -496,7 +496,7 @@ export async function setEventAvailabilityConfirmation(
 
     // Check documents exist
     if (!(await UserModel.exists({ id: formData.userId }))) {
-      return returnError(Error('User Not FOund'), res, StatusCodes.NOT_FOUND);
+      return returnError(Error('User Not Found'), res, StatusCodes.NOT_FOUND);
     }
 
     const eventDoc = await EventModel.findOneAndUpdate(

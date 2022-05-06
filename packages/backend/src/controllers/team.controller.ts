@@ -5,6 +5,7 @@ import Joi from 'joi';
 import { validate, validators } from '../libs/validate.lib';
 import { StatusCodes } from 'http-status-codes';
 import { returnError } from '../libs/error.lib';
+import { UserModel } from '../schemas/user.schema';
 
 interface CreateTeamDTO {
   _id: string;
@@ -27,6 +28,10 @@ interface TeamResponseDTO {
 }
 
 interface UpdateTeamDTO extends Partial<ITeam> {}
+
+interface AddMemberDTO {
+  userId: string;
+}
 
 export async function getTeamById(
   req: Request,
@@ -148,6 +153,44 @@ export async function deleteTeamById(req: Request, res: Response) {
     }
 
     res.sendStatus(StatusCodes.NO_CONTENT);
+  } catch (err) {
+    returnError(err, res);
+  }
+}
+
+export async function addMemberById(req: Request, res: Response) {
+  try {
+    const teamId = req.params.teamId;
+    const userId = req.body.userId;
+    const rules = Joi.object<AddMemberDTO & { teamId: string }>({
+      teamId: validators.id().required(),
+      userId: validators.id().required(),
+    });
+
+    const formData = validate(
+      res,
+      rules,
+      { teamId, userId },
+      { allowUnknown: true },
+    );
+
+    // Check that the user exists
+    if (!(await UserModel.exists({ _id: formData.userId }))) {
+      return returnError(Error('User Not Found'), res, StatusCodes.NOT_FOUND);
+    }
+
+    // Check that the team exists
+    if (!(await TeamModel.exists({ _id: formData.teamId }))) {
+      return returnError(Error('Team Not Found'), res, StatusCodes.NOT_FOUND);
+    }
+
+    // Add member to the team, note that addToSet means set membership only
+    await TeamModel.updateOne(
+      { _id: formData.teamId },
+      { $addToSet: { members: formData.userId } },
+    );
+
+    res.sendStatus(StatusCodes.OK);
   } catch (err) {
     returnError(err, res);
   }
