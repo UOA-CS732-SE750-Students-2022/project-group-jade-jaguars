@@ -36,8 +36,7 @@ const teamSchema = new Schema(
     },
     description: {
       type: String,
-      required: true,
-      default: 'description',
+      required: false,
     },
     color: {
       type: String,

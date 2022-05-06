@@ -18,7 +18,6 @@ describe('Team', () => {
   it('Get', async () => {
     const teamDoc = await TeamModel.create({
       title: 'title',
-      description: 'description',
       admin: adminDoc._id,
     });
     const teamId = teamDoc._id.toString();
@@ -34,7 +33,6 @@ describe('Team', () => {
       .post('/api/v1/team')
       .send({
         title: 'title',
-        description: 'description',
         color: Colour.BLUE,
         admin: adminDoc._id,
       })
@@ -44,7 +42,6 @@ describe('Team', () => {
   it('Update', async () => {
     const teamDoc = await TeamModel.create({
       title: 'title',
-      description: 'description',
       admin: adminDoc._id,
     });
     const teamId = teamDoc._id.toString();
@@ -57,13 +54,11 @@ describe('Team', () => {
       .expect(StatusCodes.OK);
 
     expect(userUpdateResponse.body.title).toEqual('changed');
-    expect(userUpdateResponse.body.description).toEqual('description');
   });
 
   it('Delete', async () => {
     const teamDoc = await TeamModel.create({
       title: 'title',
-      description: 'description',
       admin: adminDoc._id,
     });
     const teamId = teamDoc._id.toString();

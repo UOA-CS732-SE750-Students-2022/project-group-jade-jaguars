@@ -66,7 +66,7 @@ export async function createTeam(
   try {
     const rules = Joi.object<CreateTeamDTO>({
       title: validators.title().required(),
-      description: validators.description().required(),
+      description: validators.description().optional(),
       admin: validators.id().required(),
       members: validators.ids().optional(),
       events: validators.ids().optional(),
