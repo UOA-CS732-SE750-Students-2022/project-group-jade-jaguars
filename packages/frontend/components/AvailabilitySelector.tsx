@@ -1,6 +1,9 @@
 import { useState, useEffect, useRef } from 'react';
-import { AvailabilityBlock, AvailabilityStatus } from '../types/Availability';
-import TimeBracket from '../types/TimeBracket';
+import {
+  TimeBracket,
+  AvailabilityBlock,
+  AvailabilityStatus,
+} from '../types/Event';
 
 /*
  *  Assumption: no more than 7 days sent through as timeOptions.
@@ -9,7 +12,7 @@ import TimeBracket from '../types/TimeBracket';
  *         status: the current selection status.
  */
 function AvailabilitySelector(props: {
-  timeOptions: TimeBracket[];
+  timeOptions: TimeBracket;
   availability: AvailabilityBlock[];
   status: AvailabilityStatus;
 }) {
@@ -44,8 +47,12 @@ function AvailabilitySelector(props: {
 
   // Initialise the grid.
   useEffect(() => {
-    const startTime = new Date(props.timeOptions[0].startTime);
-    const endTime = new Date(props.timeOptions[0].endTime);
+    const startTime = new Date(props.timeOptions.startDate);
+    const endTime = new Date(props.timeOptions.startDate);
+    const lastTime = new Date(props.timeOptions.endDate);
+
+    endTime.setHours(lastTime.getHours());
+    endTime.setMinutes(lastTime.getMinutes());
 
     let halfHours = (endTime.getHours() - startTime.getHours()) * 2;
 
@@ -56,37 +63,39 @@ function AvailabilitySelector(props: {
       halfHours++;
     }
 
-    // timeList will contain the list of potential times split up among different days.
-    let timeList = props.timeOptions;
-
-    // If the time brackets are between midnight and midnight, need to split up the days.
-    if (
-      !(
-        endTime.getFullYear() === startTime.getFullYear() &&
-        endTime.getMonth() === startTime.getMonth() &&
-        endTime.getDate() === startTime.getDate()
-      )
-    ) {
-      timeList = [];
-      // Check each set of time brackets.
-      for (let index in props.timeOptions) {
-        let myStartTime = new Date(props.timeOptions[index].startTime);
-        const finalEndTime = new Date(props.timeOptions[index].endTime);
-        const daysInTB =
-          (finalEndTime.getTime() - myStartTime.getTime()) / (1000 * 3600 * 24); // How many days to split into.
-
-        // Separate out each day.
-        for (let i = 0; i < daysInTB; i++) {
-          let myEndTime = new Date(myStartTime);
-          myEndTime.setDate(myStartTime.getDate() + 1);
-          timeList.push({
-            startTime: myStartTime.getTime(),
-            endTime: myEndTime.getTime(),
-          });
-          myStartTime.setTime(myEndTime.getTime());
-        }
-      }
+    if (halfHours === 0) {
       halfHours = 48;
+    }
+
+    // timeList will contain the list of potential times split up among different days.
+    let timeList: TimeBracket[] = [];
+    // Check each set of time brackets.
+    let myStartTime = new Date(props.timeOptions.startDate);
+    const finalEndTime = new Date(props.timeOptions.endDate);
+
+    const daysInTB =
+      (finalEndTime.getTime() - myStartTime.getTime()) / (1000 * 3600 * 24); // How many days to split into.
+
+    // Separate out each day.
+    for (let i = 0; i < daysInTB; i++) {
+      let myEndTime = new Date(finalEndTime);
+      if (
+        myStartTime.getHours() == 0 &&
+        myEndTime.getHours() == 0 &&
+        myStartTime.getMinutes() == 0 &&
+        myEndTime.getMinutes() == 0
+      ) {
+        myEndTime.setDate(myStartTime.getDate() + 1);
+      } else {
+        myEndTime.setDate(myStartTime.getDate());
+      }
+      let newStartTime = new Date(myStartTime);
+      let newEndTime = new Date(myEndTime);
+      timeList.push({
+        startDate: newStartTime,
+        endDate: newEndTime,
+      });
+      myStartTime.setDate(myStartTime.getDate() + 1);
     }
 
     let initialTimeSlots: {
@@ -100,7 +109,7 @@ function AvailabilitySelector(props: {
     // Map the time slots to grid items.
     for (let i = 0; i < halfHours; i++) {
       for (let j = 0; j < numDays; j++) {
-        const day = new Date(timeList[j].startTime);
+        const day = new Date(timeList[j].startDate);
         let time = day.getHours() + 0.5 * i;
         if (day.getMinutes() == 30) {
           time += 0.5;
@@ -128,8 +137,8 @@ function AvailabilitySelector(props: {
             props.availability[index].status == AvailabilityStatus.Unavailable
           )
             continue;
-          const startDT = new Date(props.availability[index].startTime);
-          const endDT = new Date(props.availability[index].endTime);
+          const startDT = new Date(props.availability[index].startDate);
+          const endDT = new Date(props.availability[index].endDate);
           if (dateTime >= startDT && dateTime < endDT) {
             currentStatus = props.availability[index].status;
             break;
@@ -143,8 +152,8 @@ function AvailabilitySelector(props: {
       }
     }
 
-    const startDate = new Date(timeList[0].startTime);
-    const endDate = new Date(timeList[0].endTime);
+    const startDate = new Date(timeList[0].startDate);
+    const endDate = new Date(timeList[0].endDate);
 
     let hourList: string[] = [];
     let mins = '00';
@@ -233,13 +242,13 @@ function AvailabilitySelector(props: {
   }
 
   return (
-    <div>
+    <div className="m-[30px]">
       <div
         className="grid h-[20px] ml-[30px]"
         style={{ gridTemplateColumns: 'repeat(' + numCols + ', 60px)' }}
       >
         {timeList.map((timeBracket, index) => {
-          const startDate = new Date(timeBracket.startTime);
+          const startDate = new Date(timeBracket.startDate);
           return (
             <div
               className="w-[60px] h-[20px] text-[12px] z-1 block text-black text-center"
@@ -270,23 +279,23 @@ function AvailabilitySelector(props: {
         >
           {timeSlots.map((timeSlot, index) => (
             <div
-              className="w-px-60 h-px-20 block border border-solid border-black z-1"
-              key={index}
-              style={{
-                backgroundColor: (() => {
+              className={
+                'w-px-60 h-px-20 block border border-solid border-black z-1 ' +
+                (() => {
                   if (
                     selection[index].status === AvailabilityStatus.Available
                   ) {
-                    return 'green';
+                    return 'bg-primary';
                   } else if (
                     selection[index].status === AvailabilityStatus.Tentative
                   ) {
-                    return 'yellow';
+                    return 'bg-secondary';
                   } else {
-                    return 'white';
+                    return 'bg-white';
                   }
-                })(),
-              }}
+                })()
+              }
+              key={index}
               onMouseDown={(e) => {
                 e.preventDefault();
                 startDrag([timeSlot.row, timeSlot.col]);
