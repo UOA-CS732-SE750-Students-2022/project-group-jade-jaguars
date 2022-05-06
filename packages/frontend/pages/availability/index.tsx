@@ -15,6 +15,7 @@ import {
   AvailabilityBlock,
   AvailabilityStatus,
 } from '../../types/Event';
+import socketio from 'socket.io-client';
 
 //   const availability: AvailabilityBlock[] = [
 //     {
@@ -101,7 +102,7 @@ const Availability: NextPage = () => {
   const { userId } = useAuth();
 
   const token =
-    'eyJhbGciOiJSUzI1NiIsImtpZCI6ImVmMzAxNjFhOWMyZGI3ODA5ZjQ1MTNiYjRlZDA4NzNmNDczMmY3MjEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3NlY3VyZXRva2VuLmdvb2dsZS5jb20vY291bnQtbWUtaW4tNTk3ODUiLCJhdWQiOiJjb3VudC1tZS1pbi01OTc4NSIsImF1dGhfdGltZSI6MTY1MTc4NDAzMSwidXNlcl9pZCI6IjVHNWNudXFOak5SdGZuRmprZ3d5OUVadmZsbTEiLCJzdWIiOiI1RzVjbnVxTmpOUnRmbkZqa2d3eTlFWnZmbG0xIiwiaWF0IjoxNjUxNzg0MDMxLCJleHAiOjE2NTE3ODc2MzEsImVtYWlsIjoiczJAYXNkLmFzZGFhYXNzIiwiZW1haWxfdmVyaWZpZWQiOmZhbHNlLCJmaXJlYmFzZSI6eyJpZGVudGl0aWVzIjp7ImVtYWlsIjpbInMyQGFzZC5hc2RhYWFzcyJdfSwic2lnbl9pbl9wcm92aWRlciI6InBhc3N3b3JkIn19.BeeEElFZHln2Dd51uuiLN6GUeNOt6qBPviKqK9trEEZ07Ow2Cr6NThkK1XULOYGgVaZodbGtgdARVBQnGxS7rgK0SGb2UbjQFgPC28FiudsbPKbRpJdZ5vO9S-VO6-zDOuNlTx2BUUCRwj36VjWOvGNzoT-dcEOd37PZGOHcJyyJxGW6XHVd-90H742wj4OSJ4jfmUCy9jRJyKP3N-8I-S42FXFEg_sT4WD5tfJde9bauyvStCrwFRl7S617cC6DvIpZPvuacbJW0EJn7uzgV7yR_gZzEACf3UsRZ8Gx--IKeOJQmYtMQsPaeCtOGxoUzX3T2HTkOHxHL0SV8eOexA';
+    'eyJhbGciOiJSUzI1NiIsImtpZCI6ImVmMzAxNjFhOWMyZGI3ODA5ZjQ1MTNiYjRlZDA4NzNmNDczMmY3MjEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3NlY3VyZXRva2VuLmdvb2dsZS5jb20vY291bnQtbWUtaW4tNTk3ODUiLCJhdWQiOiJjb3VudC1tZS1pbi01OTc4NSIsImF1dGhfdGltZSI6MTY1MTc5NzkzNCwidXNlcl9pZCI6Ing1azJ1eVpxdjVOREdEMThiM2s2WTBDQktDNDMiLCJzdWIiOiJ4NWsydXlacXY1TkRHRDE4YjNrNlkwQ0JLQzQzIiwiaWF0IjoxNjUxNzk3OTM0LCJleHAiOjE2NTE4MDE1MzQsImVtYWlsIjoiczNAYXNkLmFzZGFhYXNzIiwiZW1haWxfdmVyaWZpZWQiOmZhbHNlLCJmaXJlYmFzZSI6eyJpZGVudGl0aWVzIjp7ImVtYWlsIjpbInMzQGFzZC5hc2RhYWFzcyJdfSwic2lnbl9pbl9wcm92aWRlciI6InBhc3N3b3JkIn19.lkxdvGY7LOxvXx60SA6WfA4rK20D8WvSU5h3h87CnxBvfDBoA7-VvPm7bcmRD2tWlYyEwuxeThL1K1L5wXjKAhiVC1uruZthJsq2SkxGeTAR2ex0x-wG9Ldz4KCBRf8Ec9cSS3Aq9QdanpX4ak-bYeXVkj8NkOqmbukJmwW-tPIAOIgDR23jjnqPJF6gMon_YiXKkX4kzjY14MzfuCf06U0tbkvEINA9Ks6M9O12a0mTxeN80k49EuLuz-LVH4_3HG-w-Ddioj9LtVmZZhKR9Rhb1osQ-qncW0ut3TGIIxbigjMdxLppoQgqy2vRpAHPMroki12iQOxVVYyvQTrv9A';
 
   const router = useRouter();
   const {
@@ -145,6 +146,13 @@ const Availability: NextPage = () => {
     }
 
     fetchData().catch(console.error);
+
+    const io = socketio('http://149.28.170.219');
+    io.on(`event:${eventId}`, (args) => {
+      console.log('event changed');
+      console.log(args);
+    });
+    console.log(`listening to event: ${eventId}`);
   }, [eventId]);
 
   const [status, setStatus] = useState<AvailabilityStatus>(
