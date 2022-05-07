@@ -170,18 +170,13 @@ const eventSchema = new Schema<IEvent>(
     team: {
       type: String,
       ref: 'Team',
-      // XOR between team and admin, one of the two fields is required
-      required: function () {
-        return !this.admin;
-      },
+      required: false,
     },
+    // The admin can be anyone, the reason why this is required is that the team leader/admin might not be the one creating the event so we should explicity state who is the admin, admin takes the priority over team lead
     admin: {
       type: String,
       ref: 'User',
-      // XOR between team and admin, one of the two fields is required
-      required: function () {
-        return !this.team;
-      },
+      required: true,
     },
   },
   { timestamps: true },

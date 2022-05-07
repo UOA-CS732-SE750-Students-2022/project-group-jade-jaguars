@@ -17,7 +17,7 @@ import { AddressInfo } from 'net';
 describe.only('Events', () => {
   it('Get', async () => {
     const eventDoc = await EventModel.create({
-      admin: 'x'.repeat(20),
+      admin: 'x'.repeat(25),
       title: 'title',
       startDate: new Date('1900'),
       endDate: new Date('2000'),
@@ -35,7 +35,7 @@ describe.only('Events', () => {
     const createResponse = await request(server)
       .post('/api/v1/event')
       .send({
-        admin: 'x'.repeat(20),
+        admin: 'x'.repeat(25),
         title: 'title',
         startDate: new Date('1900'),
         endDate: new Date('2000'),
@@ -51,7 +51,7 @@ describe.only('Events', () => {
     const spy = jest.spyOn(server.webSocket, 'send');
 
     const eventDoc = await EventModel.create({
-      admin: 'x'.repeat(20),
+      admin: 'x'.repeat(25),
       title: 'title',
       startDate: new Date('1900'),
       endDate: new Date('2000'),
@@ -74,7 +74,7 @@ describe.only('Events', () => {
       title: 'title',
       startDate: new Date('1900'),
       endDate: new Date('2000'),
-      admin: 'x'.repeat(20),
+      admin: 'x'.repeat(25),
     });
     const eventId = eventDoc._id.toString();
 
@@ -113,6 +113,7 @@ describe.only('Events', () => {
         startDate: new Date('1900'),
         endDate: new Date('2000'),
         team: teamId,
+        admin: userId,
       });
       eventId = eventDoc._id;
     });
@@ -177,6 +178,7 @@ describe.only('Events', () => {
         startDate: new Date('1900'),
         endDate: new Date('2000'),
         team: teamId,
+        admin: 'x'.repeat(25),
       });
     });
     it('Limit', async () => {
@@ -186,6 +188,7 @@ describe.only('Events', () => {
         startDate: new Date('1900'),
         endDate: new Date('2000'),
         team: teamId,
+        admin: 'x'.repeat(25),
       });
 
       const searchResponse: EventResponseDTO[] = (

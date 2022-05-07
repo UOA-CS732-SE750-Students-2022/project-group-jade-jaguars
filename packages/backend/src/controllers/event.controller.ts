@@ -24,7 +24,8 @@ export interface CreateEventDTO {
   endDate: Date;
   availability: IEventAvailability;
   location: string;
-  team?: string;
+  team?: string; // id
+  admin: string; // id
 }
 
 export interface PatchEventDTO extends Partial<IEvent> {
@@ -78,6 +79,7 @@ export interface EventResponseDTO {
   location?: string;
   identifier: string;
   team: string;
+  admin: string;
 }
 
 // Helper function for mapping a event document to a response object
@@ -93,6 +95,7 @@ function eventDocToResponseDTO(eventDoc: any): EventResponseDTO {
     location: eventDoc.location,
     identifier: eventDoc.identifier,
     team: eventDoc.team,
+    admin: eventDoc.admin,
   };
 }
 
@@ -131,6 +134,7 @@ export async function createEvent(
       endDate: validators.endDate().required(),
       location: validators.location().optional(),
       team: validators.id().optional(),
+      admin: validators.id().optional(),
     });
 
     const formData = validate(res, rules, req.body, { allowUnknown: true });
