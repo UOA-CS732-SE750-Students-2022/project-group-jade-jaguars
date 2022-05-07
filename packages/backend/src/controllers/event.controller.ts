@@ -12,7 +12,7 @@ import { returnError } from '../libs/error.lib';
 import Joi from 'joi';
 import { validate, validators } from '../libs/validate.lib';
 import { UserModel } from '../schemas/user.schema';
-import { TeamModel } from '../schemas/team.schema';
+import { ITeam, TeamModel } from '../schemas/team.schema';
 import server from '../app';
 
 export interface CreateEventDTO {
@@ -325,9 +325,24 @@ export async function addUserAvailabilityById(
       return returnError(Error('User Not Found'), res, StatusCodes.NOT_FOUND);
     }
 
-    let eventDoc = await EventModel.findById(formData.eventId);
+    let eventDoc = await EventModel.findById(formData.eventId).populate<{
+      team: ITeam;
+    }>('team');
     if (!eventDoc) {
       return returnError(Error('Event Not Found'), res, StatusCodes.NOT_FOUND);
+    }
+
+    // If the event has a team then only users belonging to that team can add availability
+    if (eventDoc.team) {
+      // All members of the team including the admin
+      const members = eventDoc.team.members + eventDoc.team.admin;
+      if (!members.includes(formData.userId)) {
+        return returnError(
+          Error('User Must Be Part Of Team To Add Availability'),
+          res,
+          StatusCodes.BAD_REQUEST,
+        );
+      }
     }
 
     const userEventAvailabilityIndex =

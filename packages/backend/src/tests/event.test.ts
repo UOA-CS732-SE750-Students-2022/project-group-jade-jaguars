@@ -216,7 +216,7 @@ describe.only('Events', () => {
   });
 
   describe('User event availability', () => {
-    let userId, eventId;
+    let userId, teamId, eventId;
 
     const startDate = new Date('1900');
     const endDate = new Date('2000');
@@ -226,10 +226,18 @@ describe.only('Events', () => {
         firstName: 'firstName',
         lastName: 'lastName',
       });
-      userId = userDoc._id.toString();
+      userId = userDoc._id;
+
+      const teamDoc = await TeamModel.create({
+        title: 'title',
+        admin: userDoc._id,
+        members: [userDoc._id],
+      });
+      teamId = teamDoc._id;
 
       const eventDoc = await EventModel.create({
         admin: userId,
+        team: teamId,
         title: 'title',
         startDate: startDate,
         endDate: endDate,
@@ -413,6 +421,26 @@ describe.only('Events', () => {
           .attendeeAvailability[0].confirmed,
       ).toBe(true);
       expect(spy).toHaveBeenCalled();
+    });
+
+    it('Attempt to add availability for a member not part of event team', async () => {
+      const secondUser = await UserModel.create({
+        _id: identifier(32),
+        firstName: 'second',
+        lastName: 'user',
+      });
+
+      expect(async () => {
+        await request(server)
+          .post(`/api/v1/event/${eventId}/availability`)
+          .send({
+            userId: secondUser._id,
+            startDate,
+            endDate,
+            status: AvailabilityStatus.Available,
+          })
+          .expect(StatusCodes.BAD_REQUEST);
+      }).rejects.toThrow();
     });
 
     it('Get user availability confirmation count', async () => {
