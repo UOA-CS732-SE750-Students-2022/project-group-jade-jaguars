@@ -1,3 +1,4 @@
+import { Paper, Grid, Box } from '@mantine/core';
 import axios from 'axios';
 import { NextPage } from 'next';
 import { useRouter } from 'next/router';
@@ -21,6 +22,12 @@ const FinalisedEventPageWithId: NextPage = () => {
     };
     getEvent();
   }, []);
-  return <div>{id}kaldfjajlfka</div>;
+  return (
+    <Box>
+      <Paper>
+        <Grid children={undefined}></Grid>
+      </Paper>
+    </Box>
+  );
 };
 export default FinalisedEventPageWithId;

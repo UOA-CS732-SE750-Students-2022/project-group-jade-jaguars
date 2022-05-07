@@ -48,7 +48,6 @@ const EventForm = ({ teamData, form, onCreateEvent }: EventFormProps) => {
   //     newTeamName: '',
   //   },
   // });
-  const [checked, setChecked] = useState(false);
   const labelArray = teamData.map((team) => team.label);
   const idArray = teamData.map((team) => team.id);
   return (
