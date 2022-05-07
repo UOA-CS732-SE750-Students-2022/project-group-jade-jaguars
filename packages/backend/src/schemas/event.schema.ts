@@ -121,7 +121,8 @@ export interface IEvent {
   availability: IEventAvailability;
   location?: string;
   identifier: string;
-  team?: string;
+  team?: string; // id
+  admin?: string; // id
 }
 
 const eventSchema = new Schema<IEvent>(
@@ -168,8 +169,19 @@ const eventSchema = new Schema<IEvent>(
     },
     team: {
       type: String,
-      required: false,
       ref: 'Team',
+      // XOR between team and admin, one of the two fields is required
+      required: function () {
+        return !this.admin;
+      },
+    },
+    admin: {
+      type: String,
+      ref: 'User',
+      // XOR between team and admin, one of the two fields is required
+      required: function () {
+        return !this.team;
+      },
     },
   },
   { timestamps: true },
