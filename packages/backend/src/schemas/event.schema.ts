@@ -162,11 +162,6 @@ const eventSchema = new Schema<IEvent>(
       type: String,
       required: false,
     },
-    identifier: {
-      type: String,
-      required: true,
-      default: identifier(10),
-    },
     team: {
       type: String,
       ref: 'Team',
