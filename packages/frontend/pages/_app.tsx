@@ -10,7 +10,7 @@ export default function App(props: AppProps) {
   const { Component, pageProps } = props;
 
   return (
-    <div className="bg-backgroundgrey">
+    <div className="bg-backgroundgrey m-0">
       <Head>
         <title>Count Me In</title>
         <link rel="icon" type="image/x-icon" href="/logo.svg" />
@@ -27,10 +27,17 @@ export default function App(props: AppProps) {
           /** Put your mantine theme override here */
           colorScheme: 'light',
           fontFamily: 'Poppins, sans-serif',
+          colors: {
+            transparent: ['#00FFFFFF'],
+          },
         }}
       >
         <AuthProvider>
-          <AppShell fixed navbar={<CustomNavbar />}>
+          <AppShell
+            styles={{ main: { padding: '0' } }}
+            fixed
+            navbar={<CustomNavbar />}
+          >
             <Component {...pageProps} />
           </AppShell>
         </AuthProvider>
