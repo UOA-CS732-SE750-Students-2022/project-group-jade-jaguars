@@ -4,6 +4,7 @@ import {
   EventStatus,
   IEvent,
   AvailabilityStatus,
+  ITimeBracket,
 } from '../schemas/event.schema';
 import { Request, Response } from 'express';
 import { StatusCodes } from 'http-status-codes';
@@ -28,9 +29,8 @@ export interface CreateEventDTO {
   admin: string; // id
 }
 
-export interface PatchEventDTO extends Partial<IEvent> {
-  eventId: string;
-}
+// Can change everything but the id
+export interface PatchEventDTO extends Partial<Omit<IEvent, '_id'>> {}
 
 export interface SearchEventDTO {
   teamId?: string;
@@ -117,7 +117,9 @@ export async function getEventById(
     if (!eventDoc) {
       return returnError(Error('Event Not Found'), res, StatusCodes.NOT_FOUND);
     }
-    res.status(StatusCodes.OK).send(eventDocToResponseDTO(eventDoc));
+    res
+      .status(StatusCodes.OK)
+      .send(eventDocToResponseDTO(eventDoc.toObject({ virtuals: true })));
   } catch (err) {
     returnError(err, res);
   }
@@ -144,7 +146,9 @@ export async function createEvent(
     if (!formData) return;
 
     const eventDoc = await EventModel.create(formData);
-    res.status(StatusCodes.CREATED).send(eventDocToResponseDTO(eventDoc));
+    res
+      .status(StatusCodes.CREATED)
+      .send(eventDocToResponseDTO(eventDoc.toObject({ virtuals: true })));
   } catch (err) {
     returnError(err, res);
   }
@@ -188,7 +192,9 @@ export async function patchEventById(
     // Send updated event via socket IO
     server.webSocket.send(`event:${eventId}`, eventDoc);
 
-    res.status(StatusCodes.OK).send(eventDocToResponseDTO(eventDoc));
+    res
+      .status(StatusCodes.OK)
+      .send(eventDocToResponseDTO(eventDoc.toObject({ virtuals: true })));
   } catch (err) {
     returnError(err, res);
   }
@@ -239,7 +245,7 @@ export async function searchEvent(
       }
       const eventDocs = (await EventModel.find({ team: formData.teamId })).map(
         (eventDoc) => {
-          return eventDocToResponseDTO(eventDoc);
+          return eventDocToResponseDTO(eventDoc.toObject({ virtuals: true }));
         },
       );
       events.push.apply(events, eventDocs);
@@ -251,7 +257,7 @@ export async function searchEvent(
           title: { $regex: formData.titleSubStr, $options: 'i' },
         })
       ).map((eventDoc) => {
-        return eventDocToResponseDTO(eventDoc);
+        return eventDocToResponseDTO(eventDoc.toObject({ virtuals: true }));
       });
       events.push.apply(events, eventDocs);
     }
@@ -283,7 +289,7 @@ export async function searchEvent(
           endDate: { $lte: formData.endDate },
         })
       ).map((eventDoc) => {
-        return eventDocToResponseDTO(eventDoc);
+        return eventDocToResponseDTO(eventDoc.toObject({ virtuals: true }));
       });
       events.push.apply(events, eventDocs);
     }
@@ -342,9 +348,10 @@ export async function addUserAvailabilityById(
       return returnError(Error('User Not Found'), res, StatusCodes.NOT_FOUND);
     }
 
-    let eventDoc = await EventModel.findById(formData.eventId).populate<{
-      team: ITeam;
-    }>('team');
+    const eventDoc = await EventModel.findById(formData.eventId)
+      .populate<{ team: ITeam }>('team')
+      .populate<{ availability: IEventAvailability }>('availability');
+
     if (!eventDoc) {
       return returnError(Error('Event Not Found'), res, StatusCodes.NOT_FOUND);
     }
@@ -392,7 +399,9 @@ export async function addUserAvailabilityById(
 
     // Send updated event via socket IO
     server.webSocket.send(`event:${eventId}`, eventDoc);
-    res.status(StatusCodes.OK).send(eventDocToResponseDTO(eventDoc));
+    res
+      .status(StatusCodes.OK)
+      .send(eventDocToResponseDTO(eventDoc.toObject({ virtuals: true })));
   } catch (err) {
     returnError(err, res);
   }
@@ -443,7 +452,11 @@ export async function removeUserAvailabilityById(
 
     // Can't remove availability timebracket if it doesn't exist for the user
     if (userEventAvailabilityIndex === -1) {
-      return returnError(Error('Bad Request'), res, StatusCodes.BAD_REQUEST);
+      return returnError(
+        Error('Bad Request, Time Bracket Does Not Exist'),
+        res,
+        StatusCodes.BAD_REQUEST,
+      );
     }
 
     // Sweep though availability brackets in order to edit to remove parts of or whole brackets
