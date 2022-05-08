@@ -4,8 +4,7 @@ import { NextPage } from 'next';
 import React, { useEffect, useState } from 'react';
 import EventForm from '../../components/EventForm';
 import { useAuth } from '../../src/context/AuthContext';
-import axios from 'axios';
-
+import { createTeam, createEvent } from '../../helpers/apiCalls/apiCalls';
 interface FormValues {
   title: string;
   dateRange: [Date | null, Date | null];
@@ -13,7 +12,7 @@ interface FormValues {
   description?: string;
   location?: string;
   newTeam: boolean;
-  newTeamName?: string;
+  newTeamName: string;
   teamName?: string;
 }
 
@@ -42,7 +41,6 @@ const CreateEventPage: NextPage = () => {
       newTeamName: '',
     },
   });
-  //TODO get team list
 
   useEffect(() => {
     const getTeamList = async () => {
@@ -63,22 +61,13 @@ const CreateEventPage: NextPage = () => {
     getTeamList();
   }, []);
   const createNewTeam = async () => {
-    const response = await fetch('http://localhost:3000/api/v1/team', {
-      method: 'POST',
-      headers: {
-        Authorization: 'Bearer ' + authToken,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        title: form.values.newTeamName,
-        admin: userId,
-        description: 'a new team',
-      }),
+    const res = await createTeam({
+      title: form.values.newTeamName,
+      admin: userId,
     });
-    const data = await response.json();
-    return await data;
+    return await res;
   };
-  const createEvent = async (teamId: string) => {
+  const createEventMethod = async (teamId: string) => {
     const startDate = form.values.dateRange[0];
     const endDate = form.values.dateRange[1];
     const startTime = form.values.timeRange[0];
@@ -91,32 +80,28 @@ const CreateEventPage: NextPage = () => {
     const data = {
       title: form.values.title,
       description: form.values.description,
-      startDate: startDateText,
-      endDate: endDateText,
+      startDate: new Date(startDateText!),
+      endDate: new Date(endDateText!),
       admin: userId,
       location: form.values.location,
-      team: teamId,
+      team: teamId ? teamId : undefined,
     };
-    const result = await axios.post(
-      'http://localhost:3000/api/v1/event',
-      data,
-      {
-        headers: {
-          Authorization: 'Bearer ' + authToken,
-        },
-      },
-    );
-    return result;
+
+    const res = await createEvent(data);
+    return res;
   };
   const onCreateEvent = async () => {
     let teamId;
     if (form.values.newTeam) {
-      const data = await createNewTeam();
-      teamId = await data.id;
+      if (form.values.newTeamName != '') {
+        const data = await createNewTeam();
+        teamId = await data.id;
+      }
     } else {
       teamId = teamList.find((o) => o.label == form.values.teamName)!.id;
     }
-    const response = await createEvent(teamId);
+    const response = await createEventMethod(teamId);
+    console.log(response);
   };
   return (
     <Container>

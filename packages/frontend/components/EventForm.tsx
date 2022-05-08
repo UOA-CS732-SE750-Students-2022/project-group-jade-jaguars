@@ -21,7 +21,7 @@ interface FormValues {
   description?: string;
   location?: string;
   newTeam: boolean;
-  newTeamName?: string;
+  newTeamName: string;
   teamName?: string;
 }
 
