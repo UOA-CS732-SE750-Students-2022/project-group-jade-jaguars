@@ -6,6 +6,7 @@ import { useAuth } from '../src/context/AuthContext';
 import { NavbarLink } from './NavbarLink';
 import { getAuth } from 'firebase/auth';
 import { useRouter } from 'next/router';
+import { Logout } from 'tabler-icons-react';
 
 const linkData = [
   { icon: LayoutDashboard, label: 'Dashboard', address: '/demo' },
@@ -15,7 +16,7 @@ const linkData = [
 export const CustomNavbar = () => {
   const { height, width } = useViewportSize();
   const [active, setActive] = useState(0);
-  const { user, setUser } = useAuth();
+  const { user, setUser, logout } = useAuth();
   const router = useRouter();
   const [isLogin, setIsLogin] = useState(false);
   useEffect(() => {
@@ -47,6 +48,16 @@ export const CustomNavbar = () => {
               />
             );
           })}
+        </Group>
+      </Navbar.Section>
+      <Navbar.Section>
+        <Group direction="column" align="center" spacing="xs">
+          <div
+            className="w-3/4 cursor-pointer flex items-center justify-center h-[80px] rounded-md  hover:bg-secondary"
+            onClick={logout}
+          >
+            <Logout />
+          </div>
         </Group>
       </Navbar.Section>
     </Navbar>

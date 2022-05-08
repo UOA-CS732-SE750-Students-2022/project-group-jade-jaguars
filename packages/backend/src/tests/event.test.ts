@@ -5,10 +5,7 @@ import { StatusCodes } from 'http-status-codes';
 import { identifier } from '../service/models.service';
 import { UserModel } from '../schemas/user.schema';
 import { TeamModel } from '../schemas/team.schema';
-import {
-  EventResponseDTO,
-  GetEventAvailabilityConfirmationsResponseDTO,
-} from '../controllers/event.controller';
+import { EventResponseDTO } from '../controllers/event.controller';
 import { createServer, Server as HttpServer } from 'http';
 import { Server, Socket } from 'socket.io';
 import Client from 'socket.io-client';
@@ -254,7 +251,6 @@ describe.only('Events', () => {
                   status: AvailabilityStatus.Available,
                 },
               ],
-              confirmed: false,
             },
           ],
         },
@@ -405,24 +401,6 @@ describe.only('Events', () => {
       expect(spy).toHaveBeenCalled();
     });
 
-    it('Confirm user availability', async () => {
-      const spy = jest.spyOn(server.webSocket, 'send');
-
-      await request(server)
-        .patch(`/api/v1/event/${eventId}/availability/confirm`)
-        .send({
-          userId,
-          confirmed: true,
-        })
-        .expect(StatusCodes.OK);
-
-      expect(
-        (await EventModel.findById(eventId)).availability
-          .attendeeAvailability[0].confirmed,
-      ).toBe(true);
-      expect(spy).toHaveBeenCalled();
-    });
-
     it('Attempt to add availability for a member not part of event team', async () => {
       const secondUser = await UserModel.create({
         _id: identifier(32),
@@ -441,61 +419,6 @@ describe.only('Events', () => {
           })
           .expect(StatusCodes.BAD_REQUEST);
       }).rejects.toThrow();
-    });
-
-    it('Get user availability confirmation count', async () => {
-      const spy = jest.spyOn(server.webSocket, 'send');
-
-      // Initially the confirmation count will be zero
-      const {
-        confirmed: confirmedInitial,
-      }: GetEventAvailabilityConfirmationsResponseDTO = (
-        await request(server)
-          .get(`/api/v1/event/${eventId}/availability/confirm`)
-          .send({
-            userId,
-          })
-          .expect(StatusCodes.OK)
-      ).body;
-      expect(confirmedInitial).toBe(0);
-
-      // Create second user
-      const secondUser = await UserModel.create({
-        _id: identifier(32),
-        firstName: 'firstName',
-        lastName: 'lastName',
-      });
-      const secondUserId = secondUser._id;
-
-      // Create a confirmed availability for second user
-      const eventDoc = await EventModel.findById(eventId);
-      eventDoc.availability.attendeeAvailability.push({
-        attendee: secondUserId,
-        availability: [
-          {
-            startDate: startDate,
-            endDate: endDate,
-            status: AvailabilityStatus.Available,
-          },
-        ],
-        confirmed: true,
-      });
-      await eventDoc.save();
-
-      // Check confirmations increases to one
-      const {
-        confirmed: confirmedFinal,
-      }: GetEventAvailabilityConfirmationsResponseDTO = (
-        await request(server)
-          .get(`/api/v1/event/${eventId}/availability/confirm`)
-          .send({
-            userId,
-          })
-          .expect(StatusCodes.OK)
-      ).body;
-
-      expect(confirmedFinal).toBe(1);
-      expect(spy).toHaveBeenCalled();
     });
 
     describe('Socket io test', () => {
