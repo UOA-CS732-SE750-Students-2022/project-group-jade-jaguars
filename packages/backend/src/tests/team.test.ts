@@ -47,7 +47,7 @@ describe('Team', () => {
     const teamId = teamDoc._id.toString();
 
     const userUpdateResponse = await request(server)
-      .put(`/api/v1/team/${teamId}`)
+      .patch(`/api/v1/team/${teamId}`)
       .send({
         title: 'changed',
       })

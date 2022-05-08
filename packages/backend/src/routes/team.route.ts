@@ -12,7 +12,7 @@ teamRouter.get('/team/:teamId', getTeamById);
 
 teamRouter.post('/team', createTeam);
 
-teamRouter.put('/team/:teamId', updateTeamById);
+teamRouter.patch('/team/:teamId', updateTeamById);
 
 teamRouter.delete('/team/:teamId', deleteTeamById);
 

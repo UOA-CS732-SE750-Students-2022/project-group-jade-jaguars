@@ -27,7 +27,8 @@ interface TeamResponseDTO {
   events: string[];
 }
 
-interface UpdateTeamDTO extends Partial<ITeam> {}
+// Can update all fields but the teamId
+interface UpdateTeamDTO extends Partial<Omit<ITeam, '_id'>> {}
 
 interface AddMemberDTO {
   userId: string;
