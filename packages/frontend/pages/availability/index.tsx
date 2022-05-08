@@ -104,6 +104,7 @@ const Availability: NextPage = () => {
   >([]);
 
   const { userId } = useAuth();
+  const [isAdmin, setIsAdmin] = useState<Boolean>(false);
 
   const token =
     'eyJhbGciOiJSUzI1NiIsImtpZCI6ImJlYmYxMDBlYWRkYTMzMmVjOGZlYTU3ZjliNWJjM2E2YWIyOWY1NTUiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3NlY3VyZXRva2VuLmdvb2dsZS5jb20vY291bnQtbWUtaW4tNTk3ODUiLCJhdWQiOiJjb3VudC1tZS1pbi01OTc4NSIsImF1dGhfdGltZSI6MTY1MTk3NzEzNCwidXNlcl9pZCI6Ikt5elZ4amc2N1JVSWhuaGlsSU5UVXhJd3pXMTIiLCJzdWIiOiJLeXpWeGpnNjdSVUlobmhpbElOVFV4SXd6VzEyIiwiaWF0IjoxNjUxOTc3MTM0LCJleHAiOjE2NTE5ODA3MzQsImVtYWlsIjoiYXNkczZAYXNkLmFzZGFhYXNzIiwiZW1haWxfdmVyaWZpZWQiOmZhbHNlLCJmaXJlYmFzZSI6eyJpZGVudGl0aWVzIjp7ImVtYWlsIjpbImFzZHM2QGFzZC5hc2RhYWFzcyJdfSwic2lnbl9pbl9wcm92aWRlciI6InBhc3N3b3JkIn19.bjtQa4m2fO58tFCH8Yxzok4SmtEbu0PqFEsC4fft9P4ua66aTx1gre_oZKXUpwTIz4Sa01brblQM1C6uzYA-QYnTHH0GRdZoB7_oa_BOpOASFgRTJo6ZNKs29NcW1EDj5K5i8JyObZVC3JE_C6NH3Zys51I7yfBJzaRedxSy-ofL0bbtfycUCLlvVlwh4X11mqqYnPhV_G9t6XRmYwXHxHR5670a3WfV6PCirMgjzqeaKOdjIHOrpRU_sWnneUcvG8U6CS4QVlYxI1MIqRrNWDxdsykdjJg1o_io1MB5zatA_yzgg_6HIouAMTFaA3qCsAO_CItSlHTFEePy-9m8Kw';
@@ -115,15 +116,14 @@ const Availability: NextPage = () => {
 
   useEffect(() => {
     async function fetchData() {
-      console.log('here');
-      await getUser(userId).then((val) => {
-        console.log(val);
-      });
       let startDate = timeOptions.startDate;
       let endDate = timeOptions.endDate;
       let myAvailability: AvailabilityBlock[] = [];
       let allAvailabilities: AttendeeAvailability[] = [];
       await getEvent(eventId!.toString()).then((val: { data: Event }) => {
+        if (val.data.admin === userId) {
+          setIsAdmin(true);
+        }
         startDate = new Date(new Date(val.data.startDate).toISOString());
         endDate = new Date(new Date(val.data.endDate).toISOString());
 
@@ -285,7 +285,8 @@ const Availability: NextPage = () => {
           <Row>
             <button
               className={
-                'bg-secondary text-black w-[100px] cursor-pointer rounded-md px-2 py-1 font-semibold hover:bg-secondarylight absolute right-0'
+                'bg-secondary text-black w-[100px] cursor-pointer rounded-md px-2 py-1 font-semibold hover:bg-secondarylight absolute right-0 ' +
+                (isAdmin ? 'block' : 'hidden')
               }
               onClick={() => console.log('finalise')}
             >
