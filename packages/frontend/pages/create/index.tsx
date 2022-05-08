@@ -1,7 +1,7 @@
 import { Container, Grid, Group } from '@mantine/core';
 import { useForm } from '@mantine/hooks';
 import { NextPage } from 'next';
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import EventForm from '../../components/EventForm';
 import { useAuth } from '../../src/context/AuthContext';
 import axios from 'axios';
@@ -19,6 +19,7 @@ interface FormValues {
 
 const CreateEventPage: NextPage = () => {
   const { userId, authToken } = useAuth();
+  const [teamList, setTeamList] = useState();
   const defaultStartTime = new Date();
   const defaultEndTime = new Date();
   defaultStartTime.setHours(9, 0, 0, 0);
@@ -40,11 +41,22 @@ const CreateEventPage: NextPage = () => {
       newTeamName: '',
     },
   });
-  useEffect(() => {
-    console.log(form.values);
-  }, [form]);
+  //TODO get team list
+
+  // useEffect(() => {
+  //   const getTeamList = async () => {
+  //     const response = await fetch(
+  //       `http://localhost:3000/api/v1/user/${userId}`,
+  //       {
+  //         headers: new Headers({
+  //           Authorization: 'Bearer ' + authToken,
+  //         }),
+  //       },
+  //     );
+  //     const data = await response.json();
+  //   };
+  // }, [form]);
   const createNewTeam = async () => {
-    //console.log(form.values);
     const response = await fetch('http://localhost:3000/api/v1/team', {
       method: 'POST',
       headers: {
@@ -69,52 +81,25 @@ const CreateEventPage: NextPage = () => {
     endDate?.setHours(endTime.getHours(), endTime.getMinutes());
     const startDateText = startDate?.toISOString();
     const endDateText = endDate?.toISOString();
-    console.log(startDateText);
-    console.log(endDateText);
-    // const data = {
-    //   title: 'TEst',
-    //   description: 'form.values.description',
-    //   startDate: form.values.dateRange[0],
-    //   endDate: form.values.dateRange[1],
-    // };
-    // const result = await axios.post(
-    //   'http://localhost:3000/api/v1/event',
-    //   data,
-    //   {
-    //     headers: {
-    //       Authorization: 'Bearer ' + authToken,
-    //     },
-    //   },
-    // );
-    // const response = await fetch('http://localhost:3000/api/v1/event', {
-    //   method: 'POST',
-    //   headers: {
-    //     Authorization: 'Bearer ' + authToken,
-    //     'Content-Type': 'application/json',
-    //   },
-    //   body: JSON.stringify({
-    //     // title: form.values.title,
-    //     title: 'TEST',
-    //     description: form.values.description,
-    //     status: 'Pending',
-    //     startDate: '2019-09-26T07:58:30.996+0200',
-    //     endDate: 'form.values.dateRange[1]',
-    //     // startDate: form.values.dateRange[0],
-    //     // endDate: form.values.dateRange[1],
-    //     availability: {
-    //       potentialTimes: {
-    //         startDate: '2019-09-26T07:58:30.996+0200',
-    //         endDate: '2019-09-26T07:58:30.996+0200',
-    //         // startDate: form.values.timeRange[0],
-    //         // endDate: form.values.timeRange[1],
-    //       },
-    //       attendeeAvailability: [],
-    //     },
-    //     location: form.values.location,
-    //     team: teamId,
-    //     attendee: [],
-    //   }),
-    // });
+
+    const data = {
+      title: form.values.title,
+      description: form.values.description,
+      startDate: startDateText,
+      endDate: endDateText,
+      admin: userId,
+      location: form.values.location,
+      team: teamId,
+    };
+    const result = await axios.post(
+      'http://localhost:3000/api/v1/event',
+      data,
+      {
+        headers: {
+          Authorization: 'Bearer ' + authToken,
+        },
+      },
+    );
   };
   const onCreateEvent = async () => {
     let teamId;
@@ -125,7 +110,6 @@ const CreateEventPage: NextPage = () => {
       teamId = teamData.find((o) => o.label == form.values.teamName)!.id;
     }
     const response = await createEvent(teamId);
-    //TODO post request to create event
   };
   return (
     <Container>
