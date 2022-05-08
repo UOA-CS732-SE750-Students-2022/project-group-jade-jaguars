@@ -19,6 +19,10 @@ interface FormValues {
 
 const CreateEventPage: NextPage = () => {
   const { userId, authToken } = useAuth();
+  const defaultStartTime = new Date();
+  const defaultEndTime = new Date();
+  defaultStartTime.setHours(9, 0, 0, 0);
+  defaultEndTime.setHours(17, 0, 0, 0);
   const teamData = [
     { id: 'asdfasdf', label: '750' },
     { id: 'asdfasdf', label: '701' },
@@ -28,7 +32,7 @@ const CreateEventPage: NextPage = () => {
     initialValues: {
       title: '',
       dateRange: [new Date(), new Date()],
-      timeRange: [new Date(), new Date()],
+      timeRange: [defaultStartTime, defaultEndTime],
       description: '',
       location: '',
       newTeam: false,
@@ -57,21 +61,31 @@ const CreateEventPage: NextPage = () => {
     return await data;
   };
   const createEvent = async (teamId: string) => {
-    const data = {
-      title: 'TEst',
-      description: 'form.values.description',
-      startDate: form.values.dateRange[0],
-      endDate: form.values.dateRange[1],
-    };
-    const result = await axios.post(
-      'http://localhost:3000/api/v1/event',
-      data,
-      {
-        headers: {
-          Authorization: 'Bearer ' + authToken,
-        },
-      },
-    );
+    const startDate = form.values.dateRange[0];
+    const endDate = form.values.dateRange[1];
+    const startTime = form.values.timeRange[0];
+    const endTime = form.values.timeRange[1];
+    startDate?.setHours(startTime.getHours(), startTime.getMinutes());
+    endDate?.setHours(endTime.getHours(), endTime.getMinutes());
+    const startDateText = startDate?.toISOString();
+    const endDateText = endDate?.toISOString();
+    console.log(startDateText);
+    console.log(endDateText);
+    // const data = {
+    //   title: 'TEst',
+    //   description: 'form.values.description',
+    //   startDate: form.values.dateRange[0],
+    //   endDate: form.values.dateRange[1],
+    // };
+    // const result = await axios.post(
+    //   'http://localhost:3000/api/v1/event',
+    //   data,
+    //   {
+    //     headers: {
+    //       Authorization: 'Bearer ' + authToken,
+    //     },
+    //   },
+    // );
     // const response = await fetch('http://localhost:3000/api/v1/event', {
     //   method: 'POST',
     //   headers: {
