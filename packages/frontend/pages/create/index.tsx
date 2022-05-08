@@ -1,10 +1,11 @@
-import { Container, Grid, Group } from '@mantine/core';
+import { Container, Grid } from '@mantine/core';
 import { useForm } from '@mantine/hooks';
 import { NextPage } from 'next';
 import React, { useEffect, useState } from 'react';
 import EventForm from '../../components/EventForm';
 import { useAuth } from '../../src/context/AuthContext';
 import { createTeam, createEvent } from '../../helpers/apiCalls/apiCalls';
+
 interface FormValues {
   title: string;
   dateRange: [Date | null, Date | null];
@@ -45,7 +46,7 @@ const CreateEventPage: NextPage = () => {
   useEffect(() => {
     const getTeamList = async () => {
       const response = await fetch(
-        `http://localhost:3000/api/v1/user/${userId}/team`,
+        `http://149.28.170.219/api/v1/user/${userId}/team`,
         {
           headers: new Headers({
             Authorization: 'Bearer ' + authToken,
