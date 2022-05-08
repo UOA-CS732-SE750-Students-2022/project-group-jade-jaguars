@@ -4,7 +4,7 @@ import {
   deleteUserById,
   getUserById,
   getUserTeamsById,
-  updateUserById,
+  patchUserById,
 } from '../controllers/user.controller';
 export const usersRouter = express.Router();
 
@@ -14,6 +14,6 @@ usersRouter.get('/user/:userId', getUserById);
 
 usersRouter.post('/user', createUser);
 
-usersRouter.patch('/user/:userId', updateUserById);
+usersRouter.patch('/user/:userId', patchUserById);
 
 usersRouter.delete('/user/:userId', deleteUserById);

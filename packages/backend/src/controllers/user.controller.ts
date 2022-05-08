@@ -24,7 +24,7 @@ interface UserResponseDTO {
 }
 
 // Allow updates to every field apart from the userId
-interface UpdateUserDTO extends Partial<Omit<IUser, '_id'>> {}
+interface PatchUserDTO extends Partial<Omit<IUser, '_id'>> {}
 
 interface GetUserTeamsResponseDTO {
   teams: ITeam[];
@@ -98,8 +98,8 @@ export async function createUser(
   }
 }
 
-export async function updateUserById(
-  req: TypedRequestBody<UpdateUserDTO>,
+export async function patchUserById(
+  req: TypedRequestBody<PatchUserDTO>,
   res: Response<UserResponseDTO>,
 ) {
   try {
@@ -107,7 +107,7 @@ export async function updateUserById(
 
     const userId = req.params.userId;
     // TODO: create/use remainder of validation rules
-    const rules = Joi.object<UpdateUserDTO & { userId: string }>({
+    const rules = Joi.object<PatchUserDTO & { userId: string }>({
       userId: validators.id().required(),
       firstName: validators.firstName().optional(),
       lastName: validators.lastName().optional(),
