@@ -6,7 +6,7 @@ import { useRouter } from 'next/router';
 import { getAuth } from 'firebase/auth';
 import Image from 'next/image';
 const Login: NextPage = () => {
-  const { user, login, logout, signedIn, setUser } = useAuth();
+  const { user, login, logout, signedIn, setUser, anonymousLogin } = useAuth();
   const router = useRouter();
   console.log();
   useEffect(() => {
@@ -46,6 +46,13 @@ const Login: NextPage = () => {
               className="bg-primary px-20 py-2 rounded-md cursor-pointer text-white"
             >
               Login
+            </button>
+
+            <button
+              onClick={anonymousLogin}
+              className="bg-primary px-10 py-2 rounded-md cursor-pointer text-white"
+            >
+              Continue without Login
             </button>
           </Group>
         </Grid.Col>
