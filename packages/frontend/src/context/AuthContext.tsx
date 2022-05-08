@@ -3,6 +3,7 @@ import {
   GoogleAuthProvider,
   onAuthStateChanged,
   signInWithPopup,
+  signInAnonymously,
 } from 'firebase/auth';
 import React, { createContext, useEffect, useState } from 'react';
 import { auth } from '../config/firebase.config';
@@ -17,6 +18,7 @@ interface authContext {
   user: User | null;
   setUser: React.Dispatch<React.SetStateAction<User | null>>;
   login: () => void;
+  anonymousLogin: () => void;
   logout: () => void;
 }
 
@@ -31,6 +33,7 @@ const AuthContext = createContext<authContext>({
   setUser: () => null,
   signedIn: false,
   login: () => {},
+  anonymousLogin: () => {},
   logout: () => {},
 });
 
@@ -69,6 +72,12 @@ export const AuthProvider: React.FC<{}> = ({ children }) => {
     console.log('logout');
   };
 
+  const anonymousLogin = () => {
+    signInAnonymously(auth).then((user) => {
+      // * logs in and sets user in firebase
+    });
+  };
+
   useEffect(() => {
     onAuthStateChanged(auth, (user) => {
       const updateToken = async () => {
@@ -97,6 +106,7 @@ export const AuthProvider: React.FC<{}> = ({ children }) => {
         setUser,
         signedIn: !!user,
         login,
+        anonymousLogin,
         logout,
       }}
     >
