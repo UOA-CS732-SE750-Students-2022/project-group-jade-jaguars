@@ -60,7 +60,7 @@ const CreateEventPage: NextPage = () => {
       setTeamList(team);
     };
     getTeamList();
-  }, []);
+  });
   const createNewTeam = async () => {
     const res = await createTeam({
       title: form.values.newTeamName,
