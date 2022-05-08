@@ -22,8 +22,8 @@ export interface CreateEventDTO {
   status?: EventStatus;
   startDate: Date;
   endDate: Date;
-  availability: IEventAvailability;
-  location: string;
+  availability?: IEventAvailability;
+  location?: string;
   team?: string; // id
   admin: string; // id
 }
@@ -110,6 +110,8 @@ export async function getEventById(
       eventId: validators.title().required(),
     });
     const formData = validate(res, rules, { eventId }, { allowUnknown: true });
+    // Validation failed, headers have been set, return
+    if (!formData) return;
 
     const eventDoc = await EventModel.findById(formData.eventId);
     if (!eventDoc) {
@@ -132,12 +134,15 @@ export async function createEvent(
       status: validators.eventStatus().optional(),
       startDate: validators.startDate().required(),
       endDate: validators.endDate().required(),
-      location: validators.location().optional(),
+      availability: Joi.array().optional(),
+      location: Joi.string().optional(),
       team: validators.id().optional(),
       admin: validators.id().optional(),
     });
-
     const formData = validate(res, rules, req.body, { allowUnknown: true });
+    // Validation failed, headers have been set, return
+    if (!formData) return;
+
     const eventDoc = await EventModel.create(formData);
     res.status(StatusCodes.CREATED).send(eventDocToResponseDTO(eventDoc));
   } catch (err) {
@@ -168,6 +173,8 @@ export async function patchEventById(
       { ...req.body, eventId },
       { allowUnknown: true },
     );
+    // Validation failed, headers have been set, return
+    if (!formData) return;
 
     const eventDoc = await EventModel.findOneAndUpdate(
       { _id: eventId },
@@ -195,6 +202,8 @@ export async function deleteEventById(req: Request, res: Response) {
       eventId: validators.id().required(),
     });
     const formData = validate(res, rules, { eventId }, { allowUnknown: true });
+    // Validation failed, headers have been set, return
+    if (!formData) return;
 
     const deleteResult = await EventModel.deleteOne({ _id: formData.eventId });
     if (deleteResult.deletedCount === 0) {
@@ -219,6 +228,8 @@ export async function searchEvent(
     }).oxor('teamId', 'titleSubStr', 'descriptionSubStr');
 
     let formData = validate(res, rules, req.body, { allowUnknown: true });
+    // Validation failed, headers have been set, return
+    if (!formData) return;
 
     let events: EventResponseDTO[] = [];
     // Search for events belonging to a team
@@ -263,6 +274,8 @@ export async function searchEvent(
       }).and('startDate', 'endDate');
 
       formData = validate(res, dateRules, req.body, { allowUnknown: true });
+      // Validation failed, headers have been set, return
+      if (!formData) return;
 
       const eventDocs = (
         await EventModel.find({
@@ -289,6 +302,8 @@ export async function searchEvent(
       limit: Joi.number().greater(0).optional(),
     });
     formData = validate(res, limitRules, req.body, { allowUnknown: true });
+    // Validation failed, headers have been set, return
+    if (!formData) return;
 
     // Limit the number of returned events
     if (formData.limit && events.length >= formData.limit) {
@@ -320,6 +335,8 @@ export async function addUserAvailabilityById(
       { ...req.body, eventId },
       { allowUnknown: true },
     );
+    // Validation failed, headers have been set, return
+    if (!formData) return;
 
     if (!(await UserModel.exists({ _id: formData.userId }))) {
       return returnError(Error('User Not Found'), res, StatusCodes.NOT_FOUND);
@@ -411,6 +428,8 @@ export async function removeUserAvailabilityById(
     const formData = validate(res, rules, payload, {
       allowUnknown: true,
     });
+    // Validation failed, headers have been set, return
+    if (!formData) return;
 
     let eventDoc = await EventModel.findById(formData.eventId);
     if (!eventDoc) {
@@ -512,6 +531,8 @@ export async function setEventAvailabilityConfirmation(
       { ...req.body, eventId },
       { allowUnknown: true },
     );
+    // Validation failed, headers have been set, return
+    if (!formData) return;
 
     // Check documents exist
     if (!(await UserModel.exists({ id: formData.userId }))) {
@@ -557,6 +578,8 @@ export async function getEventAvailabilityConfirmations(
       eventId: validators.id().required(),
     });
     const formData = validate(res, rules, { eventId }, { allowUnknown: true });
+    // Validation failed, headers have been set, return
+    if (!formData) return;
 
     const eventDoc = await EventModel.findOne({ _id: formData.eventId });
     if (!eventDoc) {

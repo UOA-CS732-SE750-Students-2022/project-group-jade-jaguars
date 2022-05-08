@@ -72,6 +72,8 @@ export async function createUser(
     }
 
     const formData = validate(res, rules, req.body, { allowUnknown: true });
+    // Validation failed, headers have been set, return
+    if (!formData) return;
 
     // _id corresponds to a prior created firebase ID and cannot be generated
     formData._id = firebaseUser.uid;
@@ -103,6 +105,8 @@ export async function updateUserById(
       lastName: validators.lastName().optional(),
     });
     const formData = validate(res, rules, req.body, { allowUnknown: true });
+    // Validation failed, headers have been set, return
+    if (!formData) return;
 
     if (firebaseUser.uid !== formData._id) {
       // return Not found as its more secure to not tell the user if the UID exists or not

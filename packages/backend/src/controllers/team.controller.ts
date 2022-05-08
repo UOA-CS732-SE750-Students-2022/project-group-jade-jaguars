@@ -44,6 +44,8 @@ export async function getTeamById(
       teamId: validators.id().required(),
     });
     const formData = validate(res, rules, { teamId }, { allowUnknown: true });
+    // Validation failed, headers have been set, return
+    if (!formData) return;
 
     const teamDoc = await TeamModel.findById(formData.teamId);
     if (!teamDoc) {
@@ -77,6 +79,8 @@ export async function createTeam(
       events: validators.ids().optional(),
     });
     const formData = validate(res, rules, req.body, { allowUnknown: true });
+    // Validation failed, headers have been set, return
+    if (!formData) return;
 
     const teamDoc = await TeamModel.create(formData);
     res.status(StatusCodes.CREATED).send({
@@ -114,6 +118,8 @@ export async function updateTeamById(
       { ...req.body, teamId },
       { allowUnknown: true },
     );
+    // Validation failed, headers have been set, return
+    if (!formData) return;
 
     const teamDoc = await TeamModel.findOneAndUpdate(
       { _id: formData.teamId },
@@ -146,6 +152,8 @@ export async function deleteTeamById(req: Request, res: Response) {
       teamId: validators.id().required(),
     });
     const formData = validate(res, rules, { teamId }, { allowUnknown: true });
+    // Validation failed, headers have been set, return
+    if (!formData) return;
 
     const result = await TeamModel.deleteOne({ _id: formData.teamId });
     if (result.deletedCount === 0) {
@@ -173,6 +181,8 @@ export async function addMemberById(req: Request, res: Response) {
       { teamId, userId },
       { allowUnknown: true },
     );
+    // Validation failed, headers have been set, return
+    if (!formData) return;
 
     // Check that the user exists
     if (!(await UserModel.exists({ _id: formData.userId }))) {

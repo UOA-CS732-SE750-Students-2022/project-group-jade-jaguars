@@ -1,6 +1,6 @@
 import { randomUUID } from 'crypto';
 import { Model, model, Schema, Types } from 'mongoose';
-import { identifier } from '../service/models.service';
+import { calculatePotentialTimes, identifier } from '../service/models.service';
 
 export enum EventStatus {
   Pending = 'Pending',
@@ -97,6 +97,12 @@ const eventAvailabilitySchema = new Schema<IEventAvailability>({
     default: [],
   },
 });
+
+// eventAvailabilitySchema
+//   .virtual('potentialTimes')
+//   .get(async function (this: any) {
+//     return await calculatePotentialTimes(this._id);
+//   });
 
 eventAvailabilitySchema.virtual('potentialTimes').get(function (this: any) {
   let potentialTimes: ITimeBracket[] = [];
