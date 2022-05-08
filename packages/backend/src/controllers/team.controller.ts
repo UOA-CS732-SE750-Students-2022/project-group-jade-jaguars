@@ -5,6 +5,7 @@ import Joi from 'joi';
 import { validate, validators } from '../libs/validate.lib';
 import { StatusCodes } from 'http-status-codes';
 import { returnError } from '../libs/error.lib';
+import { UserModel } from '../schemas/user.schema';
 
 interface CreateTeamDTO {
   _id: string;
@@ -28,6 +29,10 @@ interface TeamResponseDTO {
 
 interface UpdateTeamDTO extends Partial<ITeam> {}
 
+interface AddMemberDTO {
+  userId: string;
+}
+
 export async function getTeamById(
   req: Request,
   res: Response<TeamResponseDTO>,
@@ -39,6 +44,8 @@ export async function getTeamById(
       teamId: validators.id().required(),
     });
     const formData = validate(res, rules, { teamId }, { allowUnknown: true });
+    // Validation failed, headers have been set, return
+    if (!formData) return;
 
     const teamDoc = await TeamModel.findById(formData.teamId);
     if (!teamDoc) {
@@ -66,12 +73,14 @@ export async function createTeam(
   try {
     const rules = Joi.object<CreateTeamDTO>({
       title: validators.title().required(),
-      description: validators.description().required(),
+      description: validators.description().optional(),
       admin: validators.id().required(),
       members: validators.ids().optional(),
       events: validators.ids().optional(),
     });
     const formData = validate(res, rules, req.body, { allowUnknown: true });
+    // Validation failed, headers have been set, return
+    if (!formData) return;
 
     const teamDoc = await TeamModel.create(formData);
     res.status(StatusCodes.CREATED).send({
@@ -109,6 +118,8 @@ export async function updateTeamById(
       { ...req.body, teamId },
       { allowUnknown: true },
     );
+    // Validation failed, headers have been set, return
+    if (!formData) return;
 
     const teamDoc = await TeamModel.findOneAndUpdate(
       { _id: formData.teamId },
@@ -141,6 +152,8 @@ export async function deleteTeamById(req: Request, res: Response) {
       teamId: validators.id().required(),
     });
     const formData = validate(res, rules, { teamId }, { allowUnknown: true });
+    // Validation failed, headers have been set, return
+    if (!formData) return;
 
     const result = await TeamModel.deleteOne({ _id: formData.teamId });
     if (result.deletedCount === 0) {
@@ -148,6 +161,46 @@ export async function deleteTeamById(req: Request, res: Response) {
     }
 
     res.sendStatus(StatusCodes.NO_CONTENT);
+  } catch (err) {
+    returnError(err, res);
+  }
+}
+
+export async function addMemberById(req: Request, res: Response) {
+  try {
+    const teamId = req.params.teamId;
+    const userId = req.body.userId;
+    const rules = Joi.object<AddMemberDTO & { teamId: string }>({
+      teamId: validators.id().required(),
+      userId: validators.id().required(),
+    });
+
+    const formData = validate(
+      res,
+      rules,
+      { teamId, userId },
+      { allowUnknown: true },
+    );
+    // Validation failed, headers have been set, return
+    if (!formData) return;
+
+    // Check that the user exists
+    if (!(await UserModel.exists({ _id: formData.userId }))) {
+      return returnError(Error('User Not Found'), res, StatusCodes.NOT_FOUND);
+    }
+
+    // Check that the team exists
+    if (!(await TeamModel.exists({ _id: formData.teamId }))) {
+      return returnError(Error('Team Not Found'), res, StatusCodes.NOT_FOUND);
+    }
+
+    // Add member to the team, note that addToSet means set membership only
+    await TeamModel.updateOne(
+      { _id: formData.teamId },
+      { $addToSet: { members: formData.userId } },
+    );
+
+    res.sendStatus(StatusCodes.OK);
   } catch (err) {
     returnError(err, res);
   }

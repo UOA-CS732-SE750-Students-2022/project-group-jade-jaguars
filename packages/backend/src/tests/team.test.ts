@@ -18,7 +18,6 @@ describe('Team', () => {
   it('Get', async () => {
     const teamDoc = await TeamModel.create({
       title: 'title',
-      description: 'description',
       admin: adminDoc._id,
     });
     const teamId = teamDoc._id.toString();
@@ -34,7 +33,6 @@ describe('Team', () => {
       .post('/api/v1/team')
       .send({
         title: 'title',
-        description: 'description',
         color: Colour.BLUE,
         admin: adminDoc._id,
       })
@@ -44,7 +42,6 @@ describe('Team', () => {
   it('Update', async () => {
     const teamDoc = await TeamModel.create({
       title: 'title',
-      description: 'description',
       admin: adminDoc._id,
     });
     const teamId = teamDoc._id.toString();
@@ -57,13 +54,11 @@ describe('Team', () => {
       .expect(StatusCodes.OK);
 
     expect(userUpdateResponse.body.title).toEqual('changed');
-    expect(userUpdateResponse.body.description).toEqual('description');
   });
 
   it('Delete', async () => {
     const teamDoc = await TeamModel.create({
       title: 'title',
-      description: 'description',
       admin: adminDoc._id,
     });
     const teamId = teamDoc._id.toString();
@@ -72,5 +67,29 @@ describe('Team', () => {
       .expect(StatusCodes.NO_CONTENT);
 
     expect(await TeamModel.findById(teamId)).toBeNull();
+  });
+
+  it('Add member to team', async () => {
+    const teamDoc = await TeamModel.create({
+      title: 'title',
+      admin: adminDoc._id,
+    });
+    const teamId = teamDoc._id.toString();
+
+    const userDoc = await UserModel.create({
+      _id: 'x'.repeat(28), // firebaseId
+      firstName: 'firstName',
+      lastName: 'lastName',
+    });
+
+    const userId = userDoc._id.toString();
+
+    await request(server)
+      .put(`/api/v1/team/${teamId}/member`)
+      .send({ userId })
+      .expect(StatusCodes.OK);
+
+    const teamDoc2 = await TeamModel.findById(teamId);
+    expect(teamDoc2.members).toContain(userId);
   });
 });

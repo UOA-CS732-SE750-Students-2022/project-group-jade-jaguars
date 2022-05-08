@@ -52,12 +52,6 @@ class Server extends http.Server {
 
     this.app.use(express.json());
 
-    // Set the content type for every request to be application/json
-    this.app.use((req, res, next) => {
-      res.header('Content-Type', 'application/json');
-      next();
-    });
-
     if (process.env.NODE_ENV !== 'test') {
       this.app.use(`/docs`, swaggerUi.serve, swaggerUi.setup(swaggerDocument));
       console.log(`swagger: http://localhost:${PORT}/docs`);

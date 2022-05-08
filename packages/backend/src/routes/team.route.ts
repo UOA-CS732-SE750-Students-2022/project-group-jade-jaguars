@@ -1,5 +1,6 @@
 import express from 'express';
 import {
+  addMemberById,
   createTeam,
   deleteTeamById,
   getTeamById,
@@ -14,3 +15,5 @@ teamRouter.post('/team', createTeam);
 teamRouter.put('/team/:teamId', updateTeamById);
 
 teamRouter.delete('/team/:teamId', deleteTeamById);
+
+teamRouter.put('/team/:teamId/member', addMemberById);

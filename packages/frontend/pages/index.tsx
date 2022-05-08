@@ -5,6 +5,86 @@ import { useAuth } from '../src/context/AuthContext';
 import { useRouter } from 'next/router';
 import { getAuth } from 'firebase/auth';
 import Image from 'next/image';
+import CheckBoxList from '../components/CheckBoxList';
+import EventCard from '../components/EventCard/EventCard';
+import styles from '../styles/Home.module.css';
+import { events } from '../components/CustomCalendar/sampleEvents';
+import { ShareLinkButton } from '../components/ShareLinkButton';
+import AvailabilitySelector from '../components/AvailabilitySelector';
+import GroupAvailability from '../components/GroupAvailability';
+import TimeBracket from '../types/TimeBracket';
+import {
+  AttendeeAvailability,
+  AttendeeStatus,
+  AvailabilityStatus,
+} from '../types/Availability';
+import CustomCalendar from '../components/CustomCalendar/CustomCalendar';
+
+const timeOptions: TimeBracket[] = [
+  {
+    startTime: 1650229200000,
+    endTime: 1650258000000,
+  },
+  {
+    startTime: 1650315600000,
+    endTime: 1650344400000,
+  },
+  {
+    startTime: 1650402000000,
+    endTime: 1650430800000,
+  },
+  {
+    startTime: 1650488400000,
+    endTime: 1650517200000,
+  },
+  {
+    startTime: 1650574800000,
+    endTime: 1650603600000,
+  },
+];
+
+const availabilities: AttendeeAvailability[] = [
+  {
+    uuid: 'Brad',
+    availability: [
+      {
+        startTime: 1650232800000,
+        endTime: 1650250800000,
+        status: AvailabilityStatus.Available,
+      },
+      {
+        startTime: 1650402000000,
+        endTime: 1650430800000,
+        status: AvailabilityStatus.Tentative,
+      },
+    ],
+  },
+  {
+    uuid: 'Chad',
+    availability: [
+      {
+        startTime: 1650243600000,
+        endTime: 1650254400000,
+        status: AvailabilityStatus.Available,
+      },
+      {
+        startTime: 1650405600000,
+        endTime: 1650423600000,
+        status: AvailabilityStatus.Available,
+      },
+      {
+        startTime: 1650495600000,
+        endTime: 1650517200000,
+        status: AvailabilityStatus.Tentative,
+      },
+    ],
+  },
+];
+
+const handleHover = (info: { people: AttendeeStatus[]; numPeople: number }) => {
+  console.log(info);
+};
+
 const Home: NextPage = () => {
   const { login, signedIn, userId, authToken, user } = useAuth();
   const router = useRouter();
@@ -46,43 +126,13 @@ const Home: NextPage = () => {
   }, [signedIn]);
 
   return (
-    <Container>
-      <nav className=" p-5">
-        <Group direction="row" align="center">
-          <Image src="/logo.svg" width={70} height={70} />
-          <h1 className="mb-[-10px]">CountMeIn</h1>
-        </Group>
-      </nav>
-      <Grid align="center">
-        <Grid.Col md={12} lg={6}>
-          <span>
-            <Group direction="column" align={'center'}>
-              <Image
-                src="/landing-banner.svg"
-                alt="banner"
-                width={600}
-                height={400}
-              />
-              <a className="text-secondary" href="https://storyset.com/">
-                Illustrations by Storyset
-              </a>
-            </Group>
-          </span>
-        </Grid.Col>
-        <Grid.Col md={12} lg={6}>
-          <Group direction="column" align="center">
-            <h1>All events in one place.</h1>
-            <h1>Schedule events for teams.</h1>
-            <button
-              onClick={login}
-              className="bg-primary px-20 py-2 rounded-md cursor-pointer text-white"
-            >
-              Login
-            </button>
-          </Group>
-        </Grid.Col>
-      </Grid>
-    </Container>
+    <div className="h-[80vh] w-[50vw]">
+      <CustomCalendar
+        events={events}
+        onParticipantClick={() => console.log('clicked')}
+      />
+      <ShareLinkButton eventLink={'http'} />
+    </div>
   );
 };
 

@@ -9,7 +9,7 @@
     "prebuild": "rimraf dist",
     "build": "cross-env ENV_PATH=prod tsc",
     "start": "cross-env ENV_PATH=prod ts-node ./src/app.ts",
-    "start:dev": "cross-env ENV_PATH=dev nodemon",
+    "start:dev": "cross-env ENV_PATH=dev ts-node ./src/app.ts",
     "start:prod": "node dist/app",
     "test": "cross-env ENV_PATH=test jest --runInBand --verbose --force-exit",
     "test:dev": "cross-env ENV_PATH=test jest --runInBand --verbose --watch",

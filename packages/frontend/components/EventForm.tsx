@@ -36,21 +36,7 @@ interface EventFormProps {
   onCreateEvent: () => void;
 }
 const EventForm = ({ teamData, form, onCreateEvent }: EventFormProps) => {
-  // const form = useForm<FormValues>({
-  //   initialValues: {
-  //     title: '',
-  //     dateRange: [new Date(), new Date()],
-  //     timeRange: [new Date(), new Date()],
-  //     description: '',
-  //     location: '',
-  //     newTeam: false,
-  //     teamName: '',
-  //     newTeamName: '',
-  //   },
-  // });
-  const [checked, setChecked] = useState(false);
   const labelArray = teamData.map((team) => team.label);
-  const idArray = teamData.map((team) => team.id);
   return (
     <Box sx={{ maxWidth: 700 }} mx="auto">
       <Paper p="xl" radius="md" withBorder>
@@ -164,6 +150,18 @@ const EventForm = ({ teamData, form, onCreateEvent }: EventFormProps) => {
               }
             />
           </Grid.Col>
+          {/* <Grid.Col>
+            <div>
+              <p className="font-medium text-sm">Reminder</p>
+              <div className="mt-1 w-52">
+                <Select
+                  placeholder="Set a reminder"
+                  data={reminderOptions}
+                  onChange={(value) => onSelectChange(value)}
+                />
+              </div>
+            </div>
+          </Grid.Col> */}
           <Grid.Col span={12}>
             <Group position="right" mt="lg">
               <Button
