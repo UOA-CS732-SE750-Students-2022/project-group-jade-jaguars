@@ -27,7 +27,6 @@ export interface IAvailabilityBlock extends ITimeBracket {
 export interface IAttendeeAvailability {
   attendee: string;
   availability: IAvailabilityBlock[];
-  confirmed: Boolean;
 }
 
 export interface IEventAvailability {
@@ -85,11 +84,6 @@ const eventAvailabilitySchema = new Schema<IEventAvailability>({
           ],
           required: true,
           default: [],
-        },
-        confirmed: {
-          type: Boolean,
-          required: true,
-          default: false,
         },
       },
     ],
