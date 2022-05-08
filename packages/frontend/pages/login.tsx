@@ -3,13 +3,48 @@ import type { NextPage } from 'next';
 import { useEffect } from 'react';
 import { useAuth } from '../src/context/AuthContext';
 import { useRouter } from 'next/router';
-import { getAuth } from 'firebase/auth';
+
 import Image from 'next/image';
 const Login: NextPage = () => {
-  const { user, login, logout, signedIn, setUser, anonymousLogin } = useAuth();
+  const { user, userId, authToken, login, signedIn, anonymousLogin } =
+    useAuth();
   const router = useRouter();
   console.log();
+
   useEffect(() => {
+    const checkUserOnMongo = async () => {
+      const response = await fetch(
+        `http://149.28.170.219/api/v1/user/${userId}`,
+        {
+          headers: new Headers({
+            Authorization: 'Bearer ' + authToken,
+          }),
+        },
+      );
+
+      if (response.status == 404) {
+        const nameArray = user!.displayName!.split(' ');
+        const firstName = nameArray[0];
+        const lastName = nameArray[1];
+
+        const createUserResponse = await fetch(
+          'http://149.28.170.219/api/v1/user',
+          {
+            method: 'POST',
+            headers: {
+              Authorization: 'Bearer ' + authToken,
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              firstName: firstName,
+              lastName: lastName,
+            }),
+          },
+        );
+        console.log(createUserResponse);
+      }
+    };
+    userId && checkUserOnMongo();
     signedIn ? router.push('/') : router.push('/login');
   }, [signedIn]);
 
