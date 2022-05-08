@@ -76,6 +76,7 @@ const EventForm = ({ teamData, form, onCreateEvent }: EventFormProps) => {
           <Grid.Col sm={8} xs={12}>
             {form.values.newTeam ? (
               <TextInput
+                required
                 label="New Team Name"
                 value={form.values.newTeamName}
                 onChange={(e) =>

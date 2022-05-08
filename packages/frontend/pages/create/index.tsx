@@ -17,18 +17,19 @@ interface FormValues {
   teamName?: string;
 }
 
+interface Team {
+  id: string;
+  label: string;
+}
+
 const CreateEventPage: NextPage = () => {
   const { userId, authToken } = useAuth();
-  const [teamList, setTeamList] = useState();
+  const [teamList, setTeamList] = useState<Team[]>([]);
   const defaultStartTime = new Date();
   const defaultEndTime = new Date();
   defaultStartTime.setHours(9, 0, 0, 0);
   defaultEndTime.setHours(17, 0, 0, 0);
-  const teamData = [
-    { id: 'asdfasdf', label: '750' },
-    { id: 'asdfasdf', label: '701' },
-    { id: 'asdfasdf', label: '726' },
-  ];
+
   const form = useForm<FormValues>({
     initialValues: {
       title: '',
@@ -43,19 +44,24 @@ const CreateEventPage: NextPage = () => {
   });
   //TODO get team list
 
-  // useEffect(() => {
-  //   const getTeamList = async () => {
-  //     const response = await fetch(
-  //       `http://localhost:3000/api/v1/user/${userId}`,
-  //       {
-  //         headers: new Headers({
-  //           Authorization: 'Bearer ' + authToken,
-  //         }),
-  //       },
-  //     );
-  //     const data = await response.json();
-  //   };
-  // }, [form]);
+  useEffect(() => {
+    const getTeamList = async () => {
+      const response = await fetch(
+        `http://localhost:3000/api/v1/user/${userId}/team`,
+        {
+          headers: new Headers({
+            Authorization: 'Bearer ' + authToken,
+          }),
+        },
+      );
+      const data = await response.json();
+      const team = await data.teams.map((team: any) => {
+        return { id: team._id, label: team.title };
+      });
+      setTeamList(team);
+    };
+    getTeamList();
+  }, []);
   const createNewTeam = async () => {
     const response = await fetch('http://localhost:3000/api/v1/team', {
       method: 'POST',
@@ -100,6 +106,7 @@ const CreateEventPage: NextPage = () => {
         },
       },
     );
+    return result;
   };
   const onCreateEvent = async () => {
     let teamId;
@@ -107,7 +114,7 @@ const CreateEventPage: NextPage = () => {
       const data = await createNewTeam();
       teamId = await data.id;
     } else {
-      teamId = teamData.find((o) => o.label == form.values.teamName)!.id;
+      teamId = teamList.find((o) => o.label == form.values.teamName)!.id;
     }
     const response = await createEvent(teamId);
   };
@@ -117,7 +124,7 @@ const CreateEventPage: NextPage = () => {
       <Grid>
         <Grid.Col>
           <EventForm
-            teamData={teamData}
+            teamData={teamList}
             form={form}
             onCreateEvent={onCreateEvent}
           />
