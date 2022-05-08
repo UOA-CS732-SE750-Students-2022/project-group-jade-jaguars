@@ -19,3 +19,21 @@ export interface AttendeeStatus {
   uuid: string;
   status: AvailabilityStatus;
 }
+
+export interface AvailabilityPayload {
+  startDate: Date;
+  endDate: Date;
+  status?: AvailabilityStatusStrings;
+  userId: string;
+}
+
+export interface AvailabilityConfirmation {
+  userId: string;
+  confirmed: boolean;
+}
+
+export enum AvailabilityStatusStrings {
+  Available = 'Available',
+  Unavailable = 'Unavailable',
+  Tentative = 'Tentative',
+}
