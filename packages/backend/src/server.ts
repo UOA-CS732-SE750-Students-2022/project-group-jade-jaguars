@@ -1,7 +1,6 @@
 import express from 'express';
 import http from 'http';
 import swaggerUi from 'swagger-ui-express';
-import bodyParser from 'body-parser';
 import { eventsRouter } from './routes/event.route';
 import { usersRouter } from './routes/user.route';
 import { teamRouter } from './routes/team.route';
@@ -11,6 +10,7 @@ import dotenv from 'dotenv';
 import { isAuthenticated } from './libs/middleware.lib';
 import swaggerDocument from './docs/swagger.json';
 import * as firebase from 'firebase-admin';
+import cors from 'cors';
 
 dotenv.config({ path: `.env.${process.env.ENV_PATH}` });
 const PORT: number = parseInt(process.env.PORT);
@@ -28,6 +28,9 @@ class Server extends http.Server {
   constructor() {
     const app: express.Application = express();
     super(app);
+
+    app.use(cors({ origin: '*' }));
+
     this.app = app;
   }
 
@@ -48,7 +51,6 @@ class Server extends http.Server {
     });
 
     this.app.use(express.json());
-    this.app.use(bodyParser.json());
 
     if (process.env.NODE_ENV !== 'test') {
       this.app.use(`/docs`, swaggerUi.serve, swaggerUi.setup(swaggerDocument));

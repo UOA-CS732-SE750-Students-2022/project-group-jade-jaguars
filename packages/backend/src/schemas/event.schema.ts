@@ -1,6 +1,6 @@
 import { randomUUID } from 'crypto';
 import { Model, model, Schema, Types } from 'mongoose';
-import { identifier } from '../service/models.service';
+import { calculatePotentialTimes, identifier } from '../service/models.service';
 
 export enum EventStatus {
   Pending = 'Pending',
@@ -99,18 +99,8 @@ const eventAvailabilitySchema = new Schema<IEventAvailability>({
 });
 
 eventAvailabilitySchema.virtual('potentialTimes').get(function (this: any) {
-  let potentialTimes: ITimeBracket[] = [];
-  this.attendeeAvailability.forEach((a) => {
-    a.availability.forEach((tb) => {
-      potentialTimes.push({
-        startDate: tb.startDate,
-        endDate: tb.endDate,
-      });
-    });
-  });
-  return potentialTimes;
+  return calculatePotentialTimes(this);
 });
-
 export interface IEvent {
   _id: string;
   title: string;
@@ -121,7 +111,8 @@ export interface IEvent {
   availability: IEventAvailability;
   location?: string;
   identifier: string;
-  team?: string;
+  team?: string; // id
+  admin?: string; // id
 }
 
 const eventSchema = new Schema<IEvent>(
@@ -152,7 +143,16 @@ const eventSchema = new Schema<IEvent>(
       type: Date,
       required: true,
     },
-    availability: eventAvailabilitySchema,
+    availability: {
+      type: eventAvailabilitySchema,
+      required: true,
+      default: () => {
+        return {
+          _id: randomUUID(),
+          attendeeAvailability: [],
+        };
+      },
+    },
     description: {
       type: String,
       required: false,
@@ -161,15 +161,16 @@ const eventSchema = new Schema<IEvent>(
       type: String,
       required: false,
     },
-    identifier: {
-      type: String,
-      required: true,
-      default: identifier(10),
-    },
     team: {
       type: String,
-      required: false,
       ref: 'Team',
+      required: false,
+    },
+    // The admin can be anyone, the reason why this is required is that the team leader/admin might not be the one creating the event so we should explicity state who is the admin, admin takes the priority over team lead
+    admin: {
+      type: String,
+      ref: 'User',
+      required: true,
     },
   },
   { timestamps: true },

@@ -2,7 +2,9 @@ import server from '../app';
 import request from 'supertest';
 import { StatusCodes } from 'http-status-codes';
 import { UserModel } from '../schemas/user.schema';
+import { TeamModel } from '../schemas/team.schema';
 
+// Skipping as there is auth implementation in it which has been skipped making these tests broken!
 describe.skip('Users', () => {
   it('Get', async () => {
     const userDoc = await UserModel.create({
