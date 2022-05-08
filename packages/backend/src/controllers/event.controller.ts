@@ -118,7 +118,9 @@ export async function getEventById(
     if (!eventDoc) {
       return returnError(Error('Event Not Found'), res, StatusCodes.NOT_FOUND);
     }
-    res.status(StatusCodes.OK).send(eventDocToResponseDTO(eventDoc));
+    res
+      .status(StatusCodes.OK)
+      .send(eventDocToResponseDTO(eventDoc.toObject({ virtuals: true })));
   } catch (err) {
     returnError(err, res);
   }
@@ -145,7 +147,9 @@ export async function createEvent(
     if (!formData) return;
 
     const eventDoc = await EventModel.create(formData);
-    res.status(StatusCodes.CREATED).send(eventDocToResponseDTO(eventDoc));
+    res
+      .status(StatusCodes.CREATED)
+      .send(eventDocToResponseDTO(eventDoc.toObject({ virtuals: true })));
   } catch (err) {
     returnError(err, res);
   }
@@ -189,7 +193,9 @@ export async function patchEventById(
     // Send updated event via socket IO
     server.webSocket.send(`event:${eventId}`, eventDoc);
 
-    res.status(StatusCodes.OK).send(eventDocToResponseDTO(eventDoc));
+    res
+      .status(StatusCodes.OK)
+      .send(eventDocToResponseDTO(eventDoc.toObject({ virtuals: true })));
   } catch (err) {
     returnError(err, res);
   }
@@ -240,7 +246,7 @@ export async function searchEvent(
       }
       const eventDocs = (await EventModel.find({ team: formData.teamId })).map(
         (eventDoc) => {
-          return eventDocToResponseDTO(eventDoc);
+          return eventDocToResponseDTO(eventDoc.toObject({ virtuals: true }));
         },
       );
       events.push.apply(events, eventDocs);
@@ -252,7 +258,7 @@ export async function searchEvent(
           title: { $regex: formData.titleSubStr, $options: 'i' },
         })
       ).map((eventDoc) => {
-        return eventDocToResponseDTO(eventDoc);
+        return eventDocToResponseDTO(eventDoc.toObject({ virtuals: true }));
       });
       events.push.apply(events, eventDocs);
     }
@@ -284,7 +290,7 @@ export async function searchEvent(
           endDate: { $lte: formData.endDate },
         })
       ).map((eventDoc) => {
-        return eventDocToResponseDTO(eventDoc);
+        return eventDocToResponseDTO(eventDoc.toObject({ virtuals: true }));
       });
       events.push.apply(events, eventDocs);
     }
@@ -343,11 +349,10 @@ export async function addUserAvailabilityById(
       return returnError(Error('User Not Found'), res, StatusCodes.NOT_FOUND);
     }
 
-    let eventDoc = await EventModel.findById(formData.eventId)
+    const eventDoc = await EventModel.findById(formData.eventId)
       .populate<{ team: ITeam }>('team')
       .populate<{ availability: IEventAvailability }>('availability');
 
-    console.log(eventDoc.toObject({ virtuals: true }).availability);
     if (!eventDoc) {
       return returnError(Error('Event Not Found'), res, StatusCodes.NOT_FOUND);
     }
@@ -395,7 +400,9 @@ export async function addUserAvailabilityById(
 
     // Send updated event via socket IO
     server.webSocket.send(`event:${eventId}`, eventDoc);
-    res.status(StatusCodes.OK).send(eventDocToResponseDTO(eventDoc));
+    res
+      .status(StatusCodes.OK)
+      .send(eventDocToResponseDTO(eventDoc.toObject({ virtuals: true })));
   } catch (err) {
     returnError(err, res);
   }

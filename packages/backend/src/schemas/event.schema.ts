@@ -98,16 +98,9 @@ const eventAvailabilitySchema = new Schema<IEventAvailability>({
   },
 });
 
-eventAvailabilitySchema
-  .virtual('potentialTimes')
-  .get(async function (this: any) {
-    // Find the parent event and pass the id
-    const eventDoc = await EventModel.findOne({
-      'availability._id': { $eq: this._id },
-    });
-    const solution = await calculatePotentialTimes(eventDoc._id);
-    return solution;
-  });
+eventAvailabilitySchema.virtual('potentialTimes').get(function (this: any) {
+  return calculatePotentialTimes(this);
+});
 export interface IEvent {
   _id: string;
   title: string;

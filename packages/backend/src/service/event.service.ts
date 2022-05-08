@@ -1,6 +1,7 @@
 import {
   EventModel,
   IAvailabilityBlock,
+  IEventAvailability,
   ITimeBracket,
 } from '../schemas/event.schema';
 
@@ -16,27 +17,21 @@ export function identifier(length): string {
 
 // A bad version of the overlaps problem
 // Calculating the finalized time, does this as a readonly function
-export async function calculatePotentialTimes(
-  eventId: string,
-): Promise<ITimeBracket[]> {
+export function calculatePotentialTimes(
+  eventAvailability: IEventAvailability,
+): ITimeBracket[] {
   console.log('Hit calculate potential times');
-  console.log(eventId);
-  const eventDoc = await EventModel.findOne({ _id: eventId });
-  if (!eventDoc) {
-    throw new Error('Event Not Found');
-  }
 
   // Count the number of overlaps for the time bracket
   let solution: { bracket: ITimeBracket; overlaps: number }[] = [];
   let allTimeBrackets: ITimeBracket[] = [];
-  eventDoc.availability.attendeeAvailability.forEach((a) => {
+  eventAvailability.attendeeAvailability.forEach((a) => {
     a.availability.forEach((b) => {
       allTimeBrackets.push({ startDate: b.startDate, endDate: b.endDate });
     });
   });
 
-  // O(n^2)
-  // Check for maximal overlaps
+  // O(n^2): Check for maximal overlaps
   for (const candidate of allTimeBrackets) {
     let overlaps = 0;
     for (const b of allTimeBrackets) {
