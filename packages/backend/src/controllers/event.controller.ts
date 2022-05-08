@@ -55,19 +55,6 @@ export interface RemoveUserAvalabilityDTO {
   endDate: Date;
 }
 
-export interface SetEventAvailabilityConfirmationDTO {
-  userId: string;
-  confirmed: Boolean;
-}
-
-export interface GetEventAvailabilityConfirmationsDTO {
-  eventId: string;
-}
-
-export interface GetEventAvailabilityConfirmationsResponseDTO {
-  confirmed: Number;
-}
-
 export interface EventResponseDTO {
   id: string;
   title: string;
@@ -383,7 +370,6 @@ export async function addUserAvailabilityById(
             status: formData.status ?? AvailabilityStatus.Available, // Default to available
           },
         ],
-        confirmed: false,
       });
     } else {
       eventDoc.availability.attendeeAvailability[
@@ -520,91 +506,6 @@ export async function removeUserAvailabilityById(
     server.webSocket.send(`event:${eventId}`, eventDoc);
 
     res.sendStatus(StatusCodes.OK);
-  } catch (err) {
-    returnError(err, res);
-  }
-}
-
-export async function setEventAvailabilityConfirmation(
-  req: TypedRequestBody<SetEventAvailabilityConfirmationDTO>,
-  res: Response,
-) {
-  try {
-    const eventId = req.params.eventId;
-    const rules = Joi.object<
-      SetEventAvailabilityConfirmationDTO & { eventId: string }
-    >({
-      eventId: validators.id().required(),
-      userId: validators.id().required(),
-      confirmed: Joi.boolean().required(),
-    });
-    const formData = validate(
-      res,
-      rules,
-      { ...req.body, eventId },
-      { allowUnknown: true },
-    );
-    // Validation failed, headers have been set, return
-    if (!formData) return;
-
-    // Check documents exist
-    if (!(await UserModel.exists({ id: formData.userId }))) {
-      return returnError(Error('User Not Found'), res, StatusCodes.NOT_FOUND);
-    }
-
-    const eventDoc = await EventModel.findOneAndUpdate(
-      {
-        _id: formData.eventId,
-        'availability.attendeeAvailability': {
-          $elemMatch: { attendee: formData.userId },
-        },
-      },
-
-      {
-        $set: {
-          'availability.attendeeAvailability.$.confirmed': formData.confirmed,
-        },
-      },
-    );
-
-    if (!eventDoc) {
-      return returnError(Error('Event Not Found'), res, StatusCodes.NOT_FOUND);
-    }
-
-    // Send updated event via socket IO
-    server.webSocket.send(`event:${eventId}`, eventDoc);
-
-    res.sendStatus(StatusCodes.OK);
-  } catch (err) {
-    returnError(err, res);
-  }
-}
-
-export async function getEventAvailabilityConfirmations(
-  req: Request,
-  res: Response<GetEventAvailabilityConfirmationsResponseDTO | string>,
-) {
-  try {
-    const eventId = req.params.eventId;
-
-    const rules = Joi.object<{ eventId: string }>({
-      eventId: validators.id().required(),
-    });
-    const formData = validate(res, rules, { eventId }, { allowUnknown: true });
-    // Validation failed, headers have been set, return
-    if (!formData) return;
-
-    const eventDoc = await EventModel.findOne({ _id: formData.eventId });
-    if (!eventDoc) {
-      return returnError(Error('Event Not Found'), res, StatusCodes.NOT_FOUND);
-    }
-
-    let confirmed = 0;
-    eventDoc.availability.attendeeAvailability.forEach((avail) => {
-      if (avail.confirmed) confirmed++;
-    });
-
-    res.status(StatusCodes.OK).send({ confirmed });
   } catch (err) {
     returnError(err, res);
   }
