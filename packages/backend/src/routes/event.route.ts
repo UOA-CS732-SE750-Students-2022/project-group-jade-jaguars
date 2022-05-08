@@ -5,7 +5,7 @@ import {
   deleteEventById,
   getEventById,
   addUserAvailabilityById,
-  removeUserAvalabilityById,
+  removeUserAvailabilityById,
   searchEvent,
   setEventAvailabilityConfirmation,
   getEventAvailabilityConfirmations,
@@ -18,7 +18,7 @@ eventsRouter.post('/event/search', searchEvent);
 
 // Availability
 eventsRouter.post('/event/:eventId/availability', addUserAvailabilityById);
-eventsRouter.delete('/event/:eventId/availability', removeUserAvalabilityById);
+eventsRouter.delete('/event/:eventId/availability', removeUserAvailabilityById);
 
 // Confirm availability
 eventsRouter.get(

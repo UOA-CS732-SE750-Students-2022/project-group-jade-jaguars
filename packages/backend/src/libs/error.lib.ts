@@ -24,5 +24,9 @@ export function returnError(
     statusCode = StatusCodes.INTERNAL_SERVER_ERROR;
   }
 
+  if (res.headersSent) {
+    return res;
+  }
+
   return res.status(statusCode).send(error.message);
 }
