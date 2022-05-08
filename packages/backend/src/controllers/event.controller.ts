@@ -4,6 +4,7 @@ import {
   EventStatus,
   IEvent,
   AvailabilityStatus,
+  ITimeBracket,
 } from '../schemas/event.schema';
 import { Request, Response } from 'express';
 import { StatusCodes } from 'http-status-codes';
@@ -342,9 +343,11 @@ export async function addUserAvailabilityById(
       return returnError(Error('User Not Found'), res, StatusCodes.NOT_FOUND);
     }
 
-    let eventDoc = await EventModel.findById(formData.eventId).populate<{
-      team: ITeam;
-    }>('team');
+    let eventDoc = await EventModel.findById(formData.eventId)
+      .populate<{ team: ITeam }>('team')
+      .populate<{ availability: IEventAvailability }>('availability');
+
+    console.log(eventDoc.toObject({ virtuals: true }).availability);
     if (!eventDoc) {
       return returnError(Error('Event Not Found'), res, StatusCodes.NOT_FOUND);
     }
@@ -443,7 +446,11 @@ export async function removeUserAvailabilityById(
 
     // Can't remove availability timebracket if it doesn't exist for the user
     if (userEventAvailabilityIndex === -1) {
-      return returnError(Error('Bad Request'), res, StatusCodes.BAD_REQUEST);
+      return returnError(
+        Error('Bad Request, Time Bracket Does Not Exist'),
+        res,
+        StatusCodes.BAD_REQUEST,
+      );
     }
 
     // Sweep though availability brackets in order to edit to remove parts of or whole brackets

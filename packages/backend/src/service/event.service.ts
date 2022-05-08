@@ -19,16 +19,15 @@ export function identifier(length): string {
 export async function calculatePotentialTimes(
   eventId: string,
 ): Promise<ITimeBracket[]> {
+  console.log('Hit calculate potential times');
   console.log(eventId);
   const eventDoc = await EventModel.findOne({ _id: eventId });
   if (!eventDoc) {
     throw new Error('Event Not Found');
   }
 
-  console.log('Hit calculate potential times');
-
   // Count the number of overlaps for the time bracket
-  const solution: { bracket: ITimeBracket; overlaps: number }[] = [];
+  let solution: { bracket: ITimeBracket; overlaps: number }[] = [];
   let allTimeBrackets: ITimeBracket[] = [];
   eventDoc.availability.attendeeAvailability.forEach((a) => {
     a.availability.forEach((b) => {
@@ -58,6 +57,11 @@ export async function calculatePotentialTimes(
       return 0;
     }
   });
+
+  // Remove all duplicate times
+  solution = [...new Set(solution.map((s) => JSON.stringify(s)))].map((s) =>
+    JSON.parse(s),
+  );
 
   // Limit to 5 entities, slice works fine on arrays smaller than this criteria
   solution.slice(0, 4);

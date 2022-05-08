@@ -98,25 +98,16 @@ const eventAvailabilitySchema = new Schema<IEventAvailability>({
   },
 });
 
-// eventAvailabilitySchema
-//   .virtual('potentialTimes')
-//   .get(async function (this: any) {
-//     return await calculatePotentialTimes(this._id);
-//   });
-
-eventAvailabilitySchema.virtual('potentialTimes').get(function (this: any) {
-  let potentialTimes: ITimeBracket[] = [];
-  this.attendeeAvailability.forEach((a) => {
-    a.availability.forEach((tb) => {
-      potentialTimes.push({
-        startDate: tb.startDate,
-        endDate: tb.endDate,
-      });
+eventAvailabilitySchema
+  .virtual('potentialTimes')
+  .get(async function (this: any) {
+    // Find the parent event and pass the id
+    const eventDoc = await EventModel.findOne({
+      'availability._id': { $eq: this._id },
     });
+    const solution = await calculatePotentialTimes(eventDoc._id);
+    return solution;
   });
-  return potentialTimes;
-});
-
 export interface IEvent {
   _id: string;
   title: string;
@@ -159,7 +150,16 @@ const eventSchema = new Schema<IEvent>(
       type: Date,
       required: true,
     },
-    availability: eventAvailabilitySchema,
+    availability: {
+      type: eventAvailabilitySchema,
+      required: true,
+      default: () => {
+        return {
+          _id: randomUUID(),
+          attendeeAvailability: [],
+        };
+      },
+    },
     description: {
       type: String,
       required: false,
