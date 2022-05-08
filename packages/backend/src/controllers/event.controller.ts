@@ -29,9 +29,8 @@ export interface CreateEventDTO {
   admin: string; // id
 }
 
-export interface PatchEventDTO extends Partial<IEvent> {
-  eventId: string;
-}
+// Can change everything but the id
+export interface PatchEventDTO extends Partial<Omit<IEvent, '_id'>> {}
 
 export interface SearchEventDTO {
   teamId?: string;
