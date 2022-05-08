@@ -20,8 +20,6 @@ export function identifier(length): string {
 export function calculatePotentialTimes(
   eventAvailability: IEventAvailability,
 ): ITimeBracket[] {
-  console.log('Hit calculate potential times');
-
   // Count the number of overlaps for the time bracket
   let solution: { bracket: ITimeBracket; overlaps: number }[] = [];
   let allTimeBrackets: ITimeBracket[] = [];

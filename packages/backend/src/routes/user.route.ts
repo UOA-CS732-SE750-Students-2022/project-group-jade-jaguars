@@ -3,14 +3,17 @@ import {
   createUser,
   deleteUserById,
   getUserById,
-  updateUserById,
+  getUserTeamsById,
+  patchUserById,
 } from '../controllers/user.controller';
 export const usersRouter = express.Router();
 
-usersRouter.get('/user/:id', getUserById);
+usersRouter.get('/user/:userId/team', getUserTeamsById);
+
+usersRouter.get('/user/:userId', getUserById);
 
 usersRouter.post('/user', createUser);
 
-usersRouter.patch('/user', updateUserById);
+usersRouter.patch('/user/:userId', patchUserById);
 
-usersRouter.delete('/user/:id', deleteUserById);
+usersRouter.delete('/user/:userId', deleteUserById);

@@ -27,7 +27,8 @@ interface TeamResponseDTO {
   events: string[];
 }
 
-interface UpdateTeamDTO extends Partial<ITeam> {}
+// Can update all fields but the teamId
+interface PatchTeamDTO extends Partial<Omit<ITeam, '_id'>> {}
 
 interface AddMemberDTO {
   userId: string;
@@ -97,14 +98,14 @@ export async function createTeam(
   }
 }
 
-export async function updateTeamById(
-  req: TypedRequestBody<UpdateTeamDTO>,
+export async function patchTeamById(
+  req: TypedRequestBody<PatchTeamDTO>,
   res: Response<TeamResponseDTO>,
 ) {
   // TODO: create/use remainder of validation rules
   try {
     const teamId = req.params.teamId;
-    const rules = Joi.object<UpdateTeamDTO & { teamId: string }>({
+    const rules = Joi.object<PatchTeamDTO & { teamId: string }>({
       teamId: validators.id().required(),
       title: validators.title().optional(),
       description: validators.description().optional(),
