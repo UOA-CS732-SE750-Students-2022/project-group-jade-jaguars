@@ -121,7 +121,8 @@ export interface IEvent {
   availability: IEventAvailability;
   location?: string;
   identifier: string;
-  team?: string;
+  team?: string; // id
+  admin?: string; // id
 }
 
 const eventSchema = new Schema<IEvent>(
@@ -161,15 +162,16 @@ const eventSchema = new Schema<IEvent>(
       type: String,
       required: false,
     },
-    identifier: {
-      type: String,
-      required: true,
-      default: identifier(10),
-    },
     team: {
       type: String,
-      required: false,
       ref: 'Team',
+      required: false,
+    },
+    // The admin can be anyone, the reason why this is required is that the team leader/admin might not be the one creating the event so we should explicity state who is the admin, admin takes the priority over team lead
+    admin: {
+      type: String,
+      ref: 'User',
+      required: true,
     },
   },
   { timestamps: true },
