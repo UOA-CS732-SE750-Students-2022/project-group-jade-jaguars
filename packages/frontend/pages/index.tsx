@@ -86,9 +86,41 @@ const handleHover = (info: { people: AttendeeStatus[]; numPeople: number }) => {
 };
 
 const Home: NextPage = () => {
-  const { user, login, logout, signedIn, setUser } = useAuth();
+  const { login, signedIn, userId, authToken, user } = useAuth();
   const router = useRouter();
   useEffect(() => {
+    const checkUserOnMongo = async () => {
+      const response = await fetch(
+        `http://localhost:3000/api/v1/user/${userId}`,
+        {
+          headers: new Headers({
+            Authorization: 'Bearer ' + authToken,
+          }),
+        },
+      );
+      if (response.status == 404) {
+        const nameArray = user!.displayName!.split(' ');
+        const firstName = nameArray[0];
+        const lastName = nameArray[1];
+
+        const createUserResponse = await fetch(
+          'http://localhost:3000/api/v1/user',
+          {
+            method: 'POST',
+            headers: {
+              Authorization: 'Bearer ' + authToken,
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              firstName: firstName,
+              lastName: lastName,
+            }),
+          },
+        );
+        console.log(createUserResponse);
+      }
+    };
+    userId && checkUserOnMongo();
     signedIn ? router.push('/demo') : router.push('/');
   }, [signedIn]);
 
