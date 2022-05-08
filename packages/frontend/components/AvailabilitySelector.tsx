@@ -1,10 +1,10 @@
 import axios from 'axios';
 import { useState, useEffect, useRef } from 'react';
 import {
-  TimeBracket,
   AvailabilityBlock,
-  AvailabilityStatus,
-} from '../types/Event';
+  AvailabilityStatusStrings,
+} from '../types/Availability';
+import { TimeBracket } from '../types/Event';
 
 /*
  *  Assumption: no more than 7 days sent through as timeOptions.
@@ -15,7 +15,7 @@ import {
 function AvailabilitySelector(props: {
   timeOptions: TimeBracket;
   availability: AvailabilityBlock[];
-  status: AvailabilityStatus;
+  status: AvailabilityStatusStrings;
   selectionHandler: (selection: { startDate: Date; endDate: Date }) => void;
   deletionHandler: (deletion: { startDate: Date; endDate: Date }) => void;
 }) {
@@ -23,8 +23,8 @@ function AvailabilitySelector(props: {
   const [start, setStart] = useState<number[]>([-1, -1]); // The row and column of the click.
   const [time1, setTime1] = useState<number[]>([-1, -1]); // The row and column of the top left corner.
   const [time2, setTime2] = useState<number[]>([-1, -1]); // The row and column of the bottom right corner.
-  const [newStatus, setNewStatus] = useState<AvailabilityStatus>(
-    AvailabilityStatus.Unavailable,
+  const [newStatus, setNewStatus] = useState<AvailabilityStatusStrings>(
+    AvailabilityStatusStrings.Unavailable,
   );
 
   const [timeList, setTimeList] = useState<TimeBracket[]>([]);
@@ -35,7 +35,7 @@ function AvailabilitySelector(props: {
     {
       row: number;
       col: number;
-      status: AvailabilityStatus;
+      status: AvailabilityStatusStrings;
     }[]
   >([]);
 
@@ -44,7 +44,7 @@ function AvailabilitySelector(props: {
     {
       row: number;
       col: number;
-      status: AvailabilityStatus;
+      status: AvailabilityStatusStrings;
     }[]
   >([]);
 
@@ -106,7 +106,7 @@ function AvailabilitySelector(props: {
     let initialTimeSlots: {
       row: number;
       col: number;
-      status: AvailabilityStatus;
+      status: AvailabilityStatusStrings;
     }[] = [];
 
     const numDays = timeList.length;
@@ -135,15 +135,16 @@ function AvailabilitySelector(props: {
           hours,
           mins,
         );
-        let currentStatus = AvailabilityStatus.Unavailable;
+        let currentStatus = AvailabilityStatusStrings.Unavailable;
         // Check whether user is available at this time.
         for (let index in props.availability) {
           if (
-            props.availability[index].status == AvailabilityStatus.Unavailable
+            props.availability[index].status ==
+            AvailabilityStatusStrings.Unavailable
           )
             continue;
-          const startDT = new Date(props.availability[index].startDate);
-          const endDT = new Date(props.availability[index].endDate);
+          const startDT = new Date(props.availability[index].startTime);
+          const endDT = new Date(props.availability[index].endTime);
           if (dateTime >= startDT && dateTime < endDT) {
             currentStatus = props.availability[index].status;
             break;
@@ -201,15 +202,15 @@ function AvailabilitySelector(props: {
     let newTimeSlots: {
       row: number;
       col: number;
-      status: AvailabilityStatus;
+      status: AvailabilityStatusStrings;
     }[] = timeSlots.map((object) => ({ ...object }));
     const index = numCols * newStart[0] + newStart[1];
     if (newTimeSlots[index].status === props.status) {
-      newTimeSlots[index].status = AvailabilityStatus.Unavailable;
-    } else if (props.status === AvailabilityStatus.Available) {
-      newTimeSlots[index].status = AvailabilityStatus.Available;
+      newTimeSlots[index].status = AvailabilityStatusStrings.Unavailable;
+    } else if (props.status === AvailabilityStatusStrings.Available) {
+      newTimeSlots[index].status = AvailabilityStatusStrings.Available;
     } else {
-      newTimeSlots[index].status = AvailabilityStatus.Tentative;
+      newTimeSlots[index].status = AvailabilityStatusStrings.Tentative;
     }
     setSelection(newTimeSlots);
     setNewStatus(newTimeSlots[index].status);
@@ -225,7 +226,7 @@ function AvailabilitySelector(props: {
     let newTimeSlots: {
       row: number;
       col: number;
-      status: AvailabilityStatus;
+      status: AvailabilityStatusStrings;
     }[] = timeSlots.map((object) => ({ ...object }));
 
     // Update all divs between first mouse down and current mouse position.
@@ -277,7 +278,7 @@ function AvailabilitySelector(props: {
     endDate.setHours(endHours);
     endDate.setMinutes(endMins);
 
-    if (newStatus === AvailabilityStatus.Unavailable) {
+    if (newStatus === AvailabilityStatusStrings.Unavailable) {
       props.deletionHandler({
         startDate,
         endDate,
@@ -332,11 +333,13 @@ function AvailabilitySelector(props: {
                 'w-px-60 h-px-20 block border border-solid border-black z-1 ' +
                 (() => {
                   if (
-                    selection[index].status === AvailabilityStatus.Available
+                    selection[index].status ===
+                    AvailabilityStatusStrings.Available
                   ) {
                     return 'bg-primary';
                   } else if (
-                    selection[index].status === AvailabilityStatus.Tentative
+                    selection[index].status ===
+                    AvailabilityStatusStrings.Tentative
                   ) {
                     return 'bg-secondary';
                   } else {

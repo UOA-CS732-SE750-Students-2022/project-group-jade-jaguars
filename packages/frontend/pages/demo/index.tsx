@@ -23,7 +23,7 @@ const Demo: NextPage = () => {
       <hr></hr>
       {authToken}
       <button onClick={logout}>Logout</button>
-      <button onClick={eventAvailability()}>Event Availability</button>
+      <button onClick={eventAvailability}>Event Availability</button>
     </div>
   );
 };

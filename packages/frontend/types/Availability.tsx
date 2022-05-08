@@ -1,7 +1,7 @@
 export interface AvailabilityBlock {
   startTime: number;
   endTime: number;
-  status: AvailabilityStatus;
+  status: AvailabilityStatusStrings;
 }
 
 export enum AvailabilityStatus {
@@ -17,7 +17,7 @@ export interface AttendeeAvailability {
 
 export interface AttendeeStatus {
   uuid: string;
-  status: AvailabilityStatus;
+  status: AvailabilityStatusStrings;
 }
 
 export interface AvailabilityPayload {

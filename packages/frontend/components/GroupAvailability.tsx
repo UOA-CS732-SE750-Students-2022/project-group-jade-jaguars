@@ -1,10 +1,9 @@
 import { useState, useEffect, useRef, MouseEventHandler } from 'react';
+import { AttendeeAvailability, TimeBracket } from '../types/Event';
 import {
-  AttendeeAvailability,
-  AvailabilityStatus,
-  TimeBracket,
-} from '../types/Event';
-import { AttendeeStatus } from '../types/Availability';
+  AttendeeStatus,
+  AvailabilityStatusStrings,
+} from '../types/Availability';
 
 /*
  *  Assumption: no more than 7 days sent through as timeOptions.
@@ -128,30 +127,30 @@ function GroupAvailability(props: {
           for (let j in props.availabilities[i].availability) {
             if (
               props.availabilities[i].availability[j].status ==
-              AvailabilityStatus.Unavailable
+              AvailabilityStatusStrings.Unavailable
             )
               continue;
             const startDT = new Date(
-              props.availabilities[i].availability[j].startDate,
+              props.availabilities[i].availability[j].startTime,
             );
             const endDT = new Date(
-              props.availabilities[i].availability[j].endDate,
+              props.availabilities[i].availability[j].endTime,
             );
             if (dateTime >= startDT && dateTime < endDT) {
               if (
                 props.availabilities[i].availability[j].status ==
-                AvailabilityStatus.Available
+                AvailabilityStatusStrings.Available
               ) {
                 percentAvailable += 1 / numPeople;
                 people.push({
                   uuid: props.availabilities[i].attendee,
-                  status: AvailabilityStatus.Available,
+                  status: AvailabilityStatusStrings.Available,
                 });
               } else {
                 percentAvailable += 1 / (2 * numPeople);
                 people.push({
                   uuid: props.availabilities[i].attendee,
-                  status: AvailabilityStatus.Tentative,
+                  status: AvailabilityStatusStrings.Tentative,
                 });
               }
               break;

@@ -6,17 +6,20 @@ import { useState, useEffect } from 'react';
 import { AttendeeStatus } from '../../types/Availability';
 import AvailabilitySelector from '../../components/AvailabilitySelector';
 import GroupAvailability from '../../components/GroupAvailability';
-import axios from 'axios';
 import { useAuth } from '../../src/context/AuthContext';
 import {
-  Event,
-  TimeBracket,
-  AttendeeAvailability,
   AvailabilityBlock,
-  AvailabilityStatus,
-} from '../../types/Event';
+  AvailabilityStatusStrings,
+} from '../../types/Availability';
+import Event from '../../types/Event';
+import { TimeBracket, AttendeeAvailability } from '../../types/Event';
 import socketio from 'socket.io-client';
-import { InputStatus } from 'antd/lib/_util/statusUtils';
+import {
+  getEvent,
+  createAvailability,
+  deleteAvailability,
+  getUser,
+} from '../../helpers/apiCalls/apiCalls';
 
 //   const availability: AvailabilityBlock[] = [
 //     {
@@ -112,31 +115,29 @@ const Availability: NextPage = () => {
 
   useEffect(() => {
     async function fetchData() {
+      console.log('here');
+      await getUser(userId).then((val) => {
+        console.log(val);
+      });
       let startDate = timeOptions.startDate;
       let endDate = timeOptions.endDate;
       let myAvailability: AvailabilityBlock[] = [];
       let allAvailabilities: AttendeeAvailability[] = [];
-      await axios
-        .get('http://149.28.170.219/api/v1/event/' + eventId, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        })
-        .then((val: { data: Event }) => {
-          startDate = new Date(new Date(val.data.startDate).toISOString());
-          endDate = new Date(new Date(val.data.endDate).toISOString());
+      await getEvent(eventId!.toString()).then((val: { data: Event }) => {
+        startDate = new Date(new Date(val.data.startDate).toISOString());
+        endDate = new Date(new Date(val.data.endDate).toISOString());
 
-          allAvailabilities = val.data.availability.attendeeAvailability;
-          if (
-            allAvailabilities.find((attendee) => {
-              attendee.attendee === userId;
-            })
-          ) {
-            myAvailability = allAvailabilities.find((attendee) => {
-              attendee.attendee === userId;
-            })!.availability;
-          }
-        });
+        allAvailabilities = val.data.availability.attendeeAvailability!;
+        if (
+          allAvailabilities.find((attendee) => {
+            attendee.attendee === userId;
+          })
+        ) {
+          myAvailability = allAvailabilities.find((attendee) => {
+            attendee.attendee === userId;
+          })!.availability;
+        }
+      });
       // setTimeOptions({
       //   startDate: startDate,
       //   endDate: endDate,
@@ -156,8 +157,8 @@ const Availability: NextPage = () => {
     console.log(`listening to event: ${eventId}`);
   }, [eventId]);
 
-  const [status, setStatus] = useState<AvailabilityStatus>(
-    AvailabilityStatus.Available,
+  const [status, setStatus] = useState<AvailabilityStatusStrings>(
+    AvailabilityStatusStrings.Available,
   );
   const [info, setInfo] = useState<String[]>([]);
 
@@ -167,7 +168,7 @@ const Availability: NextPage = () => {
   }) => {
     setInfo(
       info.people.map((person, index) => {
-        return person.uuid + ': ' + AvailabilityStatus[status];
+        return person.uuid + ': ' + AvailabilityStatusStrings[status];
       }),
     );
   };
@@ -176,21 +177,12 @@ const Availability: NextPage = () => {
     startDate: Date;
     endDate: Date;
   }) => {
-    await axios
-      .post(
-        '/event/' + eventId + '/availability',
-        {
-          userId: userId,
-          startDate: selection.startDate,
-          endDate: selection.endDate,
-          status: status,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        },
-      )
+    await createAvailability(eventId!.toString(), {
+      startDate: selection.startDate,
+      endDate: selection.endDate,
+      status: status,
+      userId: userId,
+    })
       .then(function (response) {
         console.log(response);
       })
@@ -203,17 +195,11 @@ const Availability: NextPage = () => {
     startDate: Date;
     endDate: Date;
   }) => {
-    await axios
-      .delete('/event/' + eventId + '/availability', {
-        params: {
-          userId: userId,
-          startDate: deletion.startDate,
-          endDate: deletion.endDate,
-        },
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      })
+    await deleteAvailability(eventId!.toString(), {
+      userId: userId,
+      startDate: deletion.startDate,
+      endDate: deletion.endDate,
+    })
       .then(function (response) {
         console.log(response);
       })
@@ -239,11 +225,11 @@ const Availability: NextPage = () => {
                 <button
                   className={
                     'bg-primary text-black border-2 w-[100px] cursor-pointer rounded-md px-2 py-1 font-semibold hover:bg-primarylight ' +
-                    (status === AvailabilityStatus.Available
+                    (status === AvailabilityStatusStrings.Available
                       ? 'border-black'
                       : '')
                   }
-                  onClick={() => setStatus(AvailabilityStatus.Available)}
+                  onClick={() => setStatus(AvailabilityStatusStrings.Available)}
                 >
                   Available
                 </button>
@@ -252,11 +238,11 @@ const Availability: NextPage = () => {
                 <button
                   className={
                     'bg-secondary text-black border-2 w-[100px] cursor-pointer rounded-md px-2 py-1 font-semibold hover:bg-secondarylight ' +
-                    (status === AvailabilityStatus.Tentative
+                    (status === AvailabilityStatusStrings.Tentative
                       ? 'border-black'
                       : '')
                   }
-                  onClick={() => setStatus(AvailabilityStatus.Tentative)}
+                  onClick={() => setStatus(AvailabilityStatusStrings.Tentative)}
                 >
                   Maybe
                 </button>
@@ -295,6 +281,16 @@ const Availability: NextPage = () => {
                 return <p key={index}>{val}</p>;
               })}
             </Col>
+          </Row>
+          <Row>
+            <button
+              className={
+                'bg-secondary text-black w-[100px] cursor-pointer rounded-md px-2 py-1 font-semibold hover:bg-secondarylight absolute right-0'
+              }
+              onClick={() => console.log('finalise')}
+            >
+              Finalise {'>'}
+            </button>
           </Row>
         </Col>
       </Row>
