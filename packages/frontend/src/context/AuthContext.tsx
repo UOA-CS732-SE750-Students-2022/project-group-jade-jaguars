@@ -3,6 +3,7 @@ import {
   GoogleAuthProvider,
   onAuthStateChanged,
   signInWithPopup,
+  signInAnonymously,
 } from 'firebase/auth';
 import React, { createContext, useEffect, useState } from 'react';
 import { auth } from '../config/firebase.config';
@@ -17,6 +18,7 @@ interface authContext {
   user: User | null;
   setUser: React.Dispatch<React.SetStateAction<User | null>>;
   login: () => void;
+  anonymousLogin: () => void;
   logout: () => void;
 }
 
@@ -31,6 +33,7 @@ const AuthContext = createContext<authContext>({
   setUser: () => null,
   signedIn: false,
   login: () => {},
+  anonymousLogin: () => {},
   logout: () => {},
 });
 
@@ -60,13 +63,18 @@ export const AuthProvider: React.FC<{}> = ({ children }) => {
         const email = error.email;
         // The AuthCredential type that was used.
         const credential = GoogleAuthProvider.credentialFromError(error);
-        console.log({ errorCode, errorMessage, email, credential });
       });
   };
 
   const logout = () => {
     auth.signOut();
     console.log('logout');
+  };
+
+  const anonymousLogin = () => {
+    signInAnonymously(auth).then((user) => {
+      // * logs in and sets user in firebase
+    });
   };
 
   useEffect(() => {
@@ -97,6 +105,7 @@ export const AuthProvider: React.FC<{}> = ({ children }) => {
         setUser,
         signedIn: !!user,
         login,
+        anonymousLogin,
         logout,
       }}
     >
