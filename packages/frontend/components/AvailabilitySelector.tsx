@@ -1,3 +1,4 @@
+import axios from 'axios';
 import { useState, useEffect, useRef } from 'react';
 import {
   TimeBracket,
@@ -15,9 +16,13 @@ function AvailabilitySelector(props: {
   timeOptions: TimeBracket;
   availability: AvailabilityBlock[];
   status: AvailabilityStatus;
+  selectionHandler: (selection: { startDate: Date; endDate: Date }) => void;
+  deletionHandler: (deletion: { startDate: Date; endDate: Date }) => void;
 }) {
   const [selecting, setSelecting] = useState<Boolean>(false);
   const [start, setStart] = useState<number[]>([-1, -1]); // The row and column of the click.
+  const [time1, setTime1] = useState<number[]>([-1, -1]); // The row and column of the top left corner.
+  const [time2, setTime2] = useState<number[]>([-1, -1]); // The row and column of the bottom right corner.
   const [newStatus, setNewStatus] = useState<AvailabilityStatus>(
     AvailabilityStatus.Unavailable,
   );
@@ -232,13 +237,57 @@ function AvailabilitySelector(props: {
     }
 
     setSelection(newTimeSlots);
+    setTime1([row1, col1]);
+    setTime2([row2, col2]);
   }
 
   // Note: if someone releases the mouse outside the component, need to turn off selection mode.
 
-  function finaliseSelection() {
+  async function finaliseSelection() {
     setTimeSlots(selection);
     setSelecting(false);
+    const startTime = new Date(props.timeOptions.startDate);
+    let startHours = startTime.getHours() + 0.5 * time1[0];
+    let endHours = startTime.getHours() + 0.5 * time2[0];
+
+    if (startTime.getMinutes() === 30) {
+      startHours += 0.5;
+      endHours += 0.5;
+    }
+
+    let startMins = 0;
+    if (startHours % 1) {
+      startMins = 30;
+      startHours -= 0.5;
+    }
+
+    let endMins = 0;
+    if (endHours % 1) {
+      endMins = 30;
+      endHours -= 0.5;
+    }
+
+    let startDate = new Date(startTime);
+    startDate.setDate(startTime.getDate() + time1[1]);
+    startDate.setHours(startHours);
+    startDate.setMinutes(startMins);
+
+    let endDate = new Date(startTime);
+    endDate.setDate(startTime.getDate() + time2[1]);
+    endDate.setHours(endHours);
+    endDate.setMinutes(endMins);
+
+    if (newStatus === AvailabilityStatus.Unavailable) {
+      props.deletionHandler({
+        startDate,
+        endDate,
+      });
+    } else {
+      props.selectionHandler({
+        startDate,
+        endDate,
+      });
+    }
   }
 
   return (

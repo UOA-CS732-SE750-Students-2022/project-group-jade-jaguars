@@ -16,6 +16,7 @@ import {
   AvailabilityStatus,
 } from '../../types/Event';
 import socketio from 'socket.io-client';
+import { InputStatus } from 'antd/lib/_util/statusUtils';
 
 //   const availability: AvailabilityBlock[] = [
 //     {
@@ -102,14 +103,12 @@ const Availability: NextPage = () => {
   const { userId } = useAuth();
 
   const token =
-    'eyJhbGciOiJSUzI1NiIsImtpZCI6ImVmMzAxNjFhOWMyZGI3ODA5ZjQ1MTNiYjRlZDA4NzNmNDczMmY3MjEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3NlY3VyZXRva2VuLmdvb2dsZS5jb20vY291bnQtbWUtaW4tNTk3ODUiLCJhdWQiOiJjb3VudC1tZS1pbi01OTc4NSIsImF1dGhfdGltZSI6MTY1MTc5NzkzNCwidXNlcl9pZCI6Ing1azJ1eVpxdjVOREdEMThiM2s2WTBDQktDNDMiLCJzdWIiOiJ4NWsydXlacXY1TkRHRDE4YjNrNlkwQ0JLQzQzIiwiaWF0IjoxNjUxNzk3OTM0LCJleHAiOjE2NTE4MDE1MzQsImVtYWlsIjoiczNAYXNkLmFzZGFhYXNzIiwiZW1haWxfdmVyaWZpZWQiOmZhbHNlLCJmaXJlYmFzZSI6eyJpZGVudGl0aWVzIjp7ImVtYWlsIjpbInMzQGFzZC5hc2RhYWFzcyJdfSwic2lnbl9pbl9wcm92aWRlciI6InBhc3N3b3JkIn19.lkxdvGY7LOxvXx60SA6WfA4rK20D8WvSU5h3h87CnxBvfDBoA7-VvPm7bcmRD2tWlYyEwuxeThL1K1L5wXjKAhiVC1uruZthJsq2SkxGeTAR2ex0x-wG9Ldz4KCBRf8Ec9cSS3Aq9QdanpX4ak-bYeXVkj8NkOqmbukJmwW-tPIAOIgDR23jjnqPJF6gMon_YiXKkX4kzjY14MzfuCf06U0tbkvEINA9Ks6M9O12a0mTxeN80k49EuLuz-LVH4_3HG-w-Ddioj9LtVmZZhKR9Rhb1osQ-qncW0ut3TGIIxbigjMdxLppoQgqy2vRpAHPMroki12iQOxVVYyvQTrv9A';
+    'eyJhbGciOiJSUzI1NiIsImtpZCI6ImJlYmYxMDBlYWRkYTMzMmVjOGZlYTU3ZjliNWJjM2E2YWIyOWY1NTUiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3NlY3VyZXRva2VuLmdvb2dsZS5jb20vY291bnQtbWUtaW4tNTk3ODUiLCJhdWQiOiJjb3VudC1tZS1pbi01OTc4NSIsImF1dGhfdGltZSI6MTY1MTk3NzEzNCwidXNlcl9pZCI6Ikt5elZ4amc2N1JVSWhuaGlsSU5UVXhJd3pXMTIiLCJzdWIiOiJLeXpWeGpnNjdSVUlobmhpbElOVFV4SXd6VzEyIiwiaWF0IjoxNjUxOTc3MTM0LCJleHAiOjE2NTE5ODA3MzQsImVtYWlsIjoiYXNkczZAYXNkLmFzZGFhYXNzIiwiZW1haWxfdmVyaWZpZWQiOmZhbHNlLCJmaXJlYmFzZSI6eyJpZGVudGl0aWVzIjp7ImVtYWlsIjpbImFzZHM2QGFzZC5hc2RhYWFzcyJdfSwic2lnbl9pbl9wcm92aWRlciI6InBhc3N3b3JkIn19.bjtQa4m2fO58tFCH8Yxzok4SmtEbu0PqFEsC4fft9P4ua66aTx1gre_oZKXUpwTIz4Sa01brblQM1C6uzYA-QYnTHH0GRdZoB7_oa_BOpOASFgRTJo6ZNKs29NcW1EDj5K5i8JyObZVC3JE_C6NH3Zys51I7yfBJzaRedxSy-ofL0bbtfycUCLlvVlwh4X11mqqYnPhV_G9t6XRmYwXHxHR5670a3WfV6PCirMgjzqeaKOdjIHOrpRU_sWnneUcvG8U6CS4QVlYxI1MIqRrNWDxdsykdjJg1o_io1MB5zatA_yzgg_6HIouAMTFaA3qCsAO_CItSlHTFEePy-9m8Kw';
 
   const router = useRouter();
   const {
     query: { eventId },
   } = router;
-
-  console.log(eventId);
 
   useEffect(() => {
     async function fetchData() {
@@ -124,8 +123,9 @@ const Availability: NextPage = () => {
           },
         })
         .then((val: { data: Event }) => {
-          startDate = val.data.startDate;
-          endDate = val.data.endDate;
+          startDate = new Date(new Date(val.data.startDate).toISOString());
+          endDate = new Date(new Date(val.data.endDate).toISOString());
+
           allAvailabilities = val.data.availability.attendeeAvailability;
           if (
             allAvailabilities.find((attendee) => {
@@ -137,10 +137,10 @@ const Availability: NextPage = () => {
             })!.availability;
           }
         });
-      setTimeOptions({
-        startDate: startDate,
-        endDate: endDate,
-      });
+      // setTimeOptions({
+      //   startDate: startDate,
+      //   endDate: endDate,
+      // });
       setMyAvailability(myAvailability);
       setAllAvailabilities(allAvailabilities);
     }
@@ -151,6 +151,7 @@ const Availability: NextPage = () => {
     io.on(`event:${eventId}`, (args) => {
       console.log('event changed');
       console.log(args);
+      setAllAvailabilities(args.availability.attendeeAvailability);
     });
     console.log(`listening to event: ${eventId}`);
   }, [eventId]);
@@ -169,6 +170,56 @@ const Availability: NextPage = () => {
         return person.uuid + ': ' + AvailabilityStatus[status];
       }),
     );
+  };
+
+  const handleSelection = async (selection: {
+    startDate: Date;
+    endDate: Date;
+  }) => {
+    await axios
+      .post(
+        '/event/' + eventId + '/availability',
+        {
+          userId: userId,
+          startDate: selection.startDate,
+          endDate: selection.endDate,
+          status: status,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      )
+      .then(function (response) {
+        console.log(response);
+      })
+      .catch(function (error) {
+        console.log(error);
+      });
+  };
+
+  const handleDeletion = async (deletion: {
+    startDate: Date;
+    endDate: Date;
+  }) => {
+    await axios
+      .delete('/event/' + eventId + '/availability', {
+        params: {
+          userId: userId,
+          startDate: deletion.startDate,
+          endDate: deletion.endDate,
+        },
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+      .then(function (response) {
+        console.log(response);
+      })
+      .catch(function (error) {
+        console.log(error);
+      });
   };
 
   return (
@@ -217,6 +268,8 @@ const Availability: NextPage = () => {
               timeOptions={timeOptions}
               availability={myAvailability}
               status={status}
+              selectionHandler={handleSelection}
+              deletionHandler={handleDeletion}
             />
           </Row>
         </Col>
