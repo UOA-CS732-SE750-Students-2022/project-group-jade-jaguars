@@ -1,6 +1,7 @@
 import {
   EventModel,
   IAvailabilityBlock,
+  IEventAvailability,
   ITimeBracket,
 } from '../schemas/event.schema';
 
@@ -16,28 +17,21 @@ export function identifier(length): string {
 
 // A bad version of the overlaps problem
 // Calculating the finalized time, does this as a readonly function
-export async function calculatePotentialTimes(
-  eventId: string,
-): Promise<ITimeBracket[]> {
-  console.log(eventId);
-  const eventDoc = await EventModel.findOne({ _id: eventId });
-  if (!eventDoc) {
-    throw new Error('Event Not Found');
-  }
-
+export function calculatePotentialTimes(
+  eventAvailability: IEventAvailability,
+): ITimeBracket[] {
   console.log('Hit calculate potential times');
 
   // Count the number of overlaps for the time bracket
-  const solution: { bracket: ITimeBracket; overlaps: number }[] = [];
+  let solution: { bracket: ITimeBracket; overlaps: number }[] = [];
   let allTimeBrackets: ITimeBracket[] = [];
-  eventDoc.availability.attendeeAvailability.forEach((a) => {
+  eventAvailability.attendeeAvailability.forEach((a) => {
     a.availability.forEach((b) => {
       allTimeBrackets.push({ startDate: b.startDate, endDate: b.endDate });
     });
   });
 
-  // O(n^2)
-  // Check for maximal overlaps
+  // O(n^2): Check for maximal overlaps
   for (const candidate of allTimeBrackets) {
     let overlaps = 0;
     for (const b of allTimeBrackets) {
@@ -58,6 +52,11 @@ export async function calculatePotentialTimes(
       return 0;
     }
   });
+
+  // Remove all duplicate times
+  solution = [...new Set(solution.map((s) => JSON.stringify(s)))].map((s) =>
+    JSON.parse(s),
+  );
 
   // Limit to 5 entities, slice works fine on arrays smaller than this criteria
   solution.slice(0, 4);

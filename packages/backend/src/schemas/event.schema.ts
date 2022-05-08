@@ -98,25 +98,9 @@ const eventAvailabilitySchema = new Schema<IEventAvailability>({
   },
 });
 
-// eventAvailabilitySchema
-//   .virtual('potentialTimes')
-//   .get(async function (this: any) {
-//     return await calculatePotentialTimes(this._id);
-//   });
-
 eventAvailabilitySchema.virtual('potentialTimes').get(function (this: any) {
-  let potentialTimes: ITimeBracket[] = [];
-  this.attendeeAvailability.forEach((a) => {
-    a.availability.forEach((tb) => {
-      potentialTimes.push({
-        startDate: tb.startDate,
-        endDate: tb.endDate,
-      });
-    });
-  });
-  return potentialTimes;
+  return calculatePotentialTimes(this);
 });
-
 export interface IEvent {
   _id: string;
   title: string;
@@ -159,7 +143,16 @@ const eventSchema = new Schema<IEvent>(
       type: Date,
       required: true,
     },
-    availability: eventAvailabilitySchema,
+    availability: {
+      type: eventAvailabilitySchema,
+      required: true,
+      default: () => {
+        return {
+          _id: randomUUID(),
+          attendeeAvailability: [],
+        };
+      },
+    },
     description: {
       type: String,
       required: false,
