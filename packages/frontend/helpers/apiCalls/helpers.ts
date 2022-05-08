@@ -11,7 +11,6 @@ export const getToken = async () => {
 
 export const getHeaders = async () => {
   const authToken = await getToken();
-  console.log('autheoekgjlkjglkdfj', authToken);
   const headers = { Authorization: `Bearer ${authToken}` };
   return headers;
 };
