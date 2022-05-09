@@ -9,7 +9,6 @@ export default interface Event {
   availability: EventAvailability;
   attendees?: [];
   location?: string;
-  identifier?: string;
   team?: string; // id
   admin?: string; // id
 }
