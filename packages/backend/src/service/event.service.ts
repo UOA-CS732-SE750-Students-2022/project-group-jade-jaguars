@@ -5,16 +5,6 @@ import {
   ITimeBracket,
 } from '../schemas/event.schema';
 
-// Generate a random string identifier for the invite URL
-export function identifier(length): string {
-  let res = '';
-  let chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-  for (let i = 0; i < length; i++) {
-    res += chars.charAt(Math.floor(Math.random() * chars.length));
-  }
-  return res;
-}
-
 // A bad version of the overlaps problem
 // Calculating the finalized time, does this as a readonly function
 export function calculatePotentialTimes(

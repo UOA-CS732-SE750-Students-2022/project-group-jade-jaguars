@@ -4,13 +4,12 @@ import { StatusCodes } from 'http-status-codes';
 import { UserModel } from '../schemas/user.schema';
 import { TeamModel } from '../schemas/team.schema';
 import { Colour } from '../schemas/team.schema';
-import { identifier } from '../service/event.service';
 
 describe('Team', () => {
   let adminDoc;
   beforeEach(async () => {
     adminDoc = await UserModel.create({
-      _id: identifier(32),
+      _id: 'x'.repeat(25),
       firstName: 'firstName',
       lastName: 'lastName',
     });

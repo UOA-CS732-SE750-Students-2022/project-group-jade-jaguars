@@ -1,6 +1,6 @@
 import { randomUUID } from 'crypto';
 import { Model, model, Schema, Types } from 'mongoose';
-import { calculatePotentialTimes, identifier } from '../service/models.service';
+import { calculatePotentialTimes } from '../service/models.service';
 
 export enum EventStatus {
   Pending = 'Pending',
@@ -104,7 +104,6 @@ export interface IEvent {
   endDate: Date;
   availability: IEventAvailability;
   location?: string;
-  identifier: string;
   team?: string; // id
   admin?: string; // id
 }

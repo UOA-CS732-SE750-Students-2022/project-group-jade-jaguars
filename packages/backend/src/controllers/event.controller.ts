@@ -64,7 +64,6 @@ export interface EventResponseDTO {
   endDate: Date;
   availability: IEventAvailability;
   location?: string;
-  identifier: string;
   team: string;
   admin: string;
 }
@@ -80,7 +79,6 @@ function eventDocToResponseDTO(eventDoc: any): EventResponseDTO {
     availability: eventDoc.availability,
     description: eventDoc.description,
     location: eventDoc.location,
-    identifier: eventDoc.identifier,
     team: eventDoc.team,
     admin: eventDoc.admin,
   };
