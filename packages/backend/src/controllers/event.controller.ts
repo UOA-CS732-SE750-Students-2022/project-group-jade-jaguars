@@ -33,6 +33,7 @@ export interface CreateEventDTO {
 export interface PatchEventDTO extends Partial<Omit<IEvent, '_id'>> {}
 
 export interface SearchEventDTO {
+  userId?: string;
   teamId?: string;
   startDate?: Date;
   endDate?: Date;
@@ -213,18 +214,66 @@ export async function searchEvent(
 ) {
   try {
     const rules = Joi.object<SearchEventDTO>({
+      userId: validators.id().optional(),
       teamId: validators.id().optional(),
       titleSubStr: Joi.string().optional(),
       descriptionSubStr: Joi.string().optional(),
-    }).oxor('teamId', 'titleSubStr', 'descriptionSubStr');
+    }).oxor('userId', 'teamId', 'titleSubStr', 'descriptionSubStr');
 
     let formData = validate(res, rules, req.body, { allowUnknown: true });
     // Validation failed, headers have been set, return
     if (!formData) return;
 
     let events: EventResponseDTO[] = [];
+
+    // Search for events belonging to a user
+    if (formData.userId) {
+      if (!(await UserModel.exists({ _id: formData.userId }))) {
+        return returnError(Error('User Not Found'), res, StatusCodes.NOT_FOUND);
+      }
+
+      // This logic is slightly complex, either the user
+      // XXX: Filter through all event docs, this is just a lot easier for the moment
+      let eventDocs = (
+        await EventModel.find({})
+          .populate<{ team: ITeam }>('team')
+          .populate<{ availability: IEventAvailability }>('availability')
+      ).filter((e) => {
+        // Check team members
+        if (e.team) {
+          const allTeamMembers = e.team.members.concat(e.team.admin);
+          if (allTeamMembers.some((m) => m === formData.userId)) {
+            return true;
+          } else {
+            return false;
+          }
+        }
+        // Check availability for membership
+        else {
+          // Get all unique attendees who have added an availability
+          const attendees = e.availability.attendeeAvailability.map(
+            (a) => a.attendee,
+          );
+          if (attendees.some((m) => m === formData.userId)) {
+            return true;
+          } else {
+            return false;
+          }
+        }
+      });
+
+      console.log(eventDocs);
+
+      events.push.apply(
+        events,
+        eventDocs.map((eventDoc) => {
+          return eventDocToResponseDTO(eventDoc.toObject({ virtuals: true }));
+        }),
+      );
+    }
+
     // Search for events belonging to a team
-    if (formData.teamId) {
+    else if (formData.teamId) {
       if (!(await TeamModel.exists({ _id: formData.teamId }))) {
         return returnError(Error('Team Not Found'), res, StatusCodes.NOT_FOUND);
       }
