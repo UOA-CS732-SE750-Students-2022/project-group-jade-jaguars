@@ -82,15 +82,25 @@ describe.only('Events', () => {
   });
 
   describe('Search', () => {
-    let userId, teamId, eventId;
+    let userId, userId2, teamId, eventId, eventId2;
 
     beforeEach(async () => {
+      const startDate = new Date('1900');
+      const endDate = new Date('2000');
+
       const userDoc = await UserModel.create({
         _id: 'x'.repeat(25),
         firstName: 'firstName',
         lastName: 'lastName',
       });
       userId = userDoc._id;
+
+      const userDoc2 = await UserModel.create({
+        _id: 'y'.repeat(25),
+        firstName: 'firstName',
+        lastName: 'lastName',
+      });
+      userId2 = userDoc2._id;
 
       const teamDoc = await TeamModel.create({
         title: 'title',
@@ -99,6 +109,7 @@ describe.only('Events', () => {
       });
       teamId = teamDoc._id;
 
+      // Document with a team
       const eventDoc = await EventModel.create({
         title: 'title',
         description: 'description',
@@ -108,6 +119,63 @@ describe.only('Events', () => {
         admin: userId,
       });
       eventId = eventDoc._id;
+
+      // Document without a team
+      const eventDoc2 = await EventModel.create({
+        title: 'title',
+        description: 'description',
+        startDate: new Date('1900'),
+        endDate: new Date('2000'),
+        admin: userId2,
+        availability: {
+          potentialTimes: [],
+          finalisedTime: { startDate: startDate, endDate: endDate },
+          attendeeAvailability: [
+            {
+              attendee: userId2,
+              availability: [
+                {
+                  startDate,
+                  endDate,
+                  status: AvailabilityStatus.Available,
+                },
+              ],
+            },
+          ],
+        },
+      });
+
+      eventId2 = eventDoc2._id;
+    });
+
+    it('By userId (event has team)', async () => {
+      const searchResponse: EventResponseDTO[] = (
+        await request(server)
+          .post(`/api/v1/event/search`)
+          .send({
+            userId,
+          })
+          .expect(StatusCodes.OK)
+      ).body;
+
+      console.log(searchResponse);
+
+      expect(searchResponse).toHaveLength(1);
+      expect(searchResponse[0].id).toBe(eventId.toString());
+    });
+
+    it('By userId (event has no team, by availability)', async () => {
+      const searchResponse: EventResponseDTO[] = (
+        await request(server)
+          .post(`/api/v1/event/search`)
+          .send({
+            userId: userId2,
+          })
+          .expect(StatusCodes.OK)
+      ).body;
+
+      expect(searchResponse).toHaveLength(1);
+      expect(searchResponse[0].id).toBe(eventId2.toString());
     });
 
     it('By teamId', async () => {
@@ -133,8 +201,9 @@ describe.only('Events', () => {
           .expect(StatusCodes.OK)
       ).body;
 
-      expect(searchResponse).toHaveLength(1);
+      expect(searchResponse).toHaveLength(2);
       expect(searchResponse[0].id).toBe(eventId.toString());
+      expect(searchResponse[1].id).toBe(eventId2.toString());
     });
     it('By description sub-string', async () => {
       const searchResponse: EventResponseDTO[] = (
@@ -146,8 +215,9 @@ describe.only('Events', () => {
           .expect(StatusCodes.OK)
       ).body;
 
-      expect(searchResponse).toHaveLength(1);
+      expect(searchResponse).toHaveLength(2);
       expect(searchResponse[0].id).toBe(eventId.toString());
+      expect(searchResponse[1].id).toBe(eventId2.toString());
     });
     it('By date range', async () => {
       const searchResponse: EventResponseDTO[] = (
@@ -160,8 +230,9 @@ describe.only('Events', () => {
           .expect(StatusCodes.OK)
       ).body;
 
-      expect(searchResponse).toHaveLength(1);
+      expect(searchResponse).toHaveLength(2);
       expect(searchResponse[0].id).toBe(eventId.toString());
+      expect(searchResponse[1].id).toBe(eventId2.toString());
     });
     it('Create second event', async () => {
       // Create a second identical event
