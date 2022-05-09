@@ -2,7 +2,6 @@ import server from '../app';
 import request from 'supertest';
 import { AvailabilityStatus, EventModel } from '../schemas/event.schema';
 import { StatusCodes } from 'http-status-codes';
-import { identifier } from '../service/models.service';
 import { UserModel } from '../schemas/user.schema';
 import { TeamModel } from '../schemas/team.schema';
 import { EventResponseDTO } from '../controllers/event.controller';
@@ -82,16 +81,12 @@ describe.only('Events', () => {
     expect(await EventModel.exists({ _id: eventId })).toBe(null);
   });
 
-  it('Generate random identifier', async () => {
-    expect(identifier(10)).toHaveLength(10);
-  });
-
   describe('Search', () => {
     let userId, teamId, eventId;
 
     beforeEach(async () => {
       const userDoc = await UserModel.create({
-        _id: identifier(32),
+        _id: 'x'.repeat(25),
         firstName: 'firstName',
         lastName: 'lastName',
       });
@@ -219,7 +214,7 @@ describe.only('Events', () => {
     const endDate = new Date('2000');
     beforeEach(async () => {
       const userDoc = await UserModel.create({
-        _id: identifier(32),
+        _id: 'x'.repeat(25),
         firstName: 'firstName',
         lastName: 'lastName',
       });
@@ -403,7 +398,7 @@ describe.only('Events', () => {
 
     it('Attempt to add availability for a member not part of event team', async () => {
       const secondUser = await UserModel.create({
-        _id: identifier(32),
+        _id: 'y'.repeat(25),
         firstName: 'second',
         lastName: 'user',
       });
