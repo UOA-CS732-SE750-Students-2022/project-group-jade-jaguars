@@ -2,13 +2,9 @@ import server from '../app';
 import request from 'supertest';
 import { AvailabilityStatus, EventModel } from '../schemas/event.schema';
 import { StatusCodes } from 'http-status-codes';
-import { identifier } from '../service/models.service';
 import { UserModel } from '../schemas/user.schema';
 import { TeamModel } from '../schemas/team.schema';
-import {
-  EventResponseDTO,
-  GetEventAvailabilityConfirmationsResponseDTO,
-} from '../controllers/event.controller';
+import { EventResponseDTO } from '../controllers/event.controller';
 import { createServer, Server as HttpServer } from 'http';
 import { Server, Socket } from 'socket.io';
 import Client from 'socket.io-client';
@@ -17,6 +13,7 @@ import { AddressInfo } from 'net';
 describe.only('Events', () => {
   it('Get', async () => {
     const eventDoc = await EventModel.create({
+      admin: 'x'.repeat(25),
       title: 'title',
       startDate: new Date('1900'),
       endDate: new Date('2000'),
@@ -34,6 +31,7 @@ describe.only('Events', () => {
     const createResponse = await request(server)
       .post('/api/v1/event')
       .send({
+        admin: 'x'.repeat(25),
         title: 'title',
         startDate: new Date('1900'),
         endDate: new Date('2000'),
@@ -49,6 +47,7 @@ describe.only('Events', () => {
     const spy = jest.spyOn(server.webSocket, 'send');
 
     const eventDoc = await EventModel.create({
+      admin: 'x'.repeat(25),
       title: 'title',
       startDate: new Date('1900'),
       endDate: new Date('2000'),
@@ -71,6 +70,7 @@ describe.only('Events', () => {
       title: 'title',
       startDate: new Date('1900'),
       endDate: new Date('2000'),
+      admin: 'x'.repeat(25),
     });
     const eventId = eventDoc._id.toString();
 
@@ -81,16 +81,12 @@ describe.only('Events', () => {
     expect(await EventModel.exists({ _id: eventId })).toBe(null);
   });
 
-  it('Generate random identifier', async () => {
-    expect(identifier(10)).toHaveLength(10);
-  });
-
   describe('Search', () => {
     let userId, teamId, eventId;
 
     beforeEach(async () => {
       const userDoc = await UserModel.create({
-        _id: identifier(32),
+        _id: 'x'.repeat(25),
         firstName: 'firstName',
         lastName: 'lastName',
       });
@@ -109,6 +105,7 @@ describe.only('Events', () => {
         startDate: new Date('1900'),
         endDate: new Date('2000'),
         team: teamId,
+        admin: userId,
       });
       eventId = eventDoc._id;
     });
@@ -173,6 +170,7 @@ describe.only('Events', () => {
         startDate: new Date('1900'),
         endDate: new Date('2000'),
         team: teamId,
+        admin: 'x'.repeat(25),
       });
     });
     it('Limit', async () => {
@@ -182,6 +180,7 @@ describe.only('Events', () => {
         startDate: new Date('1900'),
         endDate: new Date('2000'),
         team: teamId,
+        admin: 'x'.repeat(25),
       });
 
       const searchResponse: EventResponseDTO[] = (
@@ -209,19 +208,28 @@ describe.only('Events', () => {
   });
 
   describe('User event availability', () => {
-    let userId, eventId;
+    let userId, teamId, eventId;
 
     const startDate = new Date('1900');
     const endDate = new Date('2000');
     beforeEach(async () => {
       const userDoc = await UserModel.create({
-        _id: identifier(32),
+        _id: 'x'.repeat(25),
         firstName: 'firstName',
         lastName: 'lastName',
       });
-      userId = userDoc._id.toString();
+      userId = userDoc._id;
+
+      const teamDoc = await TeamModel.create({
+        title: 'title',
+        admin: userDoc._id,
+        members: [userDoc._id],
+      });
+      teamId = teamDoc._id;
 
       const eventDoc = await EventModel.create({
+        admin: userId,
+        team: teamId,
         title: 'title',
         startDate: startDate,
         endDate: endDate,
@@ -238,7 +246,6 @@ describe.only('Events', () => {
                   status: AvailabilityStatus.Available,
                 },
               ],
-              confirmed: false,
             },
           ],
         },
@@ -389,77 +396,24 @@ describe.only('Events', () => {
       expect(spy).toHaveBeenCalled();
     });
 
-    it('Confirm user availability', async () => {
-      const spy = jest.spyOn(server.webSocket, 'send');
-
-      await request(server)
-        .patch(`/api/v1/event/${eventId}/availability/confirm`)
-        .send({
-          userId,
-          confirmed: true,
-        })
-        .expect(StatusCodes.OK);
-
-      expect(
-        (await EventModel.findById(eventId)).availability
-          .attendeeAvailability[0].confirmed,
-      ).toBe(true);
-      expect(spy).toHaveBeenCalled();
-    });
-
-    it('Get user availability confirmation count', async () => {
-      const spy = jest.spyOn(server.webSocket, 'send');
-
-      // Initially the confirmation count will be zero
-      const {
-        confirmed: confirmedInitial,
-      }: GetEventAvailabilityConfirmationsResponseDTO = (
-        await request(server)
-          .get(`/api/v1/event/${eventId}/availability/confirm`)
-          .send({
-            userId,
-          })
-          .expect(StatusCodes.OK)
-      ).body;
-      expect(confirmedInitial).toBe(0);
-
-      // Create second user
+    it('Attempt to add availability for a member not part of event team', async () => {
       const secondUser = await UserModel.create({
-        _id: identifier(32),
-        firstName: 'firstName',
-        lastName: 'lastName',
+        _id: 'y'.repeat(25),
+        firstName: 'second',
+        lastName: 'user',
       });
-      const secondUserId = secondUser._id;
 
-      // Create a confirmed availability for second user
-      const eventDoc = await EventModel.findById(eventId);
-      eventDoc.availability.attendeeAvailability.push({
-        attendee: secondUserId,
-        availability: [
-          {
-            startDate: startDate,
-            endDate: endDate,
-            status: AvailabilityStatus.Available,
-          },
-        ],
-        confirmed: true,
-      });
-      await eventDoc.save();
-
-      // Check confirmations increases to one
-      const {
-        confirmed: confirmedFinal,
-      }: GetEventAvailabilityConfirmationsResponseDTO = (
+      expect(async () => {
         await request(server)
-          .get(`/api/v1/event/${eventId}/availability/confirm`)
+          .post(`/api/v1/event/${eventId}/availability`)
           .send({
-            userId,
+            userId: secondUser._id,
+            startDate,
+            endDate,
+            status: AvailabilityStatus.Available,
           })
-          .expect(StatusCodes.OK)
-      ).body;
-
-      expect(confirmedFinal).toBe(1);
-      expect(spy).toHaveBeenCalled();
+          .expect(StatusCodes.BAD_REQUEST);
+      }).rejects.toThrow();
     });
 
     describe('Socket io test', () => {

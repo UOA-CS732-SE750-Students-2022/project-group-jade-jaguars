@@ -46,7 +46,9 @@ export function validate<T>(
   const result = rules.validate(data, options);
 
   if (result.error) {
+    console.log(result.error);
     returnError(new Error('Failed To Validate'), res, StatusCodes.BAD_REQUEST);
+    return null;
   } else {
     return result.value;
   }

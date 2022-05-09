@@ -6,6 +6,7 @@ import Joi from 'joi';
 import { validate, validators } from '../libs/validate.lib';
 import { StatusCodes } from 'http-status-codes';
 import { returnError } from '../libs/error.lib';
+import { ITeam, TeamModel } from '../schemas/team.schema';
 
 interface CreateUserDTO {
   firstName: string;
@@ -22,7 +23,12 @@ interface UserResponseDTO {
   events: String[];
 }
 
-interface UpdateUserDTO extends Partial<IUser> {}
+// Allow updates to every field apart from the userId
+interface PatchUserDTO extends Partial<Omit<IUser, '_id'>> {}
+
+interface GetUserTeamsResponseDTO {
+  teams: ITeam[];
+}
 
 export async function getUserById(
   req: Request,
@@ -30,7 +36,7 @@ export async function getUserById(
 ) {
   try {
     const firebaseUser = await getFirebaseUser(req, res);
-    const userId = req.params.id;
+    const userId = req.params.userId;
 
     const authSelf = firebaseUser.uid === userId;
 
@@ -72,6 +78,8 @@ export async function createUser(
     }
 
     const formData = validate(res, rules, req.body, { allowUnknown: true });
+    // Validation failed, headers have been set, return
+    if (!formData) return;
 
     // _id corresponds to a prior created firebase ID and cannot be generated
     formData._id = firebaseUser.uid;
@@ -90,27 +98,36 @@ export async function createUser(
   }
 }
 
-export async function updateUserById(
-  req: TypedRequestBody<UpdateUserDTO>,
+export async function patchUserById(
+  req: TypedRequestBody<PatchUserDTO>,
   res: Response<UserResponseDTO>,
 ) {
   try {
     const firebaseUser = await getFirebaseUser(req, res);
 
+    const userId = req.params.userId;
     // TODO: create/use remainder of validation rules
-    const rules = Joi.object<UpdateUserDTO>({
+    const rules = Joi.object<PatchUserDTO & { userId: string }>({
+      userId: validators.id().required(),
       firstName: validators.firstName().optional(),
       lastName: validators.lastName().optional(),
     });
-    const formData = validate(res, rules, req.body, { allowUnknown: true });
+    const formData = validate(
+      res,
+      rules,
+      { ...req.body, userId },
+      { allowUnknown: true },
+    );
+    // Validation failed, headers have been set, return
+    if (!formData) return;
 
-    if (firebaseUser.uid !== formData._id) {
+    if (firebaseUser.uid !== formData.userId) {
       // return Not found as its more secure to not tell the user if the UID exists or not
       return returnError(Error('User Not Found'), res);
     }
 
     const userDoc = await UserModel.findOneAndUpdate(
-      { _id: formData._id },
+      { _id: formData.userId },
       { $set: formData },
       { new: true },
     );
@@ -133,7 +150,7 @@ export async function updateUserById(
 export async function deleteUserById(req: Request, res: Response) {
   try {
     const firebaseUser = await getFirebaseUser(req, res);
-    const userId = req.params.id;
+    const userId = req.params.userId;
 
     if (firebaseUser.uid !== userId) {
       // return Not found as its more secure to not tell the user if the UID exists or not
@@ -147,5 +164,31 @@ export async function deleteUserById(req: Request, res: Response) {
     res.sendStatus(StatusCodes.NO_CONTENT);
   } catch (err) {
     returnError(err, res);
+  }
+}
+
+export async function getUserTeamsById(
+  req: Request,
+  res: Response<GetUserTeamsResponseDTO>,
+) {
+  const firebaseUser = await getFirebaseUser(req, res);
+  const userId = req.params.userId;
+
+  if (firebaseUser.uid !== userId) {
+    // return Not found as its more secure to not tell the user if the UID exists or not
+    return returnError(Error('User Not Found'), res);
+  }
+
+  // Either the user is the admin or is a member, is an admin a member?
+  const teamDocs = await TeamModel.find({
+    $or: [{ admin: userId }, { members: userId }],
+  });
+
+  if (!teamDocs) {
+    return returnError(Error('Cannot Find User Teams'), res);
+  } else {
+    res.status(StatusCodes.OK).send({
+      teams: teamDocs,
+    });
   }
 }

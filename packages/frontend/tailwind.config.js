@@ -15,7 +15,7 @@ module.exports = {
       yellow: colors.amber,
       pink: colors.fuchsia,
       primary: '#99C08B', // primary green
-      primarylight: '#FAF1E6', // light green
+      primarylight: '#EFF5ED', // light green
       secondary: '#FFE074', // secondary yellow
       secondarylight: '#FFF6D7',
       highlight: '#FAF1E6',

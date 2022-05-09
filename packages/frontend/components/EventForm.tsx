@@ -163,6 +163,18 @@ const EventForm = ({ teamData, form, onCreateEvent }: EventFormProps) => {
               }
             />
           </Grid.Col>
+          {/* <Grid.Col>
+            <div>
+              <p className="font-medium text-sm">Reminder</p>
+              <div className="mt-1 w-52">
+                <Select
+                  placeholder="Set a reminder"
+                  data={reminderOptions}
+                  onChange={(value) => onSelectChange(value)}
+                />
+              </div>
+            </div>
+          </Grid.Col> */}
           <Grid.Col span={12}>
             <Group position="right" mt="lg">
               <Button
