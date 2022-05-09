@@ -14,6 +14,7 @@ import {
 function GroupAvailability(props: {
   timeOptions: TimeBracket;
   availabilities: AttendeeAvailability[];
+  pageNum: number;
   onHover: (info: { people: AttendeeStatus[]; numPeople: number }) => void;
 }) {
   const [timeList, setTimeList] = useState<TimeBracket[]>([]);
@@ -36,8 +37,21 @@ function GroupAvailability(props: {
   // Initialise the grid.
   useEffect(() => {
     const startTime = new Date(props.timeOptions.startDate);
+    startTime.setDate(startTime.getDate() + (props.pageNum - 1) * 7);
     const endTime = new Date(props.timeOptions.startDate);
-    const lastTime = new Date(props.timeOptions.endDate);
+
+    let lastTime = new Date(props.timeOptions.endDate);
+
+    if (
+      (props.timeOptions.endDate.getTime() - startTime.getTime()) /
+        (1000 * 3600 * 24) >
+      7
+    ) {
+      lastTime = new Date(startTime);
+      lastTime.setDate(startTime.getDate() + 6);
+      lastTime.setHours(props.timeOptions.endDate.getHours());
+      lastTime.setMinutes(props.timeOptions.endDate.getMinutes());
+    }
 
     endTime.setHours(lastTime.getHours());
     endTime.setMinutes(lastTime.getMinutes());
@@ -50,39 +64,37 @@ function GroupAvailability(props: {
     if (endTime.getMinutes() == 30) {
       halfHours++;
     }
+
     if (halfHours === 0) {
       halfHours = 48;
     }
 
     // timeList will contain the list of potential times split up among different days.
     let timeList: TimeBracket[] = [];
-    // Check each set of time brackets.
-    let myStartTime = new Date(props.timeOptions.startDate);
-    const finalEndTime = new Date(props.timeOptions.endDate);
 
     const daysInTB =
-      (finalEndTime.getTime() - myStartTime.getTime()) / (1000 * 3600 * 24); // How many days to split into.
+      (lastTime.getTime() - startTime.getTime()) / (1000 * 3600 * 24); // How many days to split into.
 
     // Separate out each day.
     for (let i = 0; i < daysInTB; i++) {
-      let myEndTime = new Date(finalEndTime);
+      let myEndTime = new Date(lastTime);
       if (
-        myStartTime.getHours() == 0 &&
+        startTime.getHours() == 0 &&
         myEndTime.getHours() == 0 &&
-        myStartTime.getMinutes() == 0 &&
+        startTime.getMinutes() == 0 &&
         myEndTime.getMinutes() == 0
       ) {
-        myEndTime.setDate(myStartTime.getDate() + 1);
+        myEndTime.setDate(startTime.getDate() + 1);
       } else {
-        myEndTime.setDate(myStartTime.getDate());
+        myEndTime.setDate(startTime.getDate());
       }
-      let newStartTime = new Date(myStartTime);
+      let newStartTime = new Date(startTime);
       let newEndTime = new Date(myEndTime);
       timeList.push({
         startDate: newStartTime,
         endDate: newEndTime,
       });
-      myStartTime.setDate(myStartTime.getDate() + 1);
+      startTime.setDate(startTime.getDate() + 1);
     }
 
     let initialTimeSlots: {
@@ -131,10 +143,16 @@ function GroupAvailability(props: {
             )
               continue;
             const startDT = new Date(
-              props.availabilities[i].availability[j].startTime,
+              new Date(props.availabilities[i].availability[j].startDate)
+                .toISOString()
+                .slice(0, 19)
+                .replace('Z', ' '),
             );
             const endDT = new Date(
-              props.availabilities[i].availability[j].endTime,
+              new Date(props.availabilities[i].availability[j].endDate)
+                .toISOString()
+                .slice(0, 19)
+                .replace('Z', ' '),
             );
             if (dateTime >= startDT && dateTime < endDT) {
               if (

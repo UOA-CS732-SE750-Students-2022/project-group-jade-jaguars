@@ -1,6 +1,6 @@
 export interface AvailabilityBlock {
-  startTime: number;
-  endTime: number;
+  startDate: number;
+  endDate: number;
   status: AvailabilityStatusStrings;
 }
 

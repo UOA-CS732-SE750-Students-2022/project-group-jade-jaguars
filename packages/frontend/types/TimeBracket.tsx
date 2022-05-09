@@ -1,4 +1,4 @@
 export default interface TimeBracket {
-  startTime: string | number;
-  endTime: string | number;
+  startTime: Date;
+  endTime: Date;
 }

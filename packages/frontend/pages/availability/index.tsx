@@ -103,6 +103,9 @@ const Availability: NextPage = () => {
     AttendeeAvailability[]
   >([]);
 
+  const [pageNum, setPageNum] = useState<number>(1);
+  const [numPages, setNumPages] = useState<number>(1);
+
   const { userId } = useAuth();
   const [isAdmin, setIsAdmin] = useState<Boolean>(false);
 
@@ -120,28 +123,38 @@ const Availability: NextPage = () => {
       let endDate = timeOptions.endDate;
       let myAvailability: AvailabilityBlock[] = [];
       let allAvailabilities: AttendeeAvailability[] = [];
-      await getEvent(eventId!.toString()).then((val: { data: Event }) => {
-        if (val.data.admin === userId) {
+      await getEvent(eventId!.toString()).then((val: Event) => {
+        if (val.admin === userId) {
           setIsAdmin(true);
         }
-        startDate = new Date(new Date(val.data.startDate).toISOString());
-        endDate = new Date(new Date(val.data.endDate).toISOString());
+        startDate = new Date(
+          new Date(val.startDate).toISOString().slice(0, 19).replace('Z', ' '),
+        );
+        endDate = new Date(
+          new Date(val.endDate).toISOString().slice(0, 19).replace('Z', ' '),
+        );
 
-        allAvailabilities = val.data.availability.attendeeAvailability!;
+        setNumPages(
+          Math.ceil(
+            (endDate.getTime() - startDate.getTime()) / (1000 * 3600 * 24 * 7),
+          ),
+        );
+
+        allAvailabilities = val.availability.attendeeAvailability!;
         if (
           allAvailabilities.find((attendee) => {
-            attendee.attendee === userId;
+            return attendee.attendee === userId;
           })
         ) {
           myAvailability = allAvailabilities.find((attendee) => {
-            attendee.attendee === userId;
+            return attendee.attendee === userId;
           })!.availability;
         }
       });
-      // setTimeOptions({
-      //   startDate: startDate,
-      //   endDate: endDate,
-      // });
+      setTimeOptions({
+        startDate: startDate,
+        endDate: endDate,
+      });
       setMyAvailability(myAvailability);
       setAllAvailabilities(allAvailabilities);
     }
@@ -177,35 +190,38 @@ const Availability: NextPage = () => {
     startDate: Date;
     endDate: Date;
   }) => {
+    const startTime = new Date(selection.startDate);
+    startTime.setHours(startTime.getHours() + 12);
+    const endTime = new Date(selection.endDate);
+    endTime.setHours(endTime.getHours() + 12);
+    endTime.setMinutes(endTime.getMinutes() + 30);
+
     await createAvailability(eventId!.toString(), {
-      startDate: selection.startDate,
-      endDate: selection.endDate,
+      startDate: startTime,
+      endDate: endTime,
       status: status,
       userId: userId,
-    })
-      .then(function (response) {
-        console.log(response);
-      })
-      .catch(function (error) {
-        console.log(error);
-      });
+    });
   };
 
   const handleDeletion = async (deletion: {
     startDate: Date;
     endDate: Date;
   }) => {
+    const startTime = new Date(deletion.startDate);
+    startTime.setHours(startTime.getHours() + 12);
+    const endTime = new Date(deletion.endDate);
+    endTime.setHours(endTime.getHours() + 12);
+    endTime.setMinutes(endTime.getMinutes() + 30);
+
+    console.log(startTime);
+    console.log(endTime);
+
     await deleteAvailability(eventId!.toString(), {
       userId: userId,
-      startDate: deletion.startDate,
-      endDate: deletion.endDate,
-    })
-      .then(function (response) {
-        console.log(response);
-      })
-      .catch(function (error) {
-        console.log(error);
-      });
+      startDate: startTime.toISOString(),
+      endDate: endTime.toISOString(),
+    });
   };
 
   return (
@@ -254,9 +270,30 @@ const Availability: NextPage = () => {
               timeOptions={timeOptions}
               availability={myAvailability}
               status={status}
+              pageNum={pageNum}
               selectionHandler={handleSelection}
               deletionHandler={handleDeletion}
             />
+          </Row>
+          <Row>
+            <button
+              className={
+                'bg-secondary text-black w-[30px] cursor-pointer rounded-md px-2 py-1 font-semibold hover:bg-secondarylight absolute right-[70px] ' +
+                (pageNum > 1 ? 'block' : 'hidden')
+              }
+              onClick={() => setPageNum(pageNum - 1)}
+            >
+              {'<'}
+            </button>
+            <button
+              className={
+                'bg-secondary text-black w-[30px] cursor-pointer rounded-md px-2 py-1 font-semibold hover:bg-secondarylight absolute right-0 mr-[30px] ' +
+                (pageNum < numPages ? 'block' : 'hidden')
+              }
+              onClick={() => setPageNum(pageNum + 1)}
+            >
+              {'>'}
+            </button>
           </Row>
         </Col>
         <Col>
@@ -273,6 +310,7 @@ const Availability: NextPage = () => {
               <GroupAvailability
                 timeOptions={timeOptions}
                 availabilities={allAvailabilities}
+                pageNum={pageNum}
                 onHover={handleHover}
               />
             </Col>
