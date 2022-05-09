@@ -29,9 +29,6 @@ const Login: NextPage = () => {
         // ...for firstname and lastname, either backend changes these rules or frontend follow them
         const firstName = nameArray[0] ?? 'Firstname';
         const lastName = nameArray[1] ?? 'Lastname';
-
-        console.log('here idiot!!!');
-        console.log({ firstName, lastName });
         const createUserResponse = await fetch(
           'http://149.28.170.219/api/v1/user',
           {
