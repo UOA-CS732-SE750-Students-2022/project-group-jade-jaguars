@@ -9,18 +9,16 @@ const Login: NextPage = () => {
   const { user, userId, authToken, login, signedIn, anonymousLogin } =
     useAuth();
   const router = useRouter();
-  console.log();
+
+  const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
 
   useEffect(() => {
     const checkUserOnMongo = async () => {
-      const response = await fetch(
-        `http://localhost:3000/api/v1/user/${userId}`,
-        {
-          headers: new Headers({
-            Authorization: 'Bearer ' + authToken,
-          }),
-        },
-      );
+      const response = await fetch(BASE_URL + `/user/${userId}`, {
+        headers: new Headers({
+          Authorization: 'Bearer ' + authToken,
+        }),
+      });
 
       if (response.status == 404) {
         const nameArray = user!.displayName!.split(' ');
@@ -29,20 +27,17 @@ const Login: NextPage = () => {
         // ...for firstname and lastname, either backend changes these rules or frontend follow them
         const firstName = nameArray[0] ?? 'Firstname';
         const lastName = nameArray[1] ?? 'Lastname';
-        const createUserResponse = await fetch(
-          'http://localhost:3000/api/v1/user',
-          {
-            method: 'POST',
-            headers: {
-              Authorization: 'Bearer ' + authToken,
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              firstName: firstName,
-              lastName: lastName,
-            }),
+        const createUserResponse = await fetch(BASE_URL + '/user', {
+          method: 'POST',
+          headers: {
+            Authorization: 'Bearer ' + authToken,
+            'Content-Type': 'application/json',
           },
-        );
+          body: JSON.stringify({
+            firstName: firstName,
+            lastName: lastName,
+          }),
+        });
         console.log(createUserResponse);
       }
     };

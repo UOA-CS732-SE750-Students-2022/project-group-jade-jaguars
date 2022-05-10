@@ -17,8 +17,14 @@ function AvailabilitySelector(props: {
   availability: AvailabilityBlock[];
   status: AvailabilityStatusStrings;
   pageNum: number;
-  selectionHandler: (selection: { startDate: Date; endDate: Date }) => void;
-  deletionHandler: (deletion: { startDate: Date; endDate: Date }) => void;
+  selectionHandler: (selection: {
+    startDate: Date;
+    endDate: Date;
+  }) => Promise<Boolean>;
+  deletionHandler: (deletion: {
+    startDate: Date;
+    endDate: Date;
+  }) => Promise<Boolean>;
 }) {
   const [selecting, setSelecting] = useState<Boolean>(false);
   const [start, setStart] = useState<number[]>([-1, -1]); // The row and column of the click.
@@ -54,6 +60,7 @@ function AvailabilitySelector(props: {
   // Initialise the grid.
   useEffect(() => {
     const startTime = new Date(props.timeOptions.startDate);
+    // Set the start time to the correct dates using page number to specify the number of weeks.
     startTime.setDate(startTime.getDate() + (props.pageNum - 1) * 7);
     const endTime = new Date(props.timeOptions.startDate);
 
@@ -274,17 +281,20 @@ function AvailabilitySelector(props: {
     let startHours = startTime.getHours() + 0.5 * time1[0];
     let endHours = startTime.getHours() + 0.5 * time2[0];
 
+    // Add half an hour to startTime if mins is 30.
     if (startTime.getMinutes() === 30) {
       startHours += 0.5;
       endHours += 0.5;
     }
 
+    // Check if start time is on hour or half hour.
     let startMins = 0;
     if (startHours % 1) {
       startMins = 30;
       startHours -= 0.5;
     }
 
+    // Check if end time is on hour or half hour.
     let endMins = 0;
     if (endHours % 1) {
       endMins = 30;
@@ -301,17 +311,19 @@ function AvailabilitySelector(props: {
     endDate.setHours(endHours);
     endDate.setMinutes(endMins);
 
-    if (newStatus === AvailabilityStatusStrings.Unavailable) {
-      props.deletionHandler({
+    props
+      .deletionHandler({
         startDate,
         endDate,
+      })
+      .then(() => {
+        if (newStatus !== AvailabilityStatusStrings.Unavailable) {
+          props.selectionHandler({
+            startDate,
+            endDate,
+          });
+        }
       });
-    } else {
-      props.selectionHandler({
-        startDate,
-        endDate,
-      });
-    }
   }
 
   return (

@@ -38,13 +38,16 @@ const Availability: NextPage = () => {
   const { userId } = useAuth();
   const [isAdmin, setIsAdmin] = useState<Boolean>(false);
 
-  const token =
-    'eyJhbGciOiJSUzI1NiIsImtpZCI6ImJlYmYxMDBlYWRkYTMzMmVjOGZlYTU3ZjliNWJjM2E2YWIyOWY1NTUiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3NlY3VyZXRva2VuLmdvb2dsZS5jb20vY291bnQtbWUtaW4tNTk3ODUiLCJhdWQiOiJjb3VudC1tZS1pbi01OTc4NSIsImF1dGhfdGltZSI6MTY1MTk3NzEzNCwidXNlcl9pZCI6Ikt5elZ4amc2N1JVSWhuaGlsSU5UVXhJd3pXMTIiLCJzdWIiOiJLeXpWeGpnNjdSVUlobmhpbElOVFV4SXd6VzEyIiwiaWF0IjoxNjUxOTc3MTM0LCJleHAiOjE2NTE5ODA3MzQsImVtYWlsIjoiYXNkczZAYXNkLmFzZGFhYXNzIiwiZW1haWxfdmVyaWZpZWQiOmZhbHNlLCJmaXJlYmFzZSI6eyJpZGVudGl0aWVzIjp7ImVtYWlsIjpbImFzZHM2QGFzZC5hc2RhYWFzcyJdfSwic2lnbl9pbl9wcm92aWRlciI6InBhc3N3b3JkIn19.bjtQa4m2fO58tFCH8Yxzok4SmtEbu0PqFEsC4fft9P4ua66aTx1gre_oZKXUpwTIz4Sa01brblQM1C6uzYA-QYnTHH0GRdZoB7_oa_BOpOASFgRTJo6ZNKs29NcW1EDj5K5i8JyObZVC3JE_C6NH3Zys51I7yfBJzaRedxSy-ofL0bbtfycUCLlvVlwh4X11mqqYnPhV_G9t6XRmYwXHxHR5670a3WfV6PCirMgjzqeaKOdjIHOrpRU_sWnneUcvG8U6CS4QVlYxI1MIqRrNWDxdsykdjJg1o_io1MB5zatA_yzgg_6HIouAMTFaA3qCsAO_CItSlHTFEePy-9m8Kw';
-
   const router = useRouter();
   const {
     query: { eventId },
   } = router;
+
+  const getTZDate = (date: Date) => {
+    return new Date(
+      new Date(date).toISOString().slice(0, 19).replace('Z', ' '),
+    );
+  };
 
   useEffect(() => {
     async function fetchData() {
@@ -56,12 +59,8 @@ const Availability: NextPage = () => {
         if (val.admin === userId) {
           setIsAdmin(true);
         }
-        startDate = new Date(
-          new Date(val.startDate).toISOString().slice(0, 19).replace('Z', ' '),
-        );
-        endDate = new Date(
-          new Date(val.endDate).toISOString().slice(0, 19).replace('Z', ' '),
-        );
+        startDate = getTZDate(val.startDate);
+        endDate = getTZDate(val.endDate);
 
         setNumPages(
           Math.ceil(
@@ -144,6 +143,8 @@ const Availability: NextPage = () => {
       status: status,
       userId: userId,
     });
+
+    return true;
   };
 
   const handleDeletion = async (deletion: {
@@ -161,6 +162,8 @@ const Availability: NextPage = () => {
       startDate: startTime.toISOString(),
       endDate: endTime.toISOString(),
     });
+
+    return true;
   };
 
   return (
