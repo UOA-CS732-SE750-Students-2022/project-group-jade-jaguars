@@ -1,84 +1,209 @@
 import server from '../app';
 import request from 'supertest';
-import { AvailabilityStatus, EventModel } from '../schemas/event.schema';
+import {
+  AvailabilityStatus,
+  EventModel,
+  EventStatus,
+} from '../schemas/event.schema';
 import { StatusCodes } from 'http-status-codes';
 import { UserModel } from '../schemas/user.schema';
-import { TeamModel } from '../schemas/team.schema';
+import { Colour, TeamModel } from '../schemas/team.schema';
 import { EventResponseDTO } from '../controllers/event.controller';
 import { createServer, Server as HttpServer } from 'http';
 import { Server, Socket } from 'socket.io';
 import Client from 'socket.io-client';
 import { AddressInfo } from 'net';
 
-describe.only('Events', () => {
-  it('Get', async () => {
-    const eventDoc = await EventModel.create({
-      admin: 'x'.repeat(25),
-      title: 'title',
-      startDate: new Date('1900'),
-      endDate: new Date('2000'),
+describe('Events', () => {
+  describe('CRUD', () => {
+    let userId;
+    beforeEach(async () => {
+      const userDoc = await UserModel.create({
+        _id: 'x'.repeat(25),
+        firstName: 'firstName',
+        lastName: 'lastName',
+      });
+      userId = userDoc._id;
     });
 
-    const eventId = eventDoc._id.toString();
-    const eventGetResponse = await request(server)
-      .get(`/api/v1/event/${eventId}`)
-      .expect(StatusCodes.OK);
-
-    expect(eventGetResponse.body.id).toEqual(eventId);
-  });
-
-  it('Create', async () => {
-    const createResponse = await request(server)
-      .post('/api/v1/event')
-      .send({
-        admin: 'x'.repeat(25),
+    it('Get', async () => {
+      const eventDoc = await EventModel.create({
+        admin: userId,
         title: 'title',
         startDate: new Date('1900'),
         endDate: new Date('2000'),
-      })
-      .expect(StatusCodes.CREATED);
+      });
 
-    expect(
-      await EventModel.exists({ _id: createResponse.body.id }),
-    ).toBeTruthy();
-  });
+      const eventId = eventDoc._id.toString();
+      const eventGetResponse = await request(server)
+        .get(`/api/v1/event/${eventId}`)
+        .expect(StatusCodes.OK);
 
-  it('Patch', async () => {
-    const spy = jest.spyOn(server.webSocket, 'send');
-
-    const eventDoc = await EventModel.create({
-      admin: 'x'.repeat(25),
-      title: 'title',
-      startDate: new Date('1900'),
-      endDate: new Date('2000'),
+      expect(eventGetResponse.body.id).toEqual(eventId);
     });
 
-    const eventId = eventDoc._id.toString();
-    const eventUpdateResponse = await request(server)
-      .patch(`/api/v1/event/${eventId}`)
-      .send({
-        title: 'changed',
-      })
-      .expect(StatusCodes.OK);
+    it('Create without team (just admin)', async () => {
+      const createResponse = await request(server)
+        .post('/api/v1/event')
+        .send({
+          admin: userId,
+          title: 'title',
+          startDate: new Date('1900'),
+          endDate: new Date('2000'),
+        })
+        .expect(StatusCodes.CREATED);
 
-    expect(eventUpdateResponse.body.title).toEqual('changed');
-    expect(spy).toHaveBeenCalled();
-  });
+      expect(
+        await EventModel.exists({ _id: createResponse.body.id }),
+      ).toBeTruthy();
 
-  it('Delete', async () => {
-    const eventDoc = await EventModel.create({
-      title: 'title',
-      startDate: new Date('1900'),
-      endDate: new Date('2000'),
-      admin: 'x'.repeat(25),
+      const userDoc = await UserModel.findById(userId);
+      expect(userDoc.events).toHaveLength(1);
+      expect(userDoc.events[0]).toBe(createResponse.body.id);
     });
-    const eventId = eventDoc._id.toString();
 
-    await request(server)
-      .delete(`/api/v1/event/${eventId}`)
-      .expect(StatusCodes.NO_CONTENT);
+    it('Create event with team', async () => {
+      // Create a second user to be a team member
+      let memberDoc = await UserModel.create({
+        _id: 'y'.repeat(25),
+        firstName: 'firstName',
+        lastName: 'lastName',
+      });
 
-    expect(await EventModel.exists({ _id: eventId })).toBe(null);
+      let teamDoc = await TeamModel.create({
+        admin: userId,
+        members: [memberDoc._id],
+        title: 'title',
+        color: Colour.BLUE,
+      });
+
+      const createResponse = await request(server)
+        .post('/api/v1/event')
+        .send({
+          admin: userId,
+          title: 'title',
+          startDate: new Date('1900'),
+          endDate: new Date('2000'),
+          team: teamDoc._id,
+        })
+        .expect(StatusCodes.CREATED);
+
+      expect(
+        await EventModel.exists({ _id: createResponse.body.id }),
+      ).toBeTruthy();
+
+      const userDoc = await UserModel.findById(userId);
+      expect(userDoc.events).toHaveLength(1);
+      expect(userDoc.events[0]).toBe(createResponse.body.id);
+
+      memberDoc = await UserModel.findById(memberDoc._id);
+      expect(userDoc.events).toHaveLength(1);
+      expect(userDoc.events[0]).toBe(createResponse.body.id);
+
+      // check team has new event reference
+      teamDoc = await TeamModel.findById(teamDoc._id);
+      expect(teamDoc.events).toHaveLength(1);
+      expect(teamDoc.events[0]).toBe(createResponse.body.id);
+    });
+
+    it('Patch', async () => {
+      const spy = jest.spyOn(server.webSocket, 'send');
+
+      const eventDoc = await EventModel.create({
+        admin: userId,
+        title: 'title',
+        startDate: new Date('1900'),
+        endDate: new Date('2000'),
+      });
+
+      const eventId = eventDoc._id.toString();
+      const eventUpdateResponse = await request(server)
+        .patch(`/api/v1/event/${eventId}`)
+        .send({
+          title: 'changed',
+        })
+        .expect(StatusCodes.OK);
+
+      expect(eventUpdateResponse.body.title).toEqual('changed');
+      expect(spy).toHaveBeenCalled();
+    });
+
+    it('Delete', async () => {
+      const eventDoc = await EventModel.create({
+        title: 'title',
+        startDate: new Date('1900'),
+        endDate: new Date('2000'),
+        admin: userId,
+      });
+      const eventId = eventDoc._id.toString();
+
+      await request(server)
+        .delete(`/api/v1/event/${eventId}`)
+        .expect(StatusCodes.NO_CONTENT);
+
+      expect(await EventModel.exists({ _id: eventId })).toBe(null);
+    });
+
+    it('Fetch event users', async () => {
+      let memberDoc = await UserModel.create({
+        _id: 'y'.repeat(25),
+        firstName: 'firstName',
+        lastName: 'lastName',
+      });
+      const memberId = memberDoc._id;
+
+      let teamDoc = await TeamModel.create({
+        title: 'title',
+        admin: userId,
+        members: [memberId],
+      });
+
+      const eventDoc = await EventModel.create({
+        title: 'title',
+        startDate: new Date('1900'),
+        endDate: new Date('2000'),
+        admin: userId,
+        team: teamDoc._id,
+      });
+      const eventId = eventDoc._id;
+
+      const response = (
+        await request(server)
+          .get(`/api/v1/event/${eventId}/users`)
+          .expect(StatusCodes.OK)
+      ).body;
+
+      expect(response).toHaveLength(2);
+      expect(response[0].id).toBe(userId);
+      expect(response[1].id).toBe(memberId);
+    });
+
+    it('Finalize event time', async () => {
+      const startDate = new Date('1900');
+      const endDate = new Date('2000');
+      let eventDoc = await EventModel.create({
+        title: 'title',
+        startDate,
+        endDate,
+        admin: userId,
+      });
+      const eventId = eventDoc._id;
+
+      await request(server)
+        .post(`/api/v1/event/${eventId}/finalize`)
+        .send({ startDate, endDate })
+        .expect(StatusCodes.OK);
+
+      eventDoc = await EventModel.findById(eventId);
+      expect(eventDoc.availability.finalisedTime).toBeDefined();
+      expect(eventDoc.availability.finalisedTime.startDate.toISOString()).toBe(
+        startDate.toISOString(),
+      );
+      expect(eventDoc.availability.finalisedTime.endDate.toISOString()).toBe(
+        endDate.toISOString(),
+      );
+      expect(eventDoc.status).toBe(EventStatus.Accepted);
+    });
   });
 
   describe('Search', () => {
@@ -157,8 +282,6 @@ describe.only('Events', () => {
           })
           .expect(StatusCodes.OK)
       ).body;
-
-      console.log(searchResponse);
 
       expect(searchResponse).toHaveLength(1);
       expect(searchResponse[0].id).toBe(eventId.toString());
