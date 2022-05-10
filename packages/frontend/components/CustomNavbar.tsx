@@ -9,9 +9,9 @@ import { useRouter } from 'next/router';
 import { Logout } from 'tabler-icons-react';
 
 const linkData = [
-  { icon: LayoutDashboard, label: 'Dashboard' },
-  { icon: CalendarEvent, label: 'Events' },
-  { icon: Users, label: 'Teams' },
+  { icon: LayoutDashboard, label: 'Dashboard', address: '/demo' },
+  { icon: CalendarEvent, label: 'Events', address: '/create' },
+  { icon: Users, label: 'Teams', address: '/demo' },
 ];
 export const CustomNavbar = () => {
   const { height, width } = useViewportSize();
@@ -41,7 +41,10 @@ export const CustomNavbar = () => {
                 {...link}
                 key={link.label}
                 active={index === active}
-                onClick={() => setActive(index)}
+                onClick={() => {
+                  router.push(link.address);
+                  setActive(index);
+                }}
               />
             );
           })}
