@@ -131,6 +131,7 @@ const EventForm = ({ teamData, form, onCreateEvent }: EventFormProps) => {
           </Grid.Col>
           <Grid.Col>
             <Textarea
+              required
               label="Description"
               placeholder="event details"
               autosize
@@ -144,6 +145,7 @@ const EventForm = ({ teamData, form, onCreateEvent }: EventFormProps) => {
           </Grid.Col>
           <Grid.Col>
             <TextInput
+              required
               label="Location"
               placeholder="location or meeting link"
               value={form.values.location}
