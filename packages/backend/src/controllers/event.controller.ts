@@ -4,6 +4,7 @@ import {
   EventStatus,
   IEvent,
   AvailabilityStatus,
+  ITimeBracket,
 } from '../schemas/event.schema';
 import { StatusCodes } from 'http-status-codes';
 import Joi from 'joi';
@@ -16,6 +17,7 @@ import { UserModel } from '../schemas/user.schema';
 import { ITeam, TeamModel } from '../schemas/team.schema';
 import server from '../app';
 import { UserResponseDTO } from './user.controller';
+import { splitDays } from '../service/event.service';
 
 export interface CreateEventDTO {
   _id: string;
@@ -386,43 +388,6 @@ export async function searchEvent(
   }
 }
 
-function splitDays(formStartDate: Date, formEndDate: Date) {
-  // timeList will contain the list of potential times split up among different days.
-  let timeList = [];
-
-  const daysInTB =
-    (formEndDate.getTime() - formStartDate.getTime()) / (1000 * 3600 * 24); // How many days to split into.
-
-  const startDate = new Date(formStartDate);
-
-  // Separate out each day.
-  for (let i = 0; i < daysInTB; i++) {
-    let myEndTime = new Date(formEndDate);
-    if (
-      startDate.getHours() == 0 &&
-      myEndTime.getHours() == 0 &&
-      startDate.getMinutes() == 0 &&
-      myEndTime.getMinutes() == 0
-    ) {
-      myEndTime.setDate(startDate.getDate() + 1);
-    } else {
-      if (formEndDate.getHours() < 12 && formStartDate.getHours() >= 12) {
-        myEndTime.setDate(startDate.getDate() + 1);
-      } else {
-        myEndTime.setDate(startDate.getDate());
-      }
-    }
-    let newStartTime = new Date(startDate);
-    let newEndTime = new Date(myEndTime);
-    timeList.push({
-      startDate: newStartTime,
-      endDate: newEndTime,
-    });
-    startDate.setDate(startDate.getDate() + 1);
-  }
-  return timeList;
-}
-
 export async function addUserAvailabilityById(
   req: TypedRequestBody<AddUserAvailabilityDTO>,
   res: Response<EventResponseDTO | string>,
@@ -470,7 +435,11 @@ export async function addUserAvailabilityById(
       }
     }
 
+    console.log('formData');
+    console.log(formData);
     const timeList = splitDays(formData.startDate, formData.endDate);
+    console.log('after splitdays');
+    console.log(timeList);
 
     const userEventAvailabilityIndex =
       eventDoc.availability.attendeeAvailability.findIndex(
