@@ -20,8 +20,6 @@ import {
   deleteAvailability,
   getUser,
 } from '../../helpers/apiCalls/apiCalls';
-import User from '../../types/User';
-import { useForceUpdate } from '@mantine/hooks';
 
 const Availability: NextPage = () => {
   const [timeOptions, setTimeOptions] = useState<TimeBracket>({

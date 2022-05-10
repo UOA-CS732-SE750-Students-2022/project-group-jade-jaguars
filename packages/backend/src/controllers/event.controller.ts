@@ -4,7 +4,6 @@ import {
   EventStatus,
   IEvent,
   AvailabilityStatus,
-  ITimeBracket,
 } from '../schemas/event.schema';
 import { Request, Response } from 'express';
 import { StatusCodes } from 'http-status-codes';
@@ -15,7 +14,6 @@ import { validate, validators } from '../libs/validate.lib';
 import { UserModel } from '../schemas/user.schema';
 import { ITeam, TeamModel } from '../schemas/team.schema';
 import server from '../app';
-import { createEmitAndSemanticDiagnosticsBuilderProgram } from 'typescript';
 
 export interface CreateEventDTO {
   _id: string;
