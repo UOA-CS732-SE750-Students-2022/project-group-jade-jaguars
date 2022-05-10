@@ -21,8 +21,8 @@ export interface AttendeeStatus {
 }
 
 export interface AvailabilityPayload {
-  startDate: Date;
-  endDate: Date;
+  startDate: Date | String;
+  endDate: Date | String;
   status?: AvailabilityStatusStrings;
   userId: string;
 }

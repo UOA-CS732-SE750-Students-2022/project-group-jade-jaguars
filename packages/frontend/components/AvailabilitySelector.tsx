@@ -234,6 +234,8 @@ function AvailabilitySelector(props: {
       newTimeSlots[index].status = AvailabilityStatusStrings.Tentative;
     }
     setSelection(newTimeSlots);
+    setTime1([newStart[0], newStart[1]]);
+    setTime2([newStart[0], newStart[1]]);
     setNewStatus(newTimeSlots[index].status);
   }
 

@@ -20,77 +20,8 @@ import {
   deleteAvailability,
   getUser,
 } from '../../helpers/apiCalls/apiCalls';
-
-//   const availability: AvailabilityBlock[] = [
-//     {
-//       startDate: 1650232800000,
-//       endDate: 1650250800000,
-//       status: AvailabilityStatus.Available,
-//     },
-//     {
-//       startDate: 1650250800000,
-//       endDate: 1650258000000,
-//       status: AvailabilityStatus.Unavailable,
-//     },
-//     {
-//       startDate: 1650315600000,
-//       endDate: 1650344400000,
-//       status: AvailabilityStatus.Unavailable,
-//     },
-//     {
-//       startDate: 1650402000000,
-//       endDate: 1650430800000,
-//       status: AvailabilityStatus.Tentative,
-//     },
-//     {
-//       startDate: 1650488400000,
-//       endDate: 1650517200000,
-//       status: AvailabilityStatus.Unavailable,
-//     },
-//     {
-//       startDate: 1650574800000,
-//       endDate: 1650603600000,
-//       status: AvailabilityStatus.Unavailable,
-//     },
-//   ];
-
-// const availabilities: AttendeeAvailability[] = [
-//     {
-//         uuid: 'Brad',
-//         availability: [
-//           {
-//             startDate: 1650232800000,
-//             endDate: 1650250800000,
-//             status: AvailabilityStatus.Available,
-//           },
-//           {
-//             startDate: 1650402000000,
-//             endDate: 1650430800000,
-//             status: AvailabilityStatus.Tentative,
-//           },
-//         ],
-//     },
-//     {
-//         uuid: 'Chad',
-//         availability: [
-//             {
-//                 startDate: 1650243600000,
-//                 endTime: 1650254400000,
-//                 status: AvailabilityStatus.Available,
-//             },
-//             {
-//                 startDate: 1650405600000,
-//                 endDate: 1650423600000,
-//                 status: AvailabilityStatus.Available,
-//             },
-//             {
-//                 startDate: 1650495600000,
-//                 endDate: 1650517200000,
-//                 status: AvailabilityStatus.Tentative,
-//             },
-//         ],
-//     },
-// ];
+import User from '../../types/User';
+import { useForceUpdate } from '@mantine/hooks';
 
 const Availability: NextPage = () => {
   const [timeOptions, setTimeOptions] = useState<TimeBracket>({
@@ -123,6 +54,7 @@ const Availability: NextPage = () => {
       let endDate = timeOptions.endDate;
       let myAvailability: AvailabilityBlock[] = [];
       let allAvailabilities: AttendeeAvailability[] = [];
+      console.log('a');
       await getEvent(eventId!.toString()).then((val: Event) => {
         if (val.admin === userId) {
           setIsAdmin(true);
@@ -161,7 +93,7 @@ const Availability: NextPage = () => {
 
     fetchData().catch(console.error);
 
-    const io = socketio('http://149.28.170.219');
+    const io = socketio('http://localhost:3000');
     io.on(`event:${eventId}`, (args) => {
       console.log('event changed');
       console.log(args);
@@ -173,17 +105,35 @@ const Availability: NextPage = () => {
   const [status, setStatus] = useState<AvailabilityStatusStrings>(
     AvailabilityStatusStrings.Available,
   );
-  const [info, setInfo] = useState<String[]>([]);
+  const [info, setInfo] = useState<JSX.Element[]>([]);
 
-  const handleHover = (info: {
+  useEffect(() => {
+    console.log(info);
+  }, [info]);
+
+  const handleHover = async (peopleInfo: {
     people: AttendeeStatus[];
     numPeople: number;
   }) => {
-    setInfo(
-      info.people.map((person, index) => {
-        return person.uuid + ': ' + AvailabilityStatusStrings[status];
-      }),
-    );
+    async function getInfoMap() {
+      const infoMap: JSX.Element[] = [];
+      await peopleInfo.people.map(async (person, index) => {
+        const { firstName, lastName } = await getUser(person.uuid);
+        console.log(firstName + lastName);
+        infoMap.push(
+          <p key={index} className="block">
+            {firstName +
+              ' ' +
+              lastName +
+              ': ' +
+              AvailabilityStatusStrings[status]}
+          </p>,
+        );
+      });
+      return infoMap;
+    }
+    const infoMap: JSX.Element[] = await getInfoMap();
+    setInfo(infoMap);
   };
 
   const handleSelection = async (selection: {
@@ -197,8 +147,8 @@ const Availability: NextPage = () => {
     endTime.setMinutes(endTime.getMinutes() + 30);
 
     await createAvailability(eventId!.toString(), {
-      startDate: startTime,
-      endDate: endTime,
+      startDate: startTime.toISOString(),
+      endDate: endTime.toISOString(),
       status: status,
       userId: userId,
     });
@@ -213,9 +163,6 @@ const Availability: NextPage = () => {
     const endTime = new Date(deletion.endDate);
     endTime.setHours(endTime.getHours() + 12);
     endTime.setMinutes(endTime.getMinutes() + 30);
-
-    console.log(startTime);
-    console.log(endTime);
 
     await deleteAvailability(eventId!.toString(), {
       userId: userId,
@@ -314,11 +261,7 @@ const Availability: NextPage = () => {
                 onHover={handleHover}
               />
             </Col>
-            <Col>
-              {info.map((val, index) => {
-                return <p key={index}>{val}</p>;
-              })}
-            </Col>
+            <Col>{info}</Col>
           </Row>
           <Row>
             <button

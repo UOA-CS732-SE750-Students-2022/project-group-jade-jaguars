@@ -1,16 +1,19 @@
 import axios from 'axios';
 import { auth } from '../../src/config/firebase.config';
 
-// const BASE_URL_LOCAL = "http://localhost:3000/api/v1";
-const BASE_URL = 'http://149.28.170.219/api/v1';
+const BASE_URL = 'http://localhost:3000/api/v1';
+//const BASE_URL = 'http://149.28.170.219/api/v1';
 
 export const getToken = async () => {
+  console.log('b');
+  console.log(auth.currentUser);
   const authToken = await auth.currentUser?.getIdToken();
   return authToken;
 };
 
 export const getHeaders = async () => {
   const authToken = await getToken();
+  console.log(authToken);
   const headers = { Authorization: `Bearer ${authToken}` };
   return headers;
 };
@@ -35,6 +38,7 @@ export const getData = async (url: string, payload?: any) => {
 };
 
 export const postData = async (url: string, payload?: any) => {
+  console.log('posting data...');
   const data = await axios
     .post(`${BASE_URL}${url}`, payload, {
       headers: await getHeaders(),
@@ -89,6 +93,7 @@ export const patchData = async (url: string, payload?: any) => {
 };
 
 export const deleteData = async (url: string, payload?: any) => {
+  console.log('deleting data');
   const data = await axios
     .delete(`${BASE_URL}${url}`, {
       headers: await getHeaders(),

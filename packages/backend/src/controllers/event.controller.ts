@@ -15,6 +15,7 @@ import { validate, validators } from '../libs/validate.lib';
 import { UserModel } from '../schemas/user.schema';
 import { ITeam, TeamModel } from '../schemas/team.schema';
 import server from '../app';
+import { createEmitAndSemanticDiagnosticsBuilderProgram } from 'typescript';
 
 export interface CreateEventDTO {
   _id: string;
@@ -354,6 +355,44 @@ export async function addUserAvailabilityById(
       }
     }
 
+    // timeList will contain the list of potential times split up among different days.
+    let timeList = [];
+
+    const daysInTB =
+      (formData.endDate.getTime() - formData.startDate.getTime()) /
+      (1000 * 3600 * 24); // How many days to split into.
+
+    const startDate = new Date(formData.startDate);
+
+    // Separate out each day.
+    for (let i = 0; i < daysInTB; i++) {
+      let myEndTime = new Date(formData.endDate);
+      if (
+        startDate.getHours() == 0 &&
+        myEndTime.getHours() == 0 &&
+        startDate.getMinutes() == 0 &&
+        myEndTime.getMinutes() == 0
+      ) {
+        myEndTime.setDate(startDate.getDate() + 1);
+      } else {
+        if (
+          formData.endDate.getHours() < 12 &&
+          formData.startDate.getHours() >= 12
+        ) {
+          myEndTime.setDate(startDate.getDate() + 1);
+        } else {
+          myEndTime.setDate(startDate.getDate());
+        }
+      }
+      let newStartTime = new Date(startDate);
+      let newEndTime = new Date(myEndTime);
+      timeList.push({
+        startDate: newStartTime,
+        endDate: newEndTime,
+      });
+      startDate.setDate(startDate.getDate() + 1);
+    }
+
     const userEventAvailabilityIndex =
       eventDoc.availability.attendeeAvailability.findIndex(
         (x) => x.attendee === formData.userId,
@@ -361,21 +400,23 @@ export async function addUserAvailabilityById(
     if (userEventAvailabilityIndex == -1) {
       eventDoc.availability.attendeeAvailability.push({
         attendee: formData.userId,
-        availability: [
-          {
-            startDate: formData.startDate,
-            endDate: formData.endDate,
+        availability: timeList.map((time) => {
+          return {
+            startDate: time.startDate,
+            endDate: time.endDate,
             status: formData.status ?? AvailabilityStatus.Available, // Default to available
-          },
-        ],
+          };
+        }),
       });
     } else {
-      eventDoc.availability.attendeeAvailability[
-        userEventAvailabilityIndex
-      ].availability.push({
-        startDate: formData.startDate,
-        endDate: formData.endDate,
-        status: formData.status ?? AvailabilityStatus.Available,
+      timeList.map((time) => {
+        eventDoc.availability.attendeeAvailability[
+          userEventAvailabilityIndex
+        ].availability.push({
+          startDate: time.startDate,
+          endDate: time.endDate,
+          status: formData.status ?? AvailabilityStatus.Available,
+        });
       });
     }
 
@@ -443,57 +484,105 @@ export async function removeUserAvailabilityById(
       );
     }
 
+    // timeList will contain the list of potential times split up among different days.
+    let timeList = [];
+
+    const daysInTB =
+      (formData.endDate.getTime() - formData.startDate.getTime()) /
+      (1000 * 3600 * 24); // How many days to split into.
+
+    const startDate = new Date(formData.startDate);
+
+    // Separate out each day.
+    for (let i = 0; i < daysInTB; i++) {
+      let myEndTime = new Date(formData.endDate);
+      if (
+        startDate.getHours() == 0 &&
+        myEndTime.getHours() == 0 &&
+        startDate.getMinutes() == 0 &&
+        myEndTime.getMinutes() == 0
+      ) {
+        myEndTime.setDate(startDate.getDate() + 1);
+      } else {
+        if (
+          formData.endDate.getHours() < 12 &&
+          formData.startDate.getHours() >= 12
+        ) {
+          myEndTime.setDate(startDate.getDate() + 1);
+        } else {
+          myEndTime.setDate(startDate.getDate());
+        }
+      }
+      let newStartTime = new Date(startDate);
+      let newEndTime = new Date(myEndTime);
+      timeList.push({
+        startDate: newStartTime,
+        endDate: newEndTime,
+      });
+      startDate.setDate(startDate.getDate() + 1);
+    }
+
     // Sweep though availability brackets in order to edit to remove parts of or whole brackets
+    let attendeeAvailability = [];
     let adjustedAttendeeAvailability = [];
 
-    eventDoc.availability.attendeeAvailability[
-      userEventAvailabilityIndex
-    ].availability.forEach((ts) => {
-      // Existing bracket falls entirely within removal bracket
-      if (
-        ts.startDate >= formData.startDate &&
-        ts.endDate <= formData.endDate
-      ) {
-      }
-      // Existing bracket starting left side removed
-      else if (
-        ts.startDate >= formData.startDate &&
-        ts.endDate >= formData.endDate
-      ) {
-        ts.startDate = formData.endDate;
-        adjustedAttendeeAvailability.push(ts);
-      }
-      // Existing bracket ending right side removed
-      else if (
-        ts.startDate <= formData.startDate &&
-        ts.endDate <= formData.endDate
-      ) {
-        ts.endDate = formData.startDate;
-        adjustedAttendeeAvailability.push(ts);
-      }
-      // Middle removed
-      else if (
-        ts.startDate <= formData.startDate &&
-        ts.endDate >= formData.endDate
-      ) {
-        // Start left block
-        adjustedAttendeeAvailability.push({
-          startDate: ts.startDate,
-          endDate: formData.startDate,
-          status: ts.status,
-        });
-        // End right block
-        adjustedAttendeeAvailability.push({
-          startDate: formData.endDate,
-          endDate: ts.endDate,
-          status: ts.status,
-        });
+    const length = timeList.length;
+
+    for (let i = 0; i < length; i++) {
+      if (i == 0) {
+        attendeeAvailability =
+          eventDoc.availability.attendeeAvailability[userEventAvailabilityIndex]
+            .availability;
       } else {
-        res
-          .status(StatusCodes.INTERNAL_SERVER_ERROR)
-          .send('error modifying date brackets');
+        attendeeAvailability = [...adjustedAttendeeAvailability];
       }
-    });
+      adjustedAttendeeAvailability = [];
+      const time = timeList[i];
+      attendeeAvailability.forEach((ts) => {
+        // Existing bracket falls entirely within removal bracket
+        if (ts.startDate >= time.startDate && ts.endDate <= time.endDate) {
+        }
+        // Existing bracket starting left side removed
+        else if (
+          ts.startDate >= time.startDate &&
+          ts.endDate >= time.endDate &&
+          ts.startDate < time.endDate
+        ) {
+          ts.startDate = time.endDate;
+          adjustedAttendeeAvailability.push(ts);
+        }
+        // Existing bracket ending right side removed
+        else if (
+          ts.startDate <= time.startDate &&
+          ts.endDate <= time.endDate &&
+          time.startDate < ts.endDate
+        ) {
+          ts.endDate = time.startDate;
+          adjustedAttendeeAvailability.push(ts);
+        }
+        // Middle removed
+        else if (ts.startDate <= time.startDate && ts.endDate >= time.endDate) {
+          // Start left block
+          adjustedAttendeeAvailability.push({
+            startDate: ts.startDate,
+            endDate: time.startDate,
+            status: ts.status,
+          });
+          // End right block
+          adjustedAttendeeAvailability.push({
+            startDate: time.endDate,
+            endDate: ts.endDate,
+            status: ts.status,
+          });
+        } else {
+          adjustedAttendeeAvailability.push({
+            startDate: ts.startDate,
+            endDate: ts.endDate,
+            status: ts.status,
+          });
+        }
+      });
+    }
 
     eventDoc.availability.attendeeAvailability[
       userEventAvailabilityIndex
