@@ -1,9 +1,4 @@
-import {
-  EventModel,
-  IAvailabilityBlock,
-  IEventAvailability,
-  ITimeBracket,
-} from '../schemas/event.schema';
+import { IEventAvailability, ITimeBracket } from '../schemas/event.schema';
 
 // A bad version of the overlaps problem
 // Calculating the finalized time, does this as a readonly function

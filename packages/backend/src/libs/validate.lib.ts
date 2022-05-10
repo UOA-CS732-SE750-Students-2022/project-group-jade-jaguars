@@ -37,6 +37,7 @@ export const validators = {
   availabilityStatus,
 };
 
+// Validate a Joi schema, apply a validation error to the express endpoints if validation fails
 export function validate<T>(
   res: Response,
   rules: Joi.AnySchema<T>,
