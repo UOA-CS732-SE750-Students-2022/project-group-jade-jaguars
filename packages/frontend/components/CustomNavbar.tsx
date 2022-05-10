@@ -11,7 +11,7 @@ import { Logout, Plus } from 'tabler-icons-react';
 const linkData = [
   { icon: LayoutDashboard, label: 'Dashboard', address: '/demo' },
   { icon: CalendarEvent, label: 'Events', address: '/create' },
-  { icon: Users, label: 'Teams', address: '/demo' },
+  { icon: Users, label: 'Teams', address: '/finalised' },
 ];
 export const CustomNavbar = () => {
   const { height, width } = useViewportSize();
