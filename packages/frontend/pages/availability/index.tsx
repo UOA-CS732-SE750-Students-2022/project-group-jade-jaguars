@@ -116,7 +116,7 @@ const Availability: NextPage = () => {
               ' ' +
               lastName +
               ': ' +
-              AvailabilityStatusStrings[status]}
+              AvailabilityStatusStrings[person.status]}
           </p>
         );
       });
