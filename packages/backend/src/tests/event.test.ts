@@ -70,7 +70,7 @@ describe('Events', () => {
         lastName: 'lastName',
       });
 
-      const teamDoc = await TeamModel.create({
+      let teamDoc = await TeamModel.create({
         admin: userId,
         members: [memberDoc._id],
         title: 'title',
@@ -99,6 +99,11 @@ describe('Events', () => {
       memberDoc = await UserModel.findById(memberDoc._id);
       expect(userDoc.events).toHaveLength(1);
       expect(userDoc.events[0]).toBe(createResponse.body.id);
+
+      // check team has new event reference
+      teamDoc = await TeamModel.findById(teamDoc._id);
+      expect(teamDoc.events).toHaveLength(1);
+      expect(teamDoc.events[0]).toBe(createResponse.body.id);
     });
 
     it('Patch', async () => {
@@ -147,7 +152,7 @@ describe('Events', () => {
       });
       const memberId = memberDoc._id;
 
-      const teamDoc = await TeamModel.create({
+      let teamDoc = await TeamModel.create({
         title: 'title',
         admin: userId,
         members: [memberId],

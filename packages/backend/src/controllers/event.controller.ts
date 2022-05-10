@@ -153,6 +153,13 @@ export async function createEvent(
       for (const memberId of eventDocPopulated.team.members) {
         await addToUserEventSet(memberId, eventId);
       }
+
+      await eventDocPopulated.save();
+
+      // Add event to team
+      const teamDoc = await TeamModel.findById(eventDocPopulated.team._id);
+      teamDoc.events.push(eventId);
+      await teamDoc.save();
     }
     // Also add it to the admin of the event
     await addToUserEventSet(formData.admin, eventId);
