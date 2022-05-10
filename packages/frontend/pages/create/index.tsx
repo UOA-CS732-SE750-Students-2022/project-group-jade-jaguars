@@ -15,6 +15,7 @@ interface FormValues {
   newTeam: boolean;
   newTeamName: string;
   teamName?: string;
+  recurring: boolean;
 }
 
 interface Team {
@@ -40,6 +41,7 @@ const CreateEventPage: NextPage = () => {
       newTeam: false,
       teamName: '',
       newTeamName: '',
+      recurring: false,
     },
   });
 
