@@ -277,7 +277,7 @@ function AvailabilitySelector(props: {
   async function finaliseSelection() {
     setTimeSlots(selection);
     setSelecting(false);
-    const startTime = new Date(props.timeOptions.startDate);
+    const startTime = new Date(timeList[0].startDate);
     let startHours = startTime.getHours() + 0.5 * time1[0];
     let endHours = startTime.getHours() + 0.5 * time2[0];
 
