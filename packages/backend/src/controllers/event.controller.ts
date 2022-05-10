@@ -15,6 +15,7 @@ import { addToUserEventSet } from '../service/user.service';
 import { UserModel } from '../schemas/user.schema';
 import { ITeam, TeamModel } from '../schemas/team.schema';
 import server from '../app';
+import { UserResponseDTO } from './user.controller';
 
 export interface CreateEventDTO {
   _id: string;
@@ -52,6 +53,11 @@ export interface AddUserAvailabilityDTO {
 export interface RemoveUserAvalabilityDTO {
   userId: string;
   eventId: string;
+  startDate: Date;
+  endDate: Date;
+}
+
+interface FinalizeEventDateDTO {
   startDate: Date;
   endDate: Date;
 }
@@ -576,6 +582,95 @@ export async function removeUserAvailabilityById(
     // Send updated event via socket IO
     server.webSocket.send(`event:${eventId}`, eventDoc);
 
+    res.sendStatus(StatusCodes.OK);
+  } catch (err) {
+    returnError(err, res);
+  }
+}
+
+export async function getEventUsersById(
+  req: Request,
+  res: Response<UserResponseDTO[] | string>,
+) {
+  try {
+    const eventId = req.params.eventId;
+    const rules = Joi.object<{ eventId: string }>({
+      eventId: validators.id().required(),
+    });
+    const formData = validate(res, rules, { eventId }, { allowUnknown: true });
+
+    const eventDoc = await EventModel.findById(formData.eventId)
+      .populate<{ team: ITeam }>('team')
+      .populate<{ availability: IEventAvailability }>('availability');
+
+    if (!eventDoc) {
+      return returnError(Error('Event Not Found'), res, StatusCodes.NOT_FOUND);
+    }
+
+    // Find all the users
+    let allUserIds: string[] = [];
+    allUserIds.push(eventDoc.admin);
+    if (eventDoc.team) {
+      allUserIds.push(eventDoc.admin); // The admin of the event might not be the admin of the team
+      eventDoc.team.members.map((m) => {
+        allUserIds.push(m);
+      });
+    }
+
+    // Filter to make unqiue
+    allUserIds = [...new Set(allUserIds.map((s) => JSON.stringify(s)))].map(
+      (s) => JSON.parse(s),
+    );
+
+    const userResponseDocs: UserResponseDTO[] = (
+      await UserModel.find({ _id: { $in: allUserIds } })
+    ).map((u) => {
+      return {
+        id: u._id,
+        firstName: u.firstName,
+        lastName: u.lastName,
+        events: u.events,
+      };
+    });
+    res.status(StatusCodes.OK).send(userResponseDocs);
+  } catch (err) {
+    returnError(err, res);
+  }
+}
+
+export async function finalizeEventDate(req: Request, res: Response) {
+  try {
+    const eventId = req.params.eventId;
+
+    // Validate payload
+    const rules = Joi.object<FinalizeEventDateDTO & { eventId: string }>({
+      eventId: validators.id().required(),
+      startDate: validators.startDate().required(),
+      endDate: validators.endDate().required(),
+    });
+
+    const formData = validate(
+      res,
+      rules,
+      { ...req.body, eventId },
+      { allowUnknown: true },
+    );
+
+    const eventDoc = await EventModel.findById(formData.eventId);
+
+    // Check event exists
+    if (!eventDoc) {
+      return returnError(Error('Event Not Found'), res, StatusCodes.NOT_FOUND);
+    }
+
+    // Set finalized timebracket
+    eventDoc.availability.finalisedTime = {
+      startDate: formData.startDate,
+      endDate: formData.endDate,
+    };
+
+    eventDoc.save(); // Persist event
+    server.webSocket.send(`event:${eventId}`, eventDoc); // Emit event via websocket
     res.sendStatus(StatusCodes.OK);
   } catch (err) {
     returnError(err, res);

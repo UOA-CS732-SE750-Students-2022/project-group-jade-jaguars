@@ -134,6 +134,32 @@ describe('Events', () => {
 
       expect(await EventModel.exists({ _id: eventId })).toBe(null);
     });
+
+    it.only('Fetch event users', async () => {
+      const dummyUserId = 'y'.repeat(25);
+      const teamDoc = await TeamModel.create({
+        title: 'title',
+        admin: userId,
+        members: [dummyUserId],
+      });
+
+      const eventDoc = await EventModel.create({
+        title: 'title',
+        startDate: new Date('1900'),
+        endDate: new Date('2000'),
+        admin: userId,
+        team: teamDoc._id,
+      });
+      const eventId = eventDoc._id;
+
+      const response = (
+        await request(server)
+          .get(`/api/v1/event/${eventId}/users`)
+          .expect(StatusCodes.OK)
+      ).body;
+
+      console.log(response);
+    });
   });
 
   describe('Search', () => {
