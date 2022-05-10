@@ -54,7 +54,6 @@ const Availability: NextPage = () => {
       let endDate = timeOptions.endDate;
       let myAvailability: AvailabilityBlock[] = [];
       let allAvailabilities: AttendeeAvailability[] = [];
-      console.log('a');
       await getEvent(eventId!.toString()).then((val: Event) => {
         if (val.admin === userId) {
           setIsAdmin(true);
@@ -107,33 +106,28 @@ const Availability: NextPage = () => {
   );
   const [info, setInfo] = useState<JSX.Element[]>([]);
 
-  useEffect(() => {
-    console.log(info);
-  }, [info]);
-
   const handleHover = async (peopleInfo: {
     people: AttendeeStatus[];
     numPeople: number;
   }) => {
     async function getInfoMap() {
-      const infoMap: JSX.Element[] = [];
-      await peopleInfo.people.map(async (person, index) => {
+      const infoMap = peopleInfo.people.map(async (person, index) => {
         const { firstName, lastName } = await getUser(person.uuid);
-        console.log(firstName + lastName);
-        infoMap.push(
+        return (
           <p key={index} className="block">
             {firstName +
               ' ' +
               lastName +
               ': ' +
               AvailabilityStatusStrings[status]}
-          </p>,
+          </p>
         );
       });
-      return infoMap;
+      Promise.all(infoMap).then((values: JSX.Element[]) => {
+        setInfo(values);
+      });
     }
-    const infoMap: JSX.Element[] = await getInfoMap();
-    setInfo(infoMap);
+    getInfoMap();
   };
 
   const handleSelection = async (selection: {
@@ -261,7 +255,11 @@ const Availability: NextPage = () => {
                 onHover={handleHover}
               />
             </Col>
-            <Col>{info}</Col>
+            <Col>
+              {info.flatMap((val) => {
+                return val;
+              })}
+            </Col>
           </Row>
           <Row>
             <button
