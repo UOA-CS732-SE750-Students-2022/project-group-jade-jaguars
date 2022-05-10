@@ -21,8 +21,9 @@ interface FormValues {
   description?: string;
   location?: string;
   newTeam: boolean;
-  newTeamName?: string;
+  newTeamName: string;
   teamName?: string;
+  recurring: boolean;
 }
 
 type TeamInfo = {
@@ -36,20 +37,7 @@ interface EventFormProps {
   onCreateEvent: () => void;
 }
 const EventForm = ({ teamData, form, onCreateEvent }: EventFormProps) => {
-  // const form = useForm<FormValues>({
-  //   initialValues: {
-  //     title: '',
-  //     dateRange: [new Date(), new Date()],
-  //     timeRange: [new Date(), new Date()],
-  //     description: '',
-  //     location: '',
-  //     newTeam: false,
-  //     teamName: '',
-  //     newTeamName: '',
-  //   },
-  // });
   const labelArray = teamData.map((team) => team.label);
-  const idArray = teamData.map((team) => team.id);
   return (
     <Box sx={{ maxWidth: 700 }} mx="auto">
       <Paper p="xl" radius="md" withBorder>
@@ -89,6 +77,7 @@ const EventForm = ({ teamData, form, onCreateEvent }: EventFormProps) => {
           <Grid.Col sm={8} xs={12}>
             {form.values.newTeam ? (
               <TextInput
+                required
                 label="New Team Name"
                 value={form.values.newTeamName}
                 onChange={(e) =>
@@ -142,6 +131,7 @@ const EventForm = ({ teamData, form, onCreateEvent }: EventFormProps) => {
           </Grid.Col>
           <Grid.Col>
             <Textarea
+              required
               label="Description"
               placeholder="event details"
               autosize
@@ -155,6 +145,7 @@ const EventForm = ({ teamData, form, onCreateEvent }: EventFormProps) => {
           </Grid.Col>
           <Grid.Col>
             <TextInput
+              required
               label="Location"
               placeholder="location or meeting link"
               value={form.values.location}
@@ -163,19 +154,32 @@ const EventForm = ({ teamData, form, onCreateEvent }: EventFormProps) => {
               }
             />
           </Grid.Col>
-          {/* <Grid.Col>
-            <div>
-              <p className="font-medium text-sm">Reminder</p>
-              <div className="mt-1 w-52">
-                <Select
-                  placeholder="Set a reminder"
-                  data={reminderOptions}
-                  onChange={(value) => onSelectChange(value)}
-                />
-              </div>
-            </div>
-          </Grid.Col> */}
-          <Grid.Col span={12}>
+          <Grid.Col sm={4} mt={20} xs={12}>
+            <label
+              htmlFor="default-toggle2"
+              className="inline-flex relative items-center cursor-pointer"
+            >
+              <input
+                type="checkbox"
+                value=""
+                id="default-toggle2"
+                className="sr-only peer"
+                checked={form.values.recurring}
+                onChange={(event) => {
+                  form.setFieldValue('recurring', event.currentTarget.checked);
+                  console.log(form.values.recurring);
+                }}
+              />
+              <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-0   rounded-full peer dark:bg-gray-300 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-primary"></div>
+              <span className="ml-3  text-sm font-medium text-black ">
+                Weekly
+              </span>
+              <span className="ml-1  text-sm font-medium text-black ">
+                Recurrence
+              </span>
+            </label>
+          </Grid.Col>
+          <Grid.Col sm={8} xs={12}>
             <Group position="right" mt="lg">
               <Button
                 classNames={{

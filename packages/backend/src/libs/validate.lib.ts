@@ -37,6 +37,7 @@ export const validators = {
   availabilityStatus,
 };
 
+// Validate a Joi schema, apply a validation error to the express endpoints if validation fails
 export function validate<T>(
   res: Response,
   rules: Joi.AnySchema<T>,
@@ -47,7 +48,11 @@ export function validate<T>(
 
   if (result.error) {
     console.log(result.error);
-    returnError(new Error('Failed To Validate'), res, StatusCodes.BAD_REQUEST);
+    returnError(
+      new Error(`Failed To Validate ${result.error}`),
+      res,
+      StatusCodes.BAD_REQUEST,
+    );
     return null;
   } else {
     return result.value;
