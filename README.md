@@ -1,12 +1,12 @@
 # CountMeIn
 
 <p align="center">
-  <img src="./media/logo/melon.jpg" width="350" />
+  <img src="./media/logo/melon.png" width="350" />
 </p>
 
 <p align="center">
-  <a href="https://github.com/UOA-CS732-SE750-Students-2022/project-group-jade-jaguars/blob/main/.github/workflows/pr-check.yml/badge.svg">
-    <img alt="Build Status" src="https://github.com/UOA-CS732-SE750-Students-2022/project-group-jade-jaguars/blob/main/.github/workflows/pr-check.yml/badge.svg">
+  <a href="https://github.com/UOA-CS732-SE750-Students-2022/project-group-jade-jaguars/actions/workflows/pr-check.yml/badge.svg">
+    <img alt="Build Status" src="https://github.com/UOA-CS732-SE750-Students-2022/project-group-jade-jaguars/actions/workflows/pr-check.yml/badge.svg">
   </a>
 </p>
 
