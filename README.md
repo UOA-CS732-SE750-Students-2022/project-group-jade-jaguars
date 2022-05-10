@@ -8,15 +8,10 @@
   <a href="https://github.com/UOA-CS732-SE750-Students-2022/project-group-jade-jaguars/actions/workflows/pr-check.yml/badge.svg">
     <img alt="Build Status" src="https://github.com/UOA-CS732-SE750-Students-2022/project-group-jade-jaguars/actions/workflows/pr-check.yml/badge.svg">
   </a>
+  <a href="https://img.shields.io/badge/License-GPLv3-blue.svg">
+    <img alt="Licence" src="https://img.shields.io/badge/License-GPLv3-blue.svg">
+  </a>
 </p>
-
-## Build
-
-Run `npm run build` to build the project. The build artifacts will be stored in the `dist/` directory.
-
-## Running unit tests
-
-Run `npm test` to execute the unit tests via [Jest](https://jestjs.io).
 
 ## Running the frontend and backend
 
@@ -53,3 +48,7 @@ npm run start
 ```
 
 This will start the frontend and backend together. By default the backend will start with production credentials, use `npm run start:dev` to run with development credentials
+
+## Running unit tests
+
+Run `npm test` to execute the unit tests via [Jest](https://jestjs.io).
