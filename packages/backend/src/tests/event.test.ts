@@ -437,22 +437,60 @@ describe('Events', () => {
       expect(eventDoc.availability.potentialTimes).toBeTruthy();
     });
 
-    it('splitDays with single day', async () => {
+    it.only('splitDays with single day', async () => {
       const startDate = new Date('2022-05-10T22:37:38.007Z');
       const endDate = new Date('2022-05-10T23:39:38.007Z');
       const splits = splitDays(startDate, endDate);
       expect(splits).toEqual([{ startDate, endDate }]); // Time bracket remains unchanged
     });
 
-    it('splitDays with multiple days', async () => {
+    it.only('splitDays with two days', async () => {
       const startDate = new Date('2022-05-10T22:37:38.007Z');
       const endDate = new Date('2022-05-11T23:39:38.007Z');
       const splits = splitDays(startDate, endDate);
-      console.log(splits);
       expect(splits).toEqual([
         {
           startDate,
           endDate: new Date('2022-05-10T23:39:38.007Z'),
+        },
+        {
+          startDate: new Date('2022-05-11T22:37:38.007Z'),
+          endDate,
+        },
+      ]); // Time bracket split
+    });
+
+    it.only('splitDays with three days', async () => {
+      const startDate = new Date('2022-05-10T22:37:38.007Z');
+      const endDate = new Date('2022-05-12T23:39:38.007Z');
+      const splits = splitDays(startDate, endDate);
+      expect(splits).toEqual([
+        {
+          startDate,
+          endDate: new Date('2022-05-10T23:39:38.007Z'),
+        },
+        {
+          startDate: new Date('2022-05-11T22:37:38.007Z'),
+          endDate: new Date('2022-05-11T23:39:38.007Z'),
+        },
+        {
+          startDate: new Date('2022-05-12T22:37:38.007Z'),
+          endDate,
+        },
+      ]); // Time bracket split
+    });
+
+    it('splitDays with multiple days with and dates at start of day', async () => {
+      const dateOffset = 24 * 60 * 60 * 1000 * 2; //2 days
+      const startDate = new Date('2022'); // The start of 2022
+      let endDate = new Date();
+      endDate.setTime(startDate.getTime() + dateOffset);
+
+      const splits = splitDays(startDate, endDate);
+      expect(splits).toEqual([
+        {
+          startDate,
+          endDate: new Date('2022-01-01T00:00:00.000Z'),
         },
         {
           startDate: new Date('2022-05-11T22:37:38.007Z'),
