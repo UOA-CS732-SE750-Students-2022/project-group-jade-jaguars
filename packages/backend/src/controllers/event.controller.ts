@@ -535,24 +535,25 @@ export async function removeUserAvailabilityById(
       );
     }
 
-    const timeList = splitDays(formData.startDate, formData.endDate);
+    const splitDates = splitDays(formData.startDate, formData.endDate);
 
     // Sweep though availability brackets in order to edit to remove parts of or whole brackets
     let attendeeAvailability = [];
     let adjustedAttendeeAvailability = [];
 
-    const length = timeList.length;
-
-    for (let i = 0; i < length; i++) {
+    for (let i = 0; i < splitDates.length; i++) {
+      // First sweep though the attendees availability
       if (i == 0) {
         attendeeAvailability =
           eventDoc.availability.attendeeAvailability[userEventAvailabilityIndex]
             .availability;
-      } else {
+      }
+      // Not the first sweep though the attendees availability, needs to continue to be mutated and adjusted
+      else {
         attendeeAvailability = [...adjustedAttendeeAvailability];
       }
       adjustedAttendeeAvailability = [];
-      const time = timeList[i];
+      const time = splitDates[i];
       attendeeAvailability.forEach((ts) => {
         // Existing bracket falls entirely within removal bracket
         if (ts.startDate >= time.startDate && ts.endDate <= time.endDate) {

@@ -80,33 +80,34 @@ export function splitDays(
   const daysInTB =
     (formEndDate.getTime() - formStartDate.getTime()) / (1000 * 3600 * 24); // How many days to split into.
 
-  const startDate = new Date(formStartDate);
-
   // Separate out each day.
   for (let i = 0; i < daysInTB; i++) {
-    let myEndTime = new Date(formEndDate);
+    // Setup start and endDates
+    let myStartDate = new Date(formStartDate);
+    myStartDate.setDate(myStartDate.getDate() + i);
+    let myEndDate = new Date(formEndDate);
+
     if (
-      startDate.getHours() == 0 &&
-      myEndTime.getHours() == 0 &&
-      startDate.getMinutes() == 0 &&
-      myEndTime.getMinutes() == 0
+      myStartDate.getHours() == 0 &&
+      myEndDate.getHours() == 0 &&
+      myStartDate.getMinutes() == 0 &&
+      myEndDate.getMinutes() == 0
     ) {
-      myEndTime.setDate(startDate.getDate() + 1);
+      myEndDate.setDate(myStartDate.getDate() + 1);
     } else {
+      //
       if (formEndDate.getHours() < 12 && formStartDate.getHours() >= 12) {
-        myEndTime.setDate(startDate.getDate() + 1);
+        myEndDate.setDate(myStartDate.getDate() + 1);
       } else {
-        console.log('hit here');
-        myEndTime.setDate(startDate.getDate());
+        myEndDate.setDate(myStartDate.getDate());
       }
     }
-    let newStartTime = new Date(startDate);
-    let newEndTime = new Date(myEndTime);
+    let newStartTime = new Date(myStartDate);
+    let newEndTime = new Date(myEndDate);
     timeList.push({
       startDate: newStartTime,
       endDate: newEndTime,
     });
-    startDate.setDate(startDate.getDate() + 1);
   }
   return timeList;
 }
