@@ -1,6 +1,10 @@
 import server from '../app';
 import request from 'supertest';
-import { AvailabilityStatus, EventModel } from '../schemas/event.schema';
+import {
+  AvailabilityStatus,
+  EventModel,
+  EventStatus,
+} from '../schemas/event.schema';
 import { StatusCodes } from 'http-status-codes';
 import { UserModel } from '../schemas/user.schema';
 import { Colour, TeamModel } from '../schemas/team.schema';
@@ -135,12 +139,18 @@ describe('Events', () => {
       expect(await EventModel.exists({ _id: eventId })).toBe(null);
     });
 
-    it.only('Fetch event users', async () => {
-      const dummyUserId = 'y'.repeat(25);
+    it('Fetch event users', async () => {
+      let memberDoc = await UserModel.create({
+        _id: 'y'.repeat(25),
+        firstName: 'firstName',
+        lastName: 'lastName',
+      });
+      const memberId = memberDoc._id;
+
       const teamDoc = await TeamModel.create({
         title: 'title',
         admin: userId,
-        members: [dummyUserId],
+        members: [memberId],
       });
 
       const eventDoc = await EventModel.create({
@@ -158,7 +168,36 @@ describe('Events', () => {
           .expect(StatusCodes.OK)
       ).body;
 
-      console.log(response);
+      expect(response).toHaveLength(2);
+      expect(response[0].id).toBe(userId);
+      expect(response[1].id).toBe(memberId);
+    });
+
+    it('Finalize event time', async () => {
+      const startDate = new Date('1900');
+      const endDate = new Date('2000');
+      let eventDoc = await EventModel.create({
+        title: 'title',
+        startDate,
+        endDate,
+        admin: userId,
+      });
+      const eventId = eventDoc._id;
+
+      await request(server)
+        .post(`/api/v1/event/${eventId}/finalize`)
+        .send({ startDate, endDate })
+        .expect(StatusCodes.OK);
+
+      eventDoc = await EventModel.findById(eventId);
+      expect(eventDoc.availability.finalisedTime).toBeDefined();
+      expect(eventDoc.availability.finalisedTime.startDate.toISOString()).toBe(
+        startDate.toISOString(),
+      );
+      expect(eventDoc.availability.finalisedTime.endDate.toISOString()).toBe(
+        endDate.toISOString(),
+      );
+      expect(eventDoc.status).toBe(EventStatus.Accepted);
     });
   });
 

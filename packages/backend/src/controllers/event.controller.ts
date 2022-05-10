@@ -669,6 +669,9 @@ export async function finalizeEventDate(req: Request, res: Response) {
       endDate: formData.endDate,
     };
 
+    // Set finalized status
+    eventDoc.status = EventStatus.Accepted;
+
     eventDoc.save(); // Persist event
     server.webSocket.send(`event:${eventId}`, eventDoc); // Emit event via websocket
     res.sendStatus(StatusCodes.OK);
