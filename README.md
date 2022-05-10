@@ -10,14 +10,6 @@
   </a>
 </p>
 
-## Structure
-
-| Directory  | Description                                       |
-| ---------- | ------------------------------------------------- |
-| **_apps_** | Primary applications and e2e tests                |
-| backend    | NestJS backend server                             |
-| frontend   | Python server that generates data for an exchange |
-
 ## Build
 
 Run `npm run build` to build the project. The build artifacts will be stored in the `dist/` directory.
