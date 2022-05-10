@@ -1,6 +1,32 @@
 # CountMeIn
 
-## Running
+<p align="center">
+  <img src="./media/logo/melon.jpg" width="350" />
+</p>
+
+<p align="center">
+  <a href="https://github.com/UOA-CS732-SE750-Students-2022/project-group-jade-jaguars/blob/main/.github/workflows/pr-check.yml/badge.svg">
+    <img alt="Build Status" src="https://github.com/UOA-CS732-SE750-Students-2022/project-group-jade-jaguars/blob/main/.github/workflows/pr-check.yml/badge.svg">
+  </a>
+</p>
+
+## Structure
+
+| Directory  | Description                                       |
+| ---------- | ------------------------------------------------- |
+| **_apps_** | Primary applications and e2e tests                |
+| backend    | NestJS backend server                             |
+| frontend   | Python server that generates data for an exchange |
+
+## Build
+
+Run `npm run build` to build the project. The build artifacts will be stored in the `dist/` directory.
+
+## Running unit tests
+
+Run `npm test` to execute the unit tests via [Jest](https://jestjs.io).
+
+## Running the frontend and backend
 
 1. Install packages
 
