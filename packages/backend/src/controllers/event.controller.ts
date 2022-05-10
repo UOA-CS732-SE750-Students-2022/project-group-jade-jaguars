@@ -5,15 +5,17 @@ import {
   IEvent,
   AvailabilityStatus,
 } from '../schemas/event.schema';
-import { Request, Response } from 'express';
 import { StatusCodes } from 'http-status-codes';
-import { TypedRequestBody } from '../libs/utils.lib';
-import { returnError } from '../libs/error.lib';
 import Joi from 'joi';
 import { validate, validators } from '../libs/validate.lib';
+import { Request, Response } from 'express';
+import { TypedRequestBody } from '../libs/utils.lib';
+import { returnError } from '../libs/error.lib';
+import { addToUserEventSet } from '../service/user.service';
 import { UserModel } from '../schemas/user.schema';
 import { ITeam, TeamModel } from '../schemas/team.schema';
 import server from '../app';
+import { UserResponseDTO } from './user.controller';
 
 export interface CreateEventDTO {
   _id: string;
@@ -32,6 +34,7 @@ export interface CreateEventDTO {
 export interface PatchEventDTO extends Partial<Omit<IEvent, '_id'>> {}
 
 export interface SearchEventDTO {
+  userId?: string;
   teamId?: string;
   startDate?: Date;
   endDate?: Date;
@@ -50,6 +53,11 @@ export interface AddUserAvailabilityDTO {
 export interface RemoveUserAvalabilityDTO {
   userId: string;
   eventId: string;
+  startDate: Date;
+  endDate: Date;
+}
+
+interface FinalizeEventDateDTO {
   startDate: Date;
   endDate: Date;
 }
@@ -129,7 +137,33 @@ export async function createEvent(
     // Validation failed, headers have been set, return
     if (!formData) return;
 
-    const eventDoc = await EventModel.create(formData);
+    // Create event
+    let eventDoc = await EventModel.create(formData);
+    const eventId = eventDoc._id;
+
+    // Add event to user documents
+    const eventDocPopulated = await EventModel.findById(eventId).populate<{
+      team: ITeam;
+    }>('team');
+    // Add event to team users
+    if (eventDocPopulated.team) {
+      // Add event to team admin
+      await addToUserEventSet(eventDocPopulated.team.admin, eventId);
+      // Add event to team  members
+      for (const memberId of eventDocPopulated.team.members) {
+        await addToUserEventSet(memberId, eventId);
+      }
+
+      await eventDocPopulated.save();
+
+      // Add event to team
+      const teamDoc = await TeamModel.findById(eventDocPopulated.team._id);
+      teamDoc.events.push(eventId);
+      await teamDoc.save();
+    }
+    // Also add it to the admin of the event
+    await addToUserEventSet(formData.admin, eventId);
+
     res
       .status(StatusCodes.CREATED)
       .send(eventDocToResponseDTO(eventDoc.toObject({ virtuals: true })));
@@ -212,18 +246,64 @@ export async function searchEvent(
 ) {
   try {
     const rules = Joi.object<SearchEventDTO>({
+      userId: validators.id().optional(),
       teamId: validators.id().optional(),
       titleSubStr: Joi.string().optional(),
       descriptionSubStr: Joi.string().optional(),
-    }).oxor('teamId', 'titleSubStr', 'descriptionSubStr');
+    }).oxor('userId', 'teamId', 'titleSubStr', 'descriptionSubStr');
 
     let formData = validate(res, rules, req.body, { allowUnknown: true });
     // Validation failed, headers have been set, return
     if (!formData) return;
 
     let events: EventResponseDTO[] = [];
+
+    // Search for events belonging to a user
+    if (formData.userId) {
+      if (!(await UserModel.exists({ _id: formData.userId }))) {
+        return returnError(Error('User Not Found'), res, StatusCodes.NOT_FOUND);
+      }
+
+      // This logic is slightly complex, either the user
+      // XXX: Filter through all event docs, this is just a lot easier for the moment
+      let eventDocs = (
+        await EventModel.find({})
+          .populate<{ team: ITeam }>('team')
+          .populate<{ availability: IEventAvailability }>('availability')
+      ).filter((e) => {
+        // Check team members
+        if (e.team) {
+          const allTeamMembers = e.team.members.concat(e.team.admin);
+          if (allTeamMembers.some((m) => m === formData.userId)) {
+            return true;
+          } else {
+            return false;
+          }
+        }
+        // Check availability for membership
+        else {
+          // Get all unique attendees who have added an availability
+          const attendees = e.availability.attendeeAvailability.map(
+            (a) => a.attendee,
+          );
+          if (attendees.some((m) => m === formData.userId)) {
+            return true;
+          } else {
+            return false;
+          }
+        }
+      });
+
+      events.push.apply(
+        events,
+        eventDocs.map((eventDoc) => {
+          return eventDocToResponseDTO(eventDoc.toObject({ virtuals: true }));
+        }),
+      );
+    }
+
     // Search for events belonging to a team
-    if (formData.teamId) {
+    else if (formData.teamId) {
       if (!(await TeamModel.exists({ _id: formData.teamId }))) {
         return returnError(Error('Team Not Found'), res, StatusCodes.NOT_FOUND);
       }
@@ -421,6 +501,9 @@ export async function addUserAvailabilityById(
 
     await eventDoc.save();
 
+    // If the user hasn't had the event added to their document then add it
+    await addToUserEventSet(formData.userId, eventId);
+
     // Send updated event via socket IO
     server.webSocket.send(`event:${eventId}`, eventDoc);
     res
@@ -552,9 +635,105 @@ export async function removeUserAvailabilityById(
     ].availability = adjustedAttendeeAvailability;
     await eventDoc.save();
 
+    // If the user hasn't had the event added to their document then add it
+    // This should include when removing availability from the event
+    await addToUserEventSet(formData.userId, eventId);
+
     // Send updated event via socket IO
     server.webSocket.send(`event:${eventId}`, eventDoc);
 
+    res.sendStatus(StatusCodes.OK);
+  } catch (err) {
+    returnError(err, res);
+  }
+}
+
+export async function getEventUsersById(
+  req: Request,
+  res: Response<UserResponseDTO[] | string>,
+) {
+  try {
+    const eventId = req.params.eventId;
+    const rules = Joi.object<{ eventId: string }>({
+      eventId: validators.id().required(),
+    });
+    const formData = validate(res, rules, { eventId }, { allowUnknown: true });
+
+    const eventDoc = await EventModel.findById(formData.eventId)
+      .populate<{ team: ITeam }>('team')
+      .populate<{ availability: IEventAvailability }>('availability');
+
+    if (!eventDoc) {
+      return returnError(Error('Event Not Found'), res, StatusCodes.NOT_FOUND);
+    }
+
+    // Find all the users
+    let allUserIds: string[] = [];
+    allUserIds.push(eventDoc.admin);
+    if (eventDoc.team) {
+      allUserIds.push(eventDoc.admin); // The admin of the event might not be the admin of the team
+      eventDoc.team.members.map((m) => {
+        allUserIds.push(m);
+      });
+    }
+
+    // Filter to make unqiue
+    allUserIds = [...new Set(allUserIds.map((s) => JSON.stringify(s)))].map(
+      (s) => JSON.parse(s),
+    );
+
+    const userResponseDocs: UserResponseDTO[] = (
+      await UserModel.find({ _id: { $in: allUserIds } })
+    ).map((u) => {
+      return {
+        id: u._id,
+        firstName: u.firstName,
+        lastName: u.lastName,
+        events: u.events,
+      };
+    });
+    res.status(StatusCodes.OK).send(userResponseDocs);
+  } catch (err) {
+    returnError(err, res);
+  }
+}
+
+export async function finalizeEventDate(req: Request, res: Response) {
+  try {
+    const eventId = req.params.eventId;
+
+    // Validate payload
+    const rules = Joi.object<FinalizeEventDateDTO & { eventId: string }>({
+      eventId: validators.id().required(),
+      startDate: validators.startDate().required(),
+      endDate: validators.endDate().required(),
+    });
+
+    const formData = validate(
+      res,
+      rules,
+      { ...req.body, eventId },
+      { allowUnknown: true },
+    );
+
+    const eventDoc = await EventModel.findById(formData.eventId);
+
+    // Check event exists
+    if (!eventDoc) {
+      return returnError(Error('Event Not Found'), res, StatusCodes.NOT_FOUND);
+    }
+
+    // Set finalized timebracket
+    eventDoc.availability.finalisedTime = {
+      startDate: formData.startDate,
+      endDate: formData.endDate,
+    };
+
+    // Set finalized status
+    eventDoc.status = EventStatus.Accepted;
+
+    eventDoc.save(); // Persist event
+    server.webSocket.send(`event:${eventId}`, eventDoc); // Emit event via websocket
     res.sendStatus(StatusCodes.OK);
   } catch (err) {
     returnError(err, res);

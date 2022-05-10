@@ -16,7 +16,7 @@ interface CreateUserDTO {
   events?: String[];
 }
 
-interface UserResponseDTO {
+export interface UserResponseDTO {
   id: string;
   firstName: string;
   lastName: string;
@@ -171,24 +171,28 @@ export async function getUserTeamsById(
   req: Request,
   res: Response<GetUserTeamsResponseDTO>,
 ) {
-  const firebaseUser = await getFirebaseUser(req, res);
-  const userId = req.params.userId;
+  try {
+    const firebaseUser = await getFirebaseUser(req, res);
+    const userId = req.params.userId;
 
-  if (firebaseUser.uid !== userId) {
-    // return Not found as its more secure to not tell the user if the UID exists or not
-    return returnError(Error('User Not Found'), res);
-  }
+    if (firebaseUser.uid !== userId) {
+      // return Not found as its more secure to not tell the user if the UID exists or not
+      return returnError(Error('User Not Found'), res);
+    }
 
-  // Either the user is the admin or is a member, is an admin a member?
-  const teamDocs = await TeamModel.find({
-    $or: [{ admin: userId }, { members: userId }],
-  });
-
-  if (!teamDocs) {
-    return returnError(Error('Cannot Find User Teams'), res);
-  } else {
-    res.status(StatusCodes.OK).send({
-      teams: teamDocs,
+    // Either the user is the admin or is a member, is an admin a member?
+    const teamDocs = await TeamModel.find({
+      $or: [{ admin: userId }, { members: userId }],
     });
+
+    if (!teamDocs) {
+      return returnError(Error('Cannot Find User Teams'), res);
+    } else {
+      res.status(StatusCodes.OK).send({
+        teams: teamDocs,
+      });
+    }
+  } catch (err) {
+    returnError(err, res);
   }
 }
