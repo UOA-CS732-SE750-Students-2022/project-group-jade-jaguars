@@ -1,6 +1,6 @@
 import { randomUUID } from 'crypto';
 import { Model, model, Schema, Types } from 'mongoose';
-import { calculatePotentialTimes } from '../service/models.service';
+import { calculatePotentialTimes } from '../service/services.module';
 
 export enum EventStatus {
   Pending = 'Pending',

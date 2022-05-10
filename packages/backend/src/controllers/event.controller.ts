@@ -4,14 +4,14 @@ import {
   EventStatus,
   IEvent,
   AvailabilityStatus,
-  ITimeBracket,
 } from '../schemas/event.schema';
-import { Request, Response } from 'express';
 import { StatusCodes } from 'http-status-codes';
-import { TypedRequestBody } from '../libs/utils.lib';
-import { returnError } from '../libs/error.lib';
 import Joi from 'joi';
 import { validate, validators } from '../libs/validate.lib';
+import { Request, Response } from 'express';
+import { TypedRequestBody } from '../libs/utils.lib';
+import { returnError } from '../libs/error.lib';
+import { addToUserEventSet } from '../service/user.service';
 import { UserModel } from '../schemas/user.schema';
 import { ITeam, TeamModel } from '../schemas/team.schema';
 import server from '../app';
@@ -131,7 +131,26 @@ export async function createEvent(
     // Validation failed, headers have been set, return
     if (!formData) return;
 
-    const eventDoc = await EventModel.create(formData);
+    // Create event
+    let eventDoc = await EventModel.create(formData);
+    const eventId = eventDoc._id;
+
+    // Add event to user documents
+    const eventDocPopulated = await EventModel.findById(eventId).populate<{
+      team: ITeam;
+    }>('team');
+    // Add event to team users
+    if (eventDocPopulated.team) {
+      // Add event to team admin
+      await addToUserEventSet(eventDocPopulated.team.admin, eventId);
+      // Add event to team  members
+      for (const memberId of eventDocPopulated.team.members) {
+        await addToUserEventSet(memberId, eventId);
+      }
+    }
+    // Also add it to the admin of the event
+    await addToUserEventSet(formData.admin, eventId);
+
     res
       .status(StatusCodes.CREATED)
       .send(eventDocToResponseDTO(eventDoc.toObject({ virtuals: true })));
@@ -261,8 +280,6 @@ export async function searchEvent(
           }
         }
       });
-
-      console.log(eventDocs);
 
       events.push.apply(
         events,
@@ -430,6 +447,9 @@ export async function addUserAvailabilityById(
 
     await eventDoc.save();
 
+    // If the user hasn't had the event added to their document then add it
+    await addToUserEventSet(formData.userId, eventId);
+
     // Send updated event via socket IO
     server.webSocket.send(`event:${eventId}`, eventDoc);
     res
@@ -548,6 +568,10 @@ export async function removeUserAvailabilityById(
       userEventAvailabilityIndex
     ].availability = adjustedAttendeeAvailability;
     await eventDoc.save();
+
+    // If the user hasn't had the event added to their document then add it
+    // This should include when removing availability from the event
+    await addToUserEventSet(formData.userId, eventId);
 
     // Send updated event via socket IO
     server.webSocket.send(`event:${eventId}`, eventDoc);
