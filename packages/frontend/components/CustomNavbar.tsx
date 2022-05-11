@@ -1,4 +1,4 @@
-import { Avatar, Group, Image, Navbar } from '@mantine/core';
+import { Affix, Avatar, Button, Group, Image, Navbar } from '@mantine/core';
 import { useViewportSize } from '@mantine/hooks';
 import React, { useEffect, useState } from 'react';
 import { CalendarEvent, LayoutDashboard, Users } from 'tabler-icons-react';
@@ -6,12 +6,12 @@ import { useAuth } from '../src/context/AuthContext';
 import { NavbarLink } from './NavbarLink';
 import { getAuth } from 'firebase/auth';
 import { useRouter } from 'next/router';
-import { Logout } from 'tabler-icons-react';
+import { Logout, Plus } from 'tabler-icons-react';
 
 const linkData = [
-  { icon: LayoutDashboard, label: 'Dashboard' },
-  { icon: CalendarEvent, label: 'Events' },
-  { icon: Users, label: 'Teams' },
+  { icon: LayoutDashboard, label: 'Dashboard', address: '/demo' },
+  { icon: CalendarEvent, label: 'Events', address: '/create' },
+  { icon: Users, label: 'Teams', address: '/finalised' },
 ];
 export const CustomNavbar = () => {
   const { height, width } = useViewportSize();
@@ -41,22 +41,37 @@ export const CustomNavbar = () => {
                 {...link}
                 key={link.label}
                 active={index === active}
-                onClick={() => setActive(index)}
+                onClick={() => {
+                  router.push(link.address);
+                  setActive(index);
+                }}
               />
             );
           })}
         </Group>
       </Navbar.Section>
       <Navbar.Section>
-        <Group direction="column" align="center" spacing="xs">
+        <Group direction="column" align="center" spacing="xs" mb={40}>
           <div
-            className="w-3/4 cursor-pointer flex items-center justify-center h-[80px] rounded-md  hover:bg-secondary"
+            className="w-[70px] cursor-pointer flex items-center justify-center h-[70px] rounded-xl  hover:bg-secondary"
             onClick={logout}
           >
             <Logout />
           </div>
         </Group>
       </Navbar.Section>
+      {!router.pathname.includes('/create') && (
+        <Affix position={{ bottom: 40, right: 40 }}>
+          <Group direction="column" align="center" spacing="xs">
+            <div
+              className="rounded-xl p-4 cursor-pointer bg-secondary "
+              onClick={() => router.push('/create')}
+            >
+              <Plus strokeWidth={2} size={35} />
+            </div>
+          </Group>
+        </Affix>
+      )}
     </Navbar>
   ) : (
     <div></div>
