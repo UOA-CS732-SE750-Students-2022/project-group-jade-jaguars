@@ -67,7 +67,7 @@ const Availability: NextPage = () => {
         ),
       );
 
-      allAvailabilities = val.availability.attendeeAvailability!;
+      allAvailabilities = val ? val.availability.attendeeAvailability! : [];
       if (
         allAvailabilities.find((attendee) => {
           return attendee.attendee === userId;
