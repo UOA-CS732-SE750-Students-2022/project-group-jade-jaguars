@@ -10,12 +10,20 @@ const Demo: NextPage = () => {
     !signedIn && router.push('/');
   }, [signedIn]);
 
+  function eventAvailability() {
+    router.push({
+      pathname: '/availability/',
+      query: { eventId: '4e403567-a47a-432b-bdef-5302c63d4e88' },
+    });
+  }
+
   return (
     <div>
       {userId}
       <hr></hr>
       {authToken}
       <button onClick={logout}>Logout</button>
+      <button onClick={eventAvailability}>Event Availability</button>
     </div>
   );
 };

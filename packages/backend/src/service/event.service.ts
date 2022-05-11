@@ -68,3 +68,46 @@ export function bracketsOverlap(d1: ITimeBracket, d2: ITimeBracket): boolean {
     return false;
   }
 }
+
+// Split time bracket spanning over multiple days into multiple into multiple timebrackets contained within individual days
+export function splitDays(
+  formStartDate: Date,
+  formEndDate: Date,
+): ITimeBracket[] {
+  // timeList will contain the list of potential times split up among different days.
+  let timeList: ITimeBracket[] = [];
+
+  const daysInTB =
+    (formEndDate.getTime() - formStartDate.getTime()) / (1000 * 3600 * 24); // How many days to split into.
+
+  // Separate out each day.
+  for (let i = 0; i < daysInTB; i++) {
+    // Setup start and endDates
+    let myStartDate = new Date(formStartDate);
+    myStartDate.setDate(myStartDate.getDate() + i);
+    let myEndDate = new Date(formEndDate);
+
+    if (
+      myStartDate.getHours() == 0 &&
+      myEndDate.getHours() == 0 &&
+      myStartDate.getMinutes() == 0 &&
+      myEndDate.getMinutes() == 0
+    ) {
+      myEndDate.setDate(myStartDate.getDate() + 1);
+    } else {
+      //
+      if (formEndDate.getHours() < 12 && formStartDate.getHours() >= 12) {
+        myEndDate.setDate(myStartDate.getDate() + 1);
+      } else {
+        myEndDate.setDate(myStartDate.getDate());
+      }
+    }
+    let newStartTime = new Date(myStartDate);
+    let newEndTime = new Date(myEndDate);
+    timeList.push({
+      startDate: newStartTime,
+      endDate: newEndTime,
+    });
+  }
+  return timeList;
+}

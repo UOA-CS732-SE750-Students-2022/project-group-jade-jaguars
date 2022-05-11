@@ -4,6 +4,7 @@ import {
   EventStatus,
   IEvent,
   AvailabilityStatus,
+  ITimeBracket,
 } from '../schemas/event.schema';
 import { StatusCodes } from 'http-status-codes';
 import Joi from 'joi';
@@ -16,6 +17,7 @@ import { UserModel } from '../schemas/user.schema';
 import { ITeam, TeamModel } from '../schemas/team.schema';
 import server from '../app';
 import { UserResponseDTO } from './user.controller';
+import { splitDays } from '../service/event.service';
 
 export interface CreateEventDTO {
   _id: string;
@@ -433,6 +435,12 @@ export async function addUserAvailabilityById(
       }
     }
 
+    console.log('formData');
+    console.log(formData);
+    const timeList = splitDays(formData.startDate, formData.endDate);
+    console.log('after splitdays');
+    console.log(timeList);
+
     const userEventAvailabilityIndex =
       eventDoc.availability.attendeeAvailability.findIndex(
         (x) => x.attendee === formData.userId,
@@ -440,21 +448,23 @@ export async function addUserAvailabilityById(
     if (userEventAvailabilityIndex == -1) {
       eventDoc.availability.attendeeAvailability.push({
         attendee: formData.userId,
-        availability: [
-          {
-            startDate: formData.startDate,
-            endDate: formData.endDate,
+        availability: timeList.map((time) => {
+          return {
+            startDate: time.startDate,
+            endDate: time.endDate,
             status: formData.status ?? AvailabilityStatus.Available, // Default to available
-          },
-        ],
+          };
+        }),
       });
     } else {
-      eventDoc.availability.attendeeAvailability[
-        userEventAvailabilityIndex
-      ].availability.push({
-        startDate: formData.startDate,
-        endDate: formData.endDate,
-        status: formData.status ?? AvailabilityStatus.Available,
+      timeList.map((time) => {
+        eventDoc.availability.attendeeAvailability[
+          userEventAvailabilityIndex
+        ].availability.push({
+          startDate: time.startDate,
+          endDate: time.endDate,
+          status: formData.status ?? AvailabilityStatus.Available,
+        });
       });
     }
 
@@ -525,57 +535,70 @@ export async function removeUserAvailabilityById(
       );
     }
 
+    const splitDates = splitDays(formData.startDate, formData.endDate);
+
     // Sweep though availability brackets in order to edit to remove parts of or whole brackets
+    let attendeeAvailability = [];
     let adjustedAttendeeAvailability = [];
 
-    eventDoc.availability.attendeeAvailability[
-      userEventAvailabilityIndex
-    ].availability.forEach((ts) => {
-      // Existing bracket falls entirely within removal bracket
-      if (
-        ts.startDate >= formData.startDate &&
-        ts.endDate <= formData.endDate
-      ) {
+    for (let i = 0; i < splitDates.length; i++) {
+      // First sweep though the attendees availability
+      if (i == 0) {
+        attendeeAvailability =
+          eventDoc.availability.attendeeAvailability[userEventAvailabilityIndex]
+            .availability;
       }
-      // Existing bracket starting left side removed
-      else if (
-        ts.startDate >= formData.startDate &&
-        ts.endDate >= formData.endDate
-      ) {
-        ts.startDate = formData.endDate;
-        adjustedAttendeeAvailability.push(ts);
+      // Not the first sweep though the attendees availability, needs to continue to be mutated and adjusted
+      else {
+        attendeeAvailability = [...adjustedAttendeeAvailability];
       }
-      // Existing bracket ending right side removed
-      else if (
-        ts.startDate <= formData.startDate &&
-        ts.endDate <= formData.endDate
-      ) {
-        ts.endDate = formData.startDate;
-        adjustedAttendeeAvailability.push(ts);
-      }
-      // Middle removed
-      else if (
-        ts.startDate <= formData.startDate &&
-        ts.endDate >= formData.endDate
-      ) {
-        // Start left block
-        adjustedAttendeeAvailability.push({
-          startDate: ts.startDate,
-          endDate: formData.startDate,
-          status: ts.status,
-        });
-        // End right block
-        adjustedAttendeeAvailability.push({
-          startDate: formData.endDate,
-          endDate: ts.endDate,
-          status: ts.status,
-        });
-      } else {
-        res
-          .status(StatusCodes.INTERNAL_SERVER_ERROR)
-          .send('error modifying date brackets');
-      }
-    });
+      adjustedAttendeeAvailability = [];
+      const time = splitDates[i];
+      attendeeAvailability.forEach((ts) => {
+        // Existing bracket falls entirely within removal bracket
+        if (ts.startDate >= time.startDate && ts.endDate <= time.endDate) {
+        }
+        // Existing bracket starting left side removed
+        else if (
+          ts.startDate >= time.startDate &&
+          ts.endDate >= time.endDate &&
+          ts.startDate < time.endDate
+        ) {
+          ts.startDate = time.endDate;
+          adjustedAttendeeAvailability.push(ts);
+        }
+        // Existing bracket ending right side removed
+        else if (
+          ts.startDate <= time.startDate &&
+          ts.endDate <= time.endDate &&
+          time.startDate < ts.endDate
+        ) {
+          ts.endDate = time.startDate;
+          adjustedAttendeeAvailability.push(ts);
+        }
+        // Middle removed
+        else if (ts.startDate <= time.startDate && ts.endDate >= time.endDate) {
+          // Start left block
+          adjustedAttendeeAvailability.push({
+            startDate: ts.startDate,
+            endDate: time.startDate,
+            status: ts.status,
+          });
+          // End right block
+          adjustedAttendeeAvailability.push({
+            startDate: time.endDate,
+            endDate: ts.endDate,
+            status: ts.status,
+          });
+        } else {
+          adjustedAttendeeAvailability.push({
+            startDate: ts.startDate,
+            endDate: ts.endDate,
+            status: ts.status,
+          });
+        }
+      });
+    }
 
     eventDoc.availability.attendeeAvailability[
       userEventAvailabilityIndex
