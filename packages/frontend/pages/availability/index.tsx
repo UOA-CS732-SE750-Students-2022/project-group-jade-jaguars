@@ -93,7 +93,7 @@ const Availability: NextPage = () => {
     io.on(`event:${eventId}`, (args: Event) => {
       console.log('event changed');
       console.log(args);
-      setAllAvailabilities(args.availability.attendeeAvailability!);
+      setAllAvailabilities(args!.availability!.attendeeAvailability!);
     });
     console.log(`listening to event: ${eventId}`);
   }, [eventId]);
