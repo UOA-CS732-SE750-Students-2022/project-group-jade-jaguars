@@ -20,6 +20,12 @@ export enum AvailabilityStatus {
   Tentative = 'Tentative',
 }
 
+export enum RepeatableStatus {
+  Single = 'Single',
+  Weekly = 'Weekly',
+  Monthly = 'Monthly',
+}
+
 export interface IAvailabilityBlock extends ITimeBracket {
   status: AvailabilityStatus;
 }
@@ -103,6 +109,7 @@ export interface IEvent {
   startDate: Date;
   endDate: Date;
   availability: IEventAvailability;
+  repeatable: RepeatableStatus;
   location?: string;
   team?: string; // id
   admin?: string; // id
@@ -145,6 +152,12 @@ const eventSchema = new Schema<IEvent>(
           attendeeAvailability: [],
         };
       },
+    },
+    repeatable: {
+      type: String,
+      enum: Object.values(RepeatableStatus),
+      required: true,
+      default: RepeatableStatus.Single,
     },
     description: {
       type: String,

@@ -5,6 +5,7 @@ import {
   IEvent,
   AvailabilityStatus,
   ITimeBracket,
+  RepeatableStatus,
 } from '../schemas/event.schema';
 import { StatusCodes } from 'http-status-codes';
 import Joi from 'joi';
@@ -28,6 +29,7 @@ export interface CreateEventDTO {
   endDate: Date;
   availability?: IEventAvailability;
   location?: string;
+  repeatable?: RepeatableStatus;
   team?: string; // id
   admin: string; // id
 }
@@ -131,6 +133,7 @@ export async function createEvent(
       startDate: validators.startDate().required(),
       endDate: validators.endDate().required(),
       availability: Joi.array().optional(),
+      repeatable: Joi.array().optional(),
       location: Joi.string().optional(),
       team: validators.id().optional(),
       admin: validators.id().optional(),
@@ -139,7 +142,7 @@ export async function createEvent(
     // Validation failed, headers have been set, return
     if (!formData) return;
 
-    // Create event
+    // Create a number of events
     let eventDoc = await EventModel.create(formData);
     const eventId = eventDoc._id;
 
