@@ -21,13 +21,12 @@ import {
   getUser,
 } from '../../helpers/apiCalls/apiCalls';
 
-const Availability: NextPage = () => {
+const TimeFinalisation: NextPage = () => {
   const [timeOptions, setTimeOptions] = useState<TimeBracket>({
     startDate: new Date('2022-05-01T21:00:00.000Z'),
     endDate: new Date('2022-05-05T05:00:00.000Z'),
   });
 
-  const [myAvailability, setMyAvailability] = useState<AvailabilityBlock[]>([]);
   const [allAvailabilities, setAllAvailabilities] = useState<
     AttendeeAvailability[]
   >([]);
@@ -53,7 +52,6 @@ const Availability: NextPage = () => {
   async function fetchData() {
     let startDate = timeOptions.startDate;
     let endDate = timeOptions.endDate;
-    let myAvailability: AvailabilityBlock[] = [];
     let allAvailabilities: AttendeeAvailability[] = [];
     let eventTitle = 'Event Title';
     await getEvent(eventId!.toString()).then((val: Event) => {
@@ -71,22 +69,12 @@ const Availability: NextPage = () => {
       );
 
       allAvailabilities = val ? val!.availability!.attendeeAvailability! : [];
-      if (
-        allAvailabilities.find((attendee) => {
-          return attendee.attendee === userId;
-        })
-      ) {
-        myAvailability = allAvailabilities.find((attendee) => {
-          return attendee.attendee === userId;
-        })!.availability;
-      }
     });
     setEventTitle(eventTitle);
     setTimeOptions({
       startDate: startDate,
       endDate: endDate,
     });
-    setMyAvailability(myAvailability);
     setAllAvailabilities(allAvailabilities);
   }
 
@@ -102,17 +90,7 @@ const Availability: NextPage = () => {
     console.log(`listening to event: ${eventId}`);
   }, [eventId]);
 
-  const [status, setStatus] = useState<AvailabilityStatusStrings>(
-    AvailabilityStatusStrings.Available,
-  );
   const [info, setInfo] = useState<JSX.Element[]>([]);
-
-  function finaliseTimes() {
-    router.push({
-      pathname: '/timeFinalisation/',
-      query: { eventId: eventId },
-    });
-  }
 
   const handleHover = async (peopleInfo: {
     people: AttendeeStatus[];
@@ -138,45 +116,6 @@ const Availability: NextPage = () => {
     getInfoMap();
   };
 
-  const handleSelection = async (selection: {
-    startDate: Date;
-    endDate: Date;
-  }) => {
-    const startTime = new Date(selection.startDate);
-    startTime.setHours(startTime.getHours() + 12);
-    const endTime = new Date(selection.endDate);
-    endTime.setHours(endTime.getHours() + 12);
-    endTime.setMinutes(endTime.getMinutes() + 30);
-
-    await createAvailability(eventId!.toString(), {
-      startDate: startTime.toISOString(),
-      endDate: endTime.toISOString(),
-      status: status,
-      userId: userId,
-    });
-
-    return true;
-  };
-
-  const handleDeletion = async (deletion: {
-    startDate: Date;
-    endDate: Date;
-  }) => {
-    const startTime = new Date(deletion.startDate);
-    startTime.setHours(startTime.getHours() + 12);
-    const endTime = new Date(deletion.endDate);
-    endTime.setHours(endTime.getHours() + 12);
-    endTime.setMinutes(endTime.getMinutes() + 30);
-
-    await deleteAvailability(eventId!.toString(), {
-      userId: userId,
-      startDate: startTime.toISOString(),
-      endDate: endTime.toISOString(),
-    });
-
-    return true;
-  };
-
   const handlePageChange = (pageNum: number) => {
     fetchData().catch(console.error);
     setPageNum(pageNum);
@@ -192,72 +131,7 @@ const Availability: NextPage = () => {
         <Col>
           <Row>
             <Col>
-              <h2>Your Availability</h2>
-            </Col>
-            <Col>
-              <Row>
-                <button
-                  className={
-                    'bg-primary text-black border-2 w-[100px] cursor-pointer rounded-md px-2 py-1 font-semibold hover:bg-primarylight ' +
-                    (status === AvailabilityStatusStrings.Available
-                      ? 'border-black'
-                      : '')
-                  }
-                  onClick={() => setStatus(AvailabilityStatusStrings.Available)}
-                >
-                  Available
-                </button>
-              </Row>
-              <Row>
-                <button
-                  className={
-                    'bg-secondary text-black border-2 w-[100px] cursor-pointer rounded-md px-2 py-1 font-semibold hover:bg-secondarylight ' +
-                    (status === AvailabilityStatusStrings.Tentative
-                      ? 'border-black'
-                      : '')
-                  }
-                  onClick={() => setStatus(AvailabilityStatusStrings.Tentative)}
-                >
-                  Maybe
-                </button>
-              </Row>
-            </Col>
-          </Row>
-          <Row>
-            <AvailabilitySelector
-              timeOptions={timeOptions}
-              availability={myAvailability}
-              status={status}
-              pageNum={pageNum}
-              selectionHandler={handleSelection}
-              deletionHandler={handleDeletion}
-            />
-          </Row>
-          <Row>
-            <button
-              className={
-                'bg-secondary text-black w-[30px] cursor-pointer rounded-md px-2 py-1 font-semibold hover:bg-secondarylight absolute right-[70px] ' +
-                (pageNum > 1 ? 'block' : 'hidden')
-              }
-              onClick={() => handlePageChange(pageNum - 1)}
-            >
-              {'<'}
-            </button>
-            <button
-              className={
-                'bg-secondary text-black w-[30px] cursor-pointer rounded-md px-2 py-1 font-semibold hover:bg-secondarylight absolute right-0 mr-[30px] ' +
-                (pageNum < numPages ? 'block' : 'hidden')
-              }
-              onClick={() => handlePageChange(pageNum + 1)}
-            >
-              {'>'}
-            </button>
-          </Row>
-        </Col>
-        <Col>
-          <Row>
-            <Col>
-              <h2 className="mb-[35px]">Group Availability</h2>
+              <h2>Group Availability</h2>
             </Col>
             <Col>
               <h2 className="ml-[50px]">{allAvailabilities.length}</h2>
@@ -281,18 +155,31 @@ const Availability: NextPage = () => {
           <Row>
             <button
               className={
-                'bg-secondary text-black w-[100px] cursor-pointer rounded-md px-2 py-1 font-semibold hover:bg-secondarylight absolute right-0 ' +
-                (isAdmin ? 'block' : 'hidden')
+                'bg-secondary text-black w-[30px] cursor-pointer rounded-md px-2 py-1 font-semibold hover:bg-secondarylight absolute right-[70px] ' +
+                (pageNum > 1 ? 'block' : 'hidden')
               }
-              onClick={() => finaliseTimes()}
+              onClick={() => handlePageChange(pageNum - 1)}
             >
-              Finalise {'>'}
+              {'<'}
+            </button>
+            <button
+              className={
+                'bg-secondary text-black w-[30px] cursor-pointer rounded-md px-2 py-1 font-semibold hover:bg-secondarylight absolute right-0 mr-[30px] ' +
+                (pageNum < numPages ? 'block' : 'hidden')
+              }
+              onClick={() => handlePageChange(pageNum + 1)}
+            >
+              {'>'}
             </button>
           </Row>
+        </Col>
+        <Col>
+          <Row>Options</Row>
+          <Row></Row>
         </Col>
       </Row>
     </div>
   );
 };
 
-export default Availability;
+export default TimeFinalisation;
