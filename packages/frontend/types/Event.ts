@@ -6,7 +6,7 @@ export default interface Event {
   status?: EventStatus;
   startDate: Date;
   endDate: Date;
-  availability: EventAvailability;
+  availability?: EventAvailability;
   attendees?: [];
   location?: string;
   team?: string; // id
