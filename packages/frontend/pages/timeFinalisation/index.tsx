@@ -20,12 +20,15 @@ import {
   deleteAvailability,
   getUser,
 } from '../../helpers/apiCalls/apiCalls';
+import { TimeOptionsList } from '../../components/TimeOptionsList';
 
 const TimeFinalisation: NextPage = () => {
   const [timeOptions, setTimeOptions] = useState<TimeBracket>({
     startDate: new Date('2022-05-01T21:00:00.000Z'),
     endDate: new Date('2022-05-05T05:00:00.000Z'),
   });
+
+  const [potentialTimes, setPotentialTimes] = useState<TimeBracket[]>([]);
 
   const [allAvailabilities, setAllAvailabilities] = useState<
     AttendeeAvailability[]
@@ -54,6 +57,7 @@ const TimeFinalisation: NextPage = () => {
     let endDate = timeOptions.endDate;
     let allAvailabilities: AttendeeAvailability[] = [];
     let eventTitle = 'Event Title';
+    let potentialTimes: TimeBracket[] = [];
     await getEvent(eventId!.toString()).then((val: Event) => {
       eventTitle = val.title;
       if (val.admin === userId) {
@@ -69,6 +73,9 @@ const TimeFinalisation: NextPage = () => {
       );
 
       allAvailabilities = val ? val!.availability!.attendeeAvailability! : [];
+      potentialTimes = val!.availability!.potentialTimes
+        ? val!.availability!.potentialTimes!
+        : [];
     });
     setEventTitle(eventTitle);
     setTimeOptions({
@@ -76,6 +83,7 @@ const TimeFinalisation: NextPage = () => {
       endDate: endDate,
     });
     setAllAvailabilities(allAvailabilities);
+    setPotentialTimes(potentialTimes);
   }
 
   useEffect(() => {
@@ -127,7 +135,7 @@ const TimeFinalisation: NextPage = () => {
         <h1 className="mr-[30px] my-0 leading-none">{eventTitle}</h1>
         <ShareLinkButton eventLink={'https://www.google.com/'} />
       </Row>
-      <Row>
+      <Row gap={1}>
         <Col>
           <Row>
             <Col>
@@ -175,7 +183,9 @@ const TimeFinalisation: NextPage = () => {
         </Col>
         <Col>
           <Row>Options</Row>
-          <Row></Row>
+          <Row>
+            <TimeOptionsList options={potentialTimes} />
+          </Row>
         </Col>
       </Row>
     </div>
