@@ -1,10 +1,9 @@
 import { useState, useEffect, useRef, MouseEventHandler } from 'react';
+import { AttendeeAvailability, TimeBracket } from '../types/Event';
 import {
-  AttendeeAvailability,
-  AvailabilityStatus,
   AttendeeStatus,
+  AvailabilityStatusStrings,
 } from '../types/Availability';
-import TimeBracket from '../types/TimeBracket';
 
 /*
  *  Assumption: no more than 7 days sent through as timeOptions.
@@ -13,8 +12,9 @@ import TimeBracket from '../types/TimeBracket';
  *         onHover: a function returning the info about the timeslot to the page.
  */
 function GroupAvailability(props: {
-  timeOptions: TimeBracket[];
+  timeOptions: TimeBracket;
   availabilities: AttendeeAvailability[];
+  pageNum: number;
   onHover: (info: { people: AttendeeStatus[]; numPeople: number }) => void;
 }) {
   const [timeList, setTimeList] = useState<TimeBracket[]>([]);
@@ -36,8 +36,25 @@ function GroupAvailability(props: {
 
   // Initialise the grid.
   useEffect(() => {
-    const startTime = new Date(props.timeOptions[0].startTime);
-    const endTime = new Date(props.timeOptions[0].endTime);
+    const startTime = new Date(props.timeOptions.startDate);
+    startTime.setDate(startTime.getDate() + (props.pageNum - 1) * 7);
+    const endTime = new Date(props.timeOptions.startDate);
+
+    let lastTime = new Date(props.timeOptions.endDate);
+
+    if (
+      (props.timeOptions.endDate.getTime() - startTime.getTime()) /
+        (1000 * 3600 * 24) >
+      7
+    ) {
+      lastTime = new Date(startTime);
+      lastTime.setDate(startTime.getDate() + 6);
+      lastTime.setHours(props.timeOptions.endDate.getHours());
+      lastTime.setMinutes(props.timeOptions.endDate.getMinutes());
+    }
+
+    endTime.setHours(lastTime.getHours());
+    endTime.setMinutes(lastTime.getMinutes());
 
     let halfHours = (endTime.getHours() - startTime.getHours()) * 2;
 
@@ -48,37 +65,36 @@ function GroupAvailability(props: {
       halfHours++;
     }
 
-    // timeList will contain the list of potential times split up among different days.
-    let timeList = props.timeOptions;
-
-    // If the time brackets are between midnight and midnight, need to split up the days.
-    if (
-      !(
-        endTime.getFullYear() === startTime.getFullYear() &&
-        endTime.getMonth() === startTime.getMonth() &&
-        endTime.getDate() === startTime.getDate()
-      )
-    ) {
-      timeList = [];
-      // Check each set of time brackets.
-      for (let index in props.timeOptions) {
-        let myStartTime = new Date(props.timeOptions[index].startTime);
-        const finalEndTime = new Date(props.timeOptions[index].endTime);
-        const daysInTB =
-          (finalEndTime.getTime() - myStartTime.getTime()) / (1000 * 3600 * 24); // How many days to split into.
-
-        // Separate out each day.
-        for (let i = 0; i < daysInTB; i++) {
-          let myEndTime = new Date(myStartTime);
-          myEndTime.setDate(myStartTime.getDate() + 1);
-          timeList.push({
-            startTime: myStartTime.getTime(),
-            endTime: myEndTime.getTime(),
-          });
-          myStartTime.setTime(myEndTime.getTime());
-        }
-      }
+    if (halfHours === 0) {
       halfHours = 48;
+    }
+
+    // timeList will contain the list of potential times split up among different days.
+    let timeList: TimeBracket[] = [];
+
+    const daysInTB =
+      (lastTime.getTime() - startTime.getTime()) / (1000 * 3600 * 24); // How many days to split into.
+
+    // Separate out each day.
+    for (let i = 0; i < daysInTB; i++) {
+      let myEndTime = new Date(lastTime);
+      if (
+        startTime.getHours() == 0 &&
+        myEndTime.getHours() == 0 &&
+        startTime.getMinutes() == 0 &&
+        myEndTime.getMinutes() == 0
+      ) {
+        myEndTime.setDate(startTime.getDate() + 1);
+      } else {
+        myEndTime.setDate(startTime.getDate());
+      }
+      let newStartTime = new Date(startTime);
+      let newEndTime = new Date(myEndTime);
+      timeList.push({
+        startDate: newStartTime,
+        endDate: newEndTime,
+      });
+      startTime.setDate(startTime.getDate() + 1);
     }
 
     let initialTimeSlots: {
@@ -94,7 +110,7 @@ function GroupAvailability(props: {
     // Map the time slots to grid items.
     for (let i = 0; i < halfHours; i++) {
       for (let j = 0; j < numDays; j++) {
-        const day = new Date(timeList[j].startTime);
+        const day = new Date(timeList[j].startDate);
         let time = day.getHours() + 0.5 * i;
         if (day.getMinutes() == 30) {
           time += 0.5;
@@ -123,30 +139,36 @@ function GroupAvailability(props: {
           for (let j in props.availabilities[i].availability) {
             if (
               props.availabilities[i].availability[j].status ==
-              AvailabilityStatus.Unavailable
+              AvailabilityStatusStrings.Unavailable
             )
               continue;
             const startDT = new Date(
-              props.availabilities[i].availability[j].startTime,
+              new Date(props.availabilities[i].availability[j].startDate)
+                .toISOString()
+                .slice(0, 19)
+                .replace('Z', ' '),
             );
             const endDT = new Date(
-              props.availabilities[i].availability[j].endTime,
+              new Date(props.availabilities[i].availability[j].endDate)
+                .toISOString()
+                .slice(0, 19)
+                .replace('Z', ' '),
             );
             if (dateTime >= startDT && dateTime < endDT) {
               if (
                 props.availabilities[i].availability[j].status ==
-                AvailabilityStatus.Available
+                AvailabilityStatusStrings.Available
               ) {
                 percentAvailable += 1 / numPeople;
                 people.push({
-                  uuid: props.availabilities[i].uuid,
-                  status: AvailabilityStatus.Available,
+                  uuid: props.availabilities[i].attendee,
+                  status: AvailabilityStatusStrings.Available,
                 });
               } else {
                 percentAvailable += 1 / (2 * numPeople);
                 people.push({
-                  uuid: props.availabilities[i].uuid,
-                  status: AvailabilityStatus.Tentative,
+                  uuid: props.availabilities[i].attendee,
+                  status: AvailabilityStatusStrings.Tentative,
                 });
               }
               break;
@@ -162,8 +184,8 @@ function GroupAvailability(props: {
       }
     }
 
-    const startDate = new Date(timeList[0].startTime);
-    const endDate = new Date(timeList[0].endTime);
+    const startDate = new Date(timeList[0].startDate);
+    const endDate = new Date(timeList[0].endDate);
 
     let hourList: string[] = [];
     let mins = '00';
@@ -211,13 +233,13 @@ function GroupAvailability(props: {
   }
 
   return (
-    <div>
+    <div className="m-[30px]">
       <div
         className="grid h-[20px] ml-[30px]"
         style={{ gridTemplateColumns: 'repeat(' + numCols + ', 60px)' }}
       >
         {timeList.map((timeBracket, index) => {
-          const startDate = new Date(timeBracket.startTime);
+          const startDate = new Date(timeBracket.startDate);
           return (
             <div
               className="w-[60px] h-[20px] text-[12px] z-1 block text-black text-center"
@@ -248,16 +270,18 @@ function GroupAvailability(props: {
         >
           {timeSlots.map((timeSlot, index) => (
             <div
-              className="w-px-60 h-px-20 block border border-solid border-black z-1"
+              className={
+                'w-px-60 h-px-20 block border border-solid border-black z-1 ' +
+                (() => {
+                  if (timeSlot.percentAvailable === 0) {
+                    return 'bg-white';
+                  } else {
+                    return 'bg-primary';
+                  }
+                })()
+              }
               key={index}
               style={{
-                backgroundColor: (() => {
-                  if (timeSlot.percentAvailable === 0) {
-                    return 'white';
-                  } else {
-                    return 'green';
-                  }
-                })(),
                 opacity: (() => {
                   if (timeSlot.percentAvailable === 0) {
                     return 1;

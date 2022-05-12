@@ -1,11 +1,16 @@
 import { Checkbox } from '@mantine/core';
 import { useHover } from '@mantine/hooks';
-import React from 'react';
+import React, { useState } from 'react';
 interface TeamCheckBoxProps {
   label: string;
   order: number;
+  handleClick: (checked: boolean, label: string) => void;
 }
-export const TeamCheckBox: React.FC<TeamCheckBoxProps> = ({ label, order }) => {
+export const TeamCheckBox: React.FC<TeamCheckBoxProps> = ({
+  label,
+  order,
+  handleClick,
+}) => {
   const inputBackgroundColorList = [
     '#BDD8FF',
     '#FFE074',
@@ -17,9 +22,16 @@ export const TeamCheckBox: React.FC<TeamCheckBoxProps> = ({ label, order }) => {
   const inputBackgroundColor = inputBackgroundColorList[order % 5];
   const inputStyle = `ml-3 border-solid border-black border-2 cursor-pointer`;
   const { hovered, ref } = useHover();
+  const [checked, setChecked] = useState(false);
   return (
     <div ref={ref}>
       <Checkbox
+        checked={checked}
+        onChange={(e) => {
+          handleClick(checked, label);
+          console.log('first' + checked);
+          setChecked(e.currentTarget.checked);
+        }}
         color={color}
         label={label}
         classNames={{

@@ -1,8 +1,11 @@
 import { AppProps } from 'next/app';
 import Head from 'next/head';
-import { MantineProvider } from '@mantine/core';
+import { AppShell, MantineProvider } from '@mantine/core';
 import '../styles/globals.css';
 import 'antd/dist/antd.css';
+import { AuthProvider, useAuth } from '../src/context/AuthContext';
+import { CustomNavbar } from '../components/CustomNavbar';
+
 export default function App(props: AppProps) {
   const { Component, pageProps } = props;
 
@@ -25,7 +28,11 @@ export default function App(props: AppProps) {
           fontFamily: 'Poppins, sans-serif',
         }}
       >
-        <Component {...pageProps} />
+        <AuthProvider>
+          <AppShell fixed navbar={<CustomNavbar />}>
+            <Component {...pageProps} />
+          </AppShell>
+        </AuthProvider>
       </MantineProvider>
     </>
   );

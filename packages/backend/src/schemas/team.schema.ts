@@ -1,7 +1,5 @@
 import { Model, model, Schema, Types } from 'mongoose';
-import { identifier } from '../service/event.service';
-import { randomEnum } from '..//libs/utils.lib';
-import mongoose from 'mongoose';
+import { randomEnum } from '../libs/utils.lib';
 import { randomUUID } from 'crypto';
 
 // TODO: Replace this with a appropriate library or expand to whatever we need
@@ -36,8 +34,7 @@ const teamSchema = new Schema(
     },
     description: {
       type: String,
-      required: true,
-      default: 'description',
+      required: false,
     },
     color: {
       type: String,

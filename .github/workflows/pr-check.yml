@@ -8,6 +8,16 @@ on:
       - synchronize
       - ready_for_review
       - reopened
+
+env:
+  NEXT_PUBLIC_API_KEY: ${{ secrets.FB_API_KEY}}
+  NEXT_PUBLIC_AUTH_DOMAIN: ${{ secrets.FB_AUTH_DOMAIN}}
+  NEXT_PUBLIC_PROJECT_ID: ${{ secrets.FB_PROJECT_ID}}
+  NEXT_PUBLIC_STORAGE_BUCKET: ${{ secrets.FB_STORAGE_BUCKET}}
+  NEXT_PUBLIC_MESSAGING_SENDER_ID: ${{ secrets.FB_MESSAGING_SENDER_ID}}
+  NEXT_PUBLIC_APP_ID: ${{ secrets.FB_APP_ID}}
+  NEXT_PUBLIC_MEASUREMENT_ID: ${{ secrets.FB_MEASUREMENT_ID}}
+
 jobs:
   Test:
     runs-on: ubuntu-latest

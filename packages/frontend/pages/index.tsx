@@ -1,91 +1,34 @@
 import type { NextPage } from 'next';
-
-import TeamDetailsCard from '../components/TeamDetailsCard';
-import TeamDetails from '../types/TeamDetails';
-import Head from 'next/head';
-import Image from 'next/image';
-import CheckBoxList from '../components/CheckBoxList';
-import EventCard from '../components/EventCard/EventCard';
-import styles from '../styles/Home.module.css';
-import { ShareLinkButton } from '../components/ShareLinkButton';
-import AvailabilitySelector from '../components/AvailabilitySelector';
-import GroupAvailability from '../components/GroupAvailability';
-import TimeBracket from '../types/TimeBracket';
-import {
-  AttendeeAvailability,
-  AttendeeStatus,
-  AvailabilityStatus,
-} from '../types/Availability';
-
-const timeOptions: TimeBracket[] = [
-  {
-    startTime: 1650229200000,
-    endTime: 1650258000000,
-  },
-  {
-    startTime: 1650315600000,
-    endTime: 1650344400000,
-  },
-  {
-    startTime: 1650402000000,
-    endTime: 1650430800000,
-  },
-  {
-    startTime: 1650488400000,
-    endTime: 1650517200000,
-  },
-  {
-    startTime: 1650574800000,
-    endTime: 1650603600000,
-  },
-];
-
-const availabilities: AttendeeAvailability[] = [
-  {
-    uuid: 'Brad',
-    availability: [
-      {
-        startTime: 1650232800000,
-        endTime: 1650250800000,
-        status: AvailabilityStatus.Available,
-      },
-      {
-        startTime: 1650402000000,
-        endTime: 1650430800000,
-        status: AvailabilityStatus.Tentative,
-      },
-    ],
-  },
-  {
-    uuid: 'Chad',
-    availability: [
-      {
-        startTime: 1650243600000,
-        endTime: 1650254400000,
-        status: AvailabilityStatus.Available,
-      },
-      {
-        startTime: 1650405600000,
-        endTime: 1650423600000,
-        status: AvailabilityStatus.Available,
-      },
-      {
-        startTime: 1650495600000,
-        endTime: 1650517200000,
-        status: AvailabilityStatus.Tentative,
-      },
-    ],
-  },
-];
-
-const handleHover = (info: { people: AttendeeStatus[]; numPeople: number }) => {
-  console.log(info);
-};
+import { useEffect } from 'react';
+import { useAuth } from '../src/context/AuthContext';
+import { useRouter } from 'next/router';
 
 const Home: NextPage = () => {
+  const { userId, authToken, user, login, logout, signedIn, setUser } =
+    useAuth();
+  const router = useRouter();
+  useEffect(() => {
+    signedIn ? router.push('/') : router.push('/login');
+  }, [signedIn]);
+
+  // stage event: ce282192-a323-49c9-8260-28a842dea19c
+  // prod event: a78d55d9-278b-4512-a1f8-5ea9faafd110
+
+  function eventAvailability() {
+    router.push({
+      pathname: '/availability/',
+      query: { eventId: '11b1f35f-5c83-487f-98f4-f073a50f8156' },
+    });
+  }
+
   return (
     <>
-      <ShareLinkButton eventLink={'http'} />
+      {signedIn && (
+        <div>
+          <button onClick={logout}>Logout</button>
+          <button onClick={eventAvailability}>Event Availability</button>
+        </div>
+      )}
     </>
   );
 };

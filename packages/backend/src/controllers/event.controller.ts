@@ -4,15 +4,20 @@ import {
   EventStatus,
   IEvent,
   AvailabilityStatus,
+  ITimeBracket,
 } from '../schemas/event.schema';
-import { Request, Response } from 'express';
 import { StatusCodes } from 'http-status-codes';
-import { TypedRequestBody } from '../libs/utils.lib';
-import { returnError } from '../libs/error.lib';
 import Joi from 'joi';
 import { validate, validators } from '../libs/validate.lib';
+import { Request, Response } from 'express';
+import { TypedRequestBody } from '../libs/utils.lib';
+import { returnError } from '../libs/error.lib';
+import { addToUserEventSet } from '../service/user.service';
 import { UserModel } from '../schemas/user.schema';
-import { TeamModel } from '../schemas/team.schema';
+import { ITeam, TeamModel } from '../schemas/team.schema';
+import server from '../app';
+import { UserResponseDTO } from './user.controller';
+import { splitDays } from '../service/event.service';
 
 export interface CreateEventDTO {
   _id: string;
@@ -21,16 +26,17 @@ export interface CreateEventDTO {
   status?: EventStatus;
   startDate: Date;
   endDate: Date;
-  availability: IEventAvailability;
-  location: string;
-  team?: string;
+  availability?: IEventAvailability;
+  location?: string;
+  team?: string; // id
+  admin: string; // id
 }
 
-export interface PatchEventDTO extends Partial<IEvent> {
-  eventId: string;
-}
+// Can change everything but the id
+export interface PatchEventDTO extends Partial<Omit<IEvent, '_id'>> {}
 
 export interface SearchEventDTO {
+  userId?: string;
   teamId?: string;
   startDate?: Date;
   endDate?: Date;
@@ -39,7 +45,7 @@ export interface SearchEventDTO {
   limit?: number;
 }
 
-export interface AddUserAvalabilityDTO {
+export interface AddUserAvailabilityDTO {
   userId: string;
   startDate: Date;
   endDate: Date;
@@ -53,17 +59,9 @@ export interface RemoveUserAvalabilityDTO {
   endDate: Date;
 }
 
-export interface SetEventAvailabilityConfirmationDTO {
-  userId: string;
-  confirmed: Boolean;
-}
-
-export interface GetEventAvailabilityConfirmationsDTO {
-  eventId: string;
-}
-
-export interface GetEventAvailabilityConfirmationsResponseDTO {
-  confirmed: Number;
+interface FinalizeEventDateDTO {
+  startDate: Date;
+  endDate: Date;
 }
 
 export interface EventResponseDTO {
@@ -75,11 +73,11 @@ export interface EventResponseDTO {
   endDate: Date;
   availability: IEventAvailability;
   location?: string;
-  identifier: string;
   team: string;
+  admin: string;
 }
 
-// Helper function for mapping a event documetn to a respone object
+// Helper function for mapping a event document to a response object
 function eventDocToResponseDTO(eventDoc: any): EventResponseDTO {
   return {
     id: eventDoc._id,
@@ -90,8 +88,8 @@ function eventDocToResponseDTO(eventDoc: any): EventResponseDTO {
     availability: eventDoc.availability,
     description: eventDoc.description,
     location: eventDoc.location,
-    identifier: eventDoc.identifier,
     team: eventDoc.team,
+    admin: eventDoc.admin,
   };
 }
 
@@ -106,12 +104,16 @@ export async function getEventById(
       eventId: validators.title().required(),
     });
     const formData = validate(res, rules, { eventId }, { allowUnknown: true });
+    // Validation failed, headers have been set, return
+    if (!formData) return;
 
     const eventDoc = await EventModel.findById(formData.eventId);
     if (!eventDoc) {
       return returnError(Error('Event Not Found'), res, StatusCodes.NOT_FOUND);
     }
-    res.status(StatusCodes.OK).send(eventDocToResponseDTO(eventDoc));
+    res
+      .status(StatusCodes.OK)
+      .send(eventDocToResponseDTO(eventDoc.toObject({ virtuals: true })));
   } catch (err) {
     returnError(err, res);
   }
@@ -128,13 +130,45 @@ export async function createEvent(
       status: validators.eventStatus().optional(),
       startDate: validators.startDate().required(),
       endDate: validators.endDate().required(),
-      location: validators.location().optional(),
+      availability: Joi.array().optional(),
+      location: Joi.string().optional(),
       team: validators.id().optional(),
+      admin: validators.id().optional(),
     });
-
     const formData = validate(res, rules, req.body, { allowUnknown: true });
-    const eventDoc = await EventModel.create(formData);
-    res.status(StatusCodes.CREATED).send(eventDocToResponseDTO(eventDoc));
+    // Validation failed, headers have been set, return
+    if (!formData) return;
+
+    // Create event
+    let eventDoc = await EventModel.create(formData);
+    const eventId = eventDoc._id;
+
+    // Add event to user documents
+    const eventDocPopulated = await EventModel.findById(eventId).populate<{
+      team: ITeam;
+    }>('team');
+    // Add event to team users
+    if (eventDocPopulated.team) {
+      // Add event to team admin
+      await addToUserEventSet(eventDocPopulated.team.admin, eventId);
+      // Add event to team  members
+      for (const memberId of eventDocPopulated.team.members) {
+        await addToUserEventSet(memberId, eventId);
+      }
+
+      await eventDocPopulated.save();
+
+      // Add event to team
+      const teamDoc = await TeamModel.findById(eventDocPopulated.team._id);
+      teamDoc.events.push(eventId);
+      await teamDoc.save();
+    }
+    // Also add it to the admin of the event
+    await addToUserEventSet(formData.admin, eventId);
+
+    res
+      .status(StatusCodes.CREATED)
+      .send(eventDocToResponseDTO(eventDoc.toObject({ virtuals: true })));
   } catch (err) {
     returnError(err, res);
   }
@@ -163,6 +197,8 @@ export async function patchEventById(
       { ...req.body, eventId },
       { allowUnknown: true },
     );
+    // Validation failed, headers have been set, return
+    if (!formData) return;
 
     const eventDoc = await EventModel.findOneAndUpdate(
       { _id: eventId },
@@ -172,7 +208,13 @@ export async function patchEventById(
     if (!eventDoc) {
       return returnError(Error('Event Not Found'), res, StatusCodes.NOT_FOUND);
     }
-    res.status(StatusCodes.OK).send(eventDocToResponseDTO(eventDoc));
+
+    // Send updated event via socket IO
+    server.webSocket.send(`event:${eventId}`, eventDoc);
+
+    res
+      .status(StatusCodes.OK)
+      .send(eventDocToResponseDTO(eventDoc.toObject({ virtuals: true })));
   } catch (err) {
     returnError(err, res);
   }
@@ -186,6 +228,8 @@ export async function deleteEventById(req: Request, res: Response) {
       eventId: validators.id().required(),
     });
     const formData = validate(res, rules, { eventId }, { allowUnknown: true });
+    // Validation failed, headers have been set, return
+    if (!formData) return;
 
     const deleteResult = await EventModel.deleteOne({ _id: formData.eventId });
     if (deleteResult.deletedCount === 0) {
@@ -204,22 +248,70 @@ export async function searchEvent(
 ) {
   try {
     const rules = Joi.object<SearchEventDTO>({
+      userId: validators.id().optional(),
       teamId: validators.id().optional(),
       titleSubStr: Joi.string().optional(),
       descriptionSubStr: Joi.string().optional(),
-    }).oxor('teamId', 'titleSubStr', 'descriptionSubStr');
+    }).oxor('userId', 'teamId', 'titleSubStr', 'descriptionSubStr');
 
     let formData = validate(res, rules, req.body, { allowUnknown: true });
+    // Validation failed, headers have been set, return
+    if (!formData) return;
 
     let events: EventResponseDTO[] = [];
+
+    // Search for events belonging to a user
+    if (formData.userId) {
+      if (!(await UserModel.exists({ _id: formData.userId }))) {
+        return returnError(Error('User Not Found'), res, StatusCodes.NOT_FOUND);
+      }
+
+      // This logic is slightly complex, either the user
+      // XXX: Filter through all event docs, this is just a lot easier for the moment
+      let eventDocs = (
+        await EventModel.find({})
+          .populate<{ team: ITeam }>('team')
+          .populate<{ availability: IEventAvailability }>('availability')
+      ).filter((e) => {
+        // Check team members
+        if (e.team) {
+          const allTeamMembers = e.team.members.concat(e.team.admin);
+          if (allTeamMembers.some((m) => m === formData.userId)) {
+            return true;
+          } else {
+            return false;
+          }
+        }
+        // Check availability for membership
+        else {
+          // Get all unique attendees who have added an availability
+          const attendees = e.availability.attendeeAvailability.map(
+            (a) => a.attendee,
+          );
+          if (attendees.some((m) => m === formData.userId)) {
+            return true;
+          } else {
+            return false;
+          }
+        }
+      });
+
+      events.push.apply(
+        events,
+        eventDocs.map((eventDoc) => {
+          return eventDocToResponseDTO(eventDoc.toObject({ virtuals: true }));
+        }),
+      );
+    }
+
     // Search for events belonging to a team
-    if (formData.teamId) {
+    else if (formData.teamId) {
       if (!(await TeamModel.exists({ _id: formData.teamId }))) {
         return returnError(Error('Team Not Found'), res, StatusCodes.NOT_FOUND);
       }
       const eventDocs = (await EventModel.find({ team: formData.teamId })).map(
         (eventDoc) => {
-          return eventDocToResponseDTO(eventDoc);
+          return eventDocToResponseDTO(eventDoc.toObject({ virtuals: true }));
         },
       );
       events.push.apply(events, eventDocs);
@@ -231,7 +323,7 @@ export async function searchEvent(
           title: { $regex: formData.titleSubStr, $options: 'i' },
         })
       ).map((eventDoc) => {
-        return eventDocToResponseDTO(eventDoc);
+        return eventDocToResponseDTO(eventDoc.toObject({ virtuals: true }));
       });
       events.push.apply(events, eventDocs);
     }
@@ -254,6 +346,8 @@ export async function searchEvent(
       }).and('startDate', 'endDate');
 
       formData = validate(res, dateRules, req.body, { allowUnknown: true });
+      // Validation failed, headers have been set, return
+      if (!formData) return;
 
       const eventDocs = (
         await EventModel.find({
@@ -261,7 +355,7 @@ export async function searchEvent(
           endDate: { $lte: formData.endDate },
         })
       ).map((eventDoc) => {
-        return eventDocToResponseDTO(eventDoc);
+        return eventDocToResponseDTO(eventDoc.toObject({ virtuals: true }));
       });
       events.push.apply(events, eventDocs);
     }
@@ -280,6 +374,8 @@ export async function searchEvent(
       limit: Joi.number().greater(0).optional(),
     });
     formData = validate(res, limitRules, req.body, { allowUnknown: true });
+    // Validation failed, headers have been set, return
+    if (!formData) return;
 
     // Limit the number of returned events
     if (formData.limit && events.length >= formData.limit) {
@@ -293,13 +389,13 @@ export async function searchEvent(
 }
 
 export async function addUserAvailabilityById(
-  req: TypedRequestBody<AddUserAvalabilityDTO>,
+  req: TypedRequestBody<AddUserAvailabilityDTO>,
   res: Response<EventResponseDTO | string>,
 ) {
   try {
     let eventId = req.params.eventId;
 
-    const rules = Joi.object<AddUserAvalabilityDTO & { eventId: string }>({
+    const rules = Joi.object<AddUserAvailabilityDTO & { eventId: string }>({
       userId: validators.id().required(),
       startDate: validators.startDate().required(),
       endDate: validators.endDate().required(),
@@ -311,15 +407,39 @@ export async function addUserAvailabilityById(
       { ...req.body, eventId },
       { allowUnknown: true },
     );
+    // Validation failed, headers have been set, return
+    if (!formData) return;
 
     if (!(await UserModel.exists({ _id: formData.userId }))) {
       return returnError(Error('User Not Found'), res, StatusCodes.NOT_FOUND);
     }
 
-    let eventDoc = await EventModel.findById(formData.eventId);
+    const eventDoc = await EventModel.findById(formData.eventId)
+      .populate<{ team: ITeam }>('team')
+      .populate<{ availability: IEventAvailability }>('availability');
+
     if (!eventDoc) {
       return returnError(Error('Event Not Found'), res, StatusCodes.NOT_FOUND);
     }
+
+    // If the event has a team then only users belonging to that team can add availability
+    if (eventDoc.team) {
+      // All members of the team including the admin
+      const members = eventDoc.team.members + eventDoc.team.admin;
+      if (!members.includes(formData.userId)) {
+        return returnError(
+          Error('User Must Be Part Of Team To Add Availability'),
+          res,
+          StatusCodes.BAD_REQUEST,
+        );
+      }
+    }
+
+    console.log('formData');
+    console.log(formData);
+    const timeList = splitDays(formData.startDate, formData.endDate);
+    console.log('after splitdays');
+    console.log(timeList);
 
     const userEventAvailabilityIndex =
       eventDoc.availability.attendeeAvailability.findIndex(
@@ -328,33 +448,42 @@ export async function addUserAvailabilityById(
     if (userEventAvailabilityIndex == -1) {
       eventDoc.availability.attendeeAvailability.push({
         attendee: formData.userId,
-        availability: [
-          {
-            startDate: formData.startDate,
-            endDate: formData.endDate,
+        availability: timeList.map((time) => {
+          return {
+            startDate: time.startDate,
+            endDate: time.endDate,
             status: formData.status ?? AvailabilityStatus.Available, // Default to available
-          },
-        ],
-        confirmed: false,
+          };
+        }),
       });
     } else {
-      eventDoc.availability.attendeeAvailability[
-        userEventAvailabilityIndex
-      ].availability.push({
-        startDate: formData.startDate,
-        endDate: formData.endDate,
-        status: formData.status ?? AvailabilityStatus.Available,
+      timeList.map((time) => {
+        eventDoc.availability.attendeeAvailability[
+          userEventAvailabilityIndex
+        ].availability.push({
+          startDate: time.startDate,
+          endDate: time.endDate,
+          status: formData.status ?? AvailabilityStatus.Available,
+        });
       });
     }
 
     await eventDoc.save();
-    res.status(StatusCodes.OK).send(eventDocToResponseDTO(eventDoc));
+
+    // If the user hasn't had the event added to their document then add it
+    await addToUserEventSet(formData.userId, eventId);
+
+    // Send updated event via socket IO
+    server.webSocket.send(`event:${eventId}`, eventDoc);
+    res
+      .status(StatusCodes.OK)
+      .send(eventDocToResponseDTO(eventDoc.toObject({ virtuals: true })));
   } catch (err) {
     returnError(err, res);
   }
 }
 
-export async function removeUserAvalabilityById(
+export async function removeUserAvailabilityById(
   req: Request,
   res: Response<EventResponseDTO | string>,
 ) {
@@ -384,6 +513,8 @@ export async function removeUserAvalabilityById(
     const formData = validate(res, rules, payload, {
       allowUnknown: true,
     });
+    // Validation failed, headers have been set, return
+    if (!formData) return;
 
     let eventDoc = await EventModel.findById(formData.eventId);
     if (!eventDoc) {
@@ -397,84 +528,157 @@ export async function removeUserAvalabilityById(
 
     // Can't remove availability timebracket if it doesn't exist for the user
     if (userEventAvailabilityIndex === -1) {
-      return returnError(Error('Bad Request'), res, StatusCodes.BAD_REQUEST);
+      return returnError(
+        Error('Bad Request, Time Bracket Does Not Exist'),
+        res,
+        StatusCodes.BAD_REQUEST,
+      );
     }
 
+    const splitDates = splitDays(formData.startDate, formData.endDate);
+
     // Sweep though availability brackets in order to edit to remove parts of or whole brackets
+    let attendeeAvailability = [];
     let adjustedAttendeeAvailability = [];
 
-    eventDoc.availability.attendeeAvailability[
-      userEventAvailabilityIndex
-    ].availability.forEach((ts) => {
-      // Existing bracket falls entirely within removal bracket
-      if (
-        ts.startDate >= formData.startDate &&
-        ts.endDate <= formData.endDate
-      ) {
+    for (let i = 0; i < splitDates.length; i++) {
+      // First sweep though the attendees availability
+      if (i == 0) {
+        attendeeAvailability =
+          eventDoc.availability.attendeeAvailability[userEventAvailabilityIndex]
+            .availability;
       }
-      // Existing bracket starting left side removed
-      else if (
-        ts.startDate >= formData.startDate &&
-        ts.endDate >= formData.endDate
-      ) {
-        ts.startDate = formData.endDate;
-        adjustedAttendeeAvailability.push(ts);
+      // Not the first sweep though the attendees availability, needs to continue to be mutated and adjusted
+      else {
+        attendeeAvailability = [...adjustedAttendeeAvailability];
       }
-      // Existing bracket ending right side removed
-      else if (
-        ts.startDate <= formData.startDate &&
-        ts.endDate <= formData.endDate
-      ) {
-        ts.endDate = formData.startDate;
-        adjustedAttendeeAvailability.push(ts);
-      }
-      // Middle removed
-      else if (
-        ts.startDate <= formData.startDate &&
-        ts.endDate >= formData.endDate
-      ) {
-        // Start left block
-        adjustedAttendeeAvailability.push({
-          startDate: ts.startDate,
-          endDate: formData.startDate,
-          status: ts.status,
-        });
-        // End right block
-        adjustedAttendeeAvailability.push({
-          startDate: formData.endDate,
-          endDate: ts.endDate,
-          status: ts.status,
-        });
-      } else {
-        res
-          .status(StatusCodes.INTERNAL_SERVER_ERROR)
-          .send('error modifying date brackets');
-      }
-    });
+      adjustedAttendeeAvailability = [];
+      const time = splitDates[i];
+      attendeeAvailability.forEach((ts) => {
+        // Existing bracket falls entirely within removal bracket
+        if (ts.startDate >= time.startDate && ts.endDate <= time.endDate) {
+        }
+        // Existing bracket starting left side removed
+        else if (
+          ts.startDate >= time.startDate &&
+          ts.endDate >= time.endDate &&
+          ts.startDate < time.endDate
+        ) {
+          ts.startDate = time.endDate;
+          adjustedAttendeeAvailability.push(ts);
+        }
+        // Existing bracket ending right side removed
+        else if (
+          ts.startDate <= time.startDate &&
+          ts.endDate <= time.endDate &&
+          time.startDate < ts.endDate
+        ) {
+          ts.endDate = time.startDate;
+          adjustedAttendeeAvailability.push(ts);
+        }
+        // Middle removed
+        else if (ts.startDate <= time.startDate && ts.endDate >= time.endDate) {
+          // Start left block
+          adjustedAttendeeAvailability.push({
+            startDate: ts.startDate,
+            endDate: time.startDate,
+            status: ts.status,
+          });
+          // End right block
+          adjustedAttendeeAvailability.push({
+            startDate: time.endDate,
+            endDate: ts.endDate,
+            status: ts.status,
+          });
+        } else {
+          adjustedAttendeeAvailability.push({
+            startDate: ts.startDate,
+            endDate: ts.endDate,
+            status: ts.status,
+          });
+        }
+      });
+    }
 
     eventDoc.availability.attendeeAvailability[
       userEventAvailabilityIndex
     ].availability = adjustedAttendeeAvailability;
     await eventDoc.save();
+
+    // If the user hasn't had the event added to their document then add it
+    // This should include when removing availability from the event
+    await addToUserEventSet(formData.userId, eventId);
+
+    // Send updated event via socket IO
+    server.webSocket.send(`event:${eventId}`, eventDoc);
+
     res.sendStatus(StatusCodes.OK);
   } catch (err) {
     returnError(err, res);
   }
 }
 
-export async function setEventAvailabilityConfirmation(
-  req: TypedRequestBody<SetEventAvailabilityConfirmationDTO>,
-  res: Response,
+export async function getEventUsersById(
+  req: Request,
+  res: Response<UserResponseDTO[] | string>,
 ) {
   try {
     const eventId = req.params.eventId;
-    const rules = Joi.object<
-      SetEventAvailabilityConfirmationDTO & { eventId: string }
-    >({
+    const rules = Joi.object<{ eventId: string }>({
       eventId: validators.id().required(),
-      userId: validators.id().required(),
-      confirmed: Joi.boolean().required(),
     });
+    const formData = validate(res, rules, { eventId }, { allowUnknown: true });
+
+    const eventDoc = await EventModel.findById(formData.eventId)
+      .populate<{ team: ITeam }>('team')
+      .populate<{ availability: IEventAvailability }>('availability');
+
+    if (!eventDoc) {
+      return returnError(Error('Event Not Found'), res, StatusCodes.NOT_FOUND);
+    }
+
+    // Find all the users
+    let allUserIds: string[] = [];
+    allUserIds.push(eventDoc.admin);
+    if (eventDoc.team) {
+      allUserIds.push(eventDoc.admin); // The admin of the event might not be the admin of the team
+      eventDoc.team.members.map((m) => {
+        allUserIds.push(m);
+      });
+    }
+
+    // Filter to make unqiue
+    allUserIds = [...new Set(allUserIds.map((s) => JSON.stringify(s)))].map(
+      (s) => JSON.parse(s),
+    );
+
+    const userResponseDocs: UserResponseDTO[] = (
+      await UserModel.find({ _id: { $in: allUserIds } })
+    ).map((u) => {
+      return {
+        id: u._id,
+        firstName: u.firstName,
+        lastName: u.lastName,
+        events: u.events,
+      };
+    });
+    res.status(StatusCodes.OK).send(userResponseDocs);
+  } catch (err) {
+    returnError(err, res);
+  }
+}
+
+export async function finalizeEventDate(req: Request, res: Response) {
+  try {
+    const eventId = req.params.eventId;
+
+    // Validate payload
+    const rules = Joi.object<FinalizeEventDateDTO & { eventId: string }>({
+      eventId: validators.id().required(),
+      startDate: validators.startDate().required(),
+      endDate: validators.endDate().required(),
+    });
+
     const formData = validate(
       res,
       rules,
@@ -482,59 +686,25 @@ export async function setEventAvailabilityConfirmation(
       { allowUnknown: true },
     );
 
-    // Check documents exist
-    if (!(await UserModel.exists({ id: formData.userId }))) {
-      return returnError(Error('User Not FOund'), res, StatusCodes.NOT_FOUND);
-    }
+    const eventDoc = await EventModel.findById(formData.eventId);
 
-    const eventDoc = await EventModel.findOneAndUpdate(
-      {
-        _id: formData.eventId,
-        'availability.attendeeAvailability': {
-          $elemMatch: { attendee: formData.userId },
-        },
-      },
-
-      {
-        $set: {
-          'availability.attendeeAvailability.$.confirmed': formData.confirmed,
-        },
-      },
-    );
-
+    // Check event exists
     if (!eventDoc) {
       return returnError(Error('Event Not Found'), res, StatusCodes.NOT_FOUND);
     }
 
+    // Set finalized timebracket
+    eventDoc.availability.finalisedTime = {
+      startDate: formData.startDate,
+      endDate: formData.endDate,
+    };
+
+    // Set finalized status
+    eventDoc.status = EventStatus.Accepted;
+
+    eventDoc.save(); // Persist event
+    server.webSocket.send(`event:${eventId}`, eventDoc); // Emit event via websocket
     res.sendStatus(StatusCodes.OK);
-  } catch (err) {
-    returnError(err, res);
-  }
-}
-
-export async function getEventAvailabilityConfirmations(
-  req: Request,
-  res: Response<GetEventAvailabilityConfirmationsResponseDTO | string>,
-) {
-  try {
-    const eventId = req.params.eventId;
-
-    const rules = Joi.object<{ eventId: string }>({
-      eventId: validators.id().required(),
-    });
-    const formData = validate(res, rules, { eventId }, { allowUnknown: true });
-
-    const eventDoc = await EventModel.findOne({ _id: formData.eventId });
-    if (!eventDoc) {
-      return returnError(Error('Event Not Found'), res, StatusCodes.NOT_FOUND);
-    }
-
-    let confirmed = 0;
-    eventDoc.availability.attendeeAvailability.forEach((avail) => {
-      if (avail.confirmed) confirmed++;
-    });
-
-    res.status(StatusCodes.OK).send({ confirmed });
   } catch (err) {
     returnError(err, res);
   }

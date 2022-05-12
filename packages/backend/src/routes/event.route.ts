@@ -5,10 +5,10 @@ import {
   deleteEventById,
   getEventById,
   addUserAvailabilityById,
-  removeUserAvalabilityById,
+  removeUserAvailabilityById,
   searchEvent,
-  setEventAvailabilityConfirmation,
-  getEventAvailabilityConfirmations,
+  getEventUsersById,
+  finalizeEventDate,
 } from '../controllers/event.controller';
 
 export const eventsRouter = express.Router();
@@ -16,19 +16,15 @@ export const eventsRouter = express.Router();
 // Search
 eventsRouter.post('/event/search', searchEvent);
 
+// Users in Event
+eventsRouter.get('/event/:eventId/users', getEventUsersById);
+
 // Availability
 eventsRouter.post('/event/:eventId/availability', addUserAvailabilityById);
-eventsRouter.delete('/event/:eventId/availability', removeUserAvalabilityById);
+eventsRouter.delete('/event/:eventId/availability', removeUserAvailabilityById);
 
-// Confirm availability
-eventsRouter.get(
-  '/event/:eventId/availability/confirm',
-  getEventAvailabilityConfirmations,
-);
-eventsRouter.patch(
-  '/event/:eventId/availability/confirm',
-  setEventAvailabilityConfirmation,
-);
+// Finalize Time
+eventsRouter.post('/event/:eventId/finalize', finalizeEventDate);
 
 // CRUD
 eventsRouter.get('/event/:eventId', getEventById);
