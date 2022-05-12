@@ -8,12 +8,19 @@ interface TimeOptionsListProp {
 
 export const TimeOptionsList = ({ options }: TimeOptionsListProp) => {
   const [active, setActive] = useState(0);
+  const [checkedTime, setCheckedTime] = useState('');
+  const handleClick = (option: string) => {
+    setCheckedTime(option);
+  };
   return (
     <div>
       <ScrollArea style={{ height: 300, width: 400 }}>
         {options.map((option, index) => (
           <TimeOptionCheckBox
-            onClick={() => setActive(index)}
+            onClick={() => {
+              handleClick(option);
+              setActive(index);
+            }}
             active={index === active}
             key={index}
             option={option}
