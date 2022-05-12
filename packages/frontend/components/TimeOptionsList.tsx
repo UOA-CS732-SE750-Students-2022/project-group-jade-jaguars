@@ -1,28 +1,34 @@
 import { ScrollArea } from '@mantine/core';
-import React, { useEffect, useState } from 'react';
+import React, { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import { TimeOptionCheckBox } from './TimeOptionCheckBox';
 import { TimeBracket } from '../types/Event';
 
 interface TimeOptionsListProp {
   options: TimeBracket[];
+  setCheckedTime: Dispatch<SetStateAction<TimeBracket | undefined>>;
 }
 
-export const TimeOptionsList = ({ options }: TimeOptionsListProp) => {
+export const TimeOptionsList = ({
+  options,
+  setCheckedTime,
+}: TimeOptionsListProp) => {
   const [active, setActive] = useState(0);
-  const [checkedTime, setCheckedTime] = useState<TimeBracket>();
   const [stringOptions, setStringOptions] = useState<string[]>([]);
   const handleClick = (index: number) => {
     setCheckedTime(options[index]);
   };
 
+  const getTZDate = (date: Date) => {
+    return new Date(
+      new Date(date).toISOString().slice(0, 19).replace('Z', ' '),
+    );
+  };
+
   useEffect(() => {
-    console.log(options);
     let stringOptions: string[] = [];
     options.forEach((option) => {
-      let startDate = new Date(option.startDate);
-      startDate.setHours(startDate.getHours() + 12);
-      let endDate = new Date(option.endDate);
-      endDate.setHours(endDate.getHours() + 12);
+      let startDate = getTZDate(option.startDate);
+      let endDate = getTZDate(option.endDate);
       stringOptions.push(
         startDate.toDateString() +
           ', ' +
@@ -30,8 +36,6 @@ export const TimeOptionsList = ({ options }: TimeOptionsListProp) => {
           ':' +
           startDate.getMinutes() +
           (startDate.getMinutes() == 0 ? '0 - ' : ' - ') +
-          endDate.toDateString() +
-          ', ' +
           endDate.getHours() +
           ':' +
           endDate.getMinutes() +

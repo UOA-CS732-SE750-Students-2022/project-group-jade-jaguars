@@ -1,5 +1,5 @@
 import { deleteData, getData, patchData, postData, putData } from './helpers';
-import Event, { SearchEventPayload } from '../../types/Event';
+import Event, { SearchEventPayload, TimeBracket } from '../../types/Event';
 import User from '../../types/User';
 import {
   AvailabilityConfirmation,
@@ -56,6 +56,14 @@ export const searchEvent = async (payload: string) => {
     titleSubStr: payload,
   };
   const data = await postData(`/event/search`, dataPayload);
+  return data;
+};
+
+export const finaliseEventTime = async (
+  eventId: string,
+  payload: TimeBracket,
+) => {
+  const data = await postData(`/event/${eventId}/finalize`, payload);
   return data;
 };
 

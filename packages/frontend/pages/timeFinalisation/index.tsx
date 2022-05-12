@@ -4,21 +4,16 @@ import { ShareLinkButton } from '../../components/ShareLinkButton';
 import { Row, Col } from '@nextui-org/react';
 import { useState, useEffect } from 'react';
 import { AttendeeStatus } from '../../types/Availability';
-import AvailabilitySelector from '../../components/AvailabilitySelector';
 import GroupAvailability from '../../components/GroupAvailability';
 import { useAuth } from '../../src/context/AuthContext';
-import {
-  AvailabilityBlock,
-  AvailabilityStatusStrings,
-} from '../../types/Availability';
+import { AvailabilityStatusStrings } from '../../types/Availability';
 import Event from '../../types/Event';
 import { TimeBracket, AttendeeAvailability } from '../../types/Event';
 import socketio from 'socket.io-client';
 import {
   getEvent,
-  createAvailability,
-  deleteAvailability,
   getUser,
+  finaliseEventTime,
 } from '../../helpers/apiCalls/apiCalls';
 import { TimeOptionsList } from '../../components/TimeOptionsList';
 
@@ -38,8 +33,9 @@ const TimeFinalisation: NextPage = () => {
   const [pageNum, setPageNum] = useState<number>(1);
   const [numPages, setNumPages] = useState<number>(1);
 
+  const [selectedTimes, setSelectedTimes] = useState<TimeBracket>();
+
   const { userId } = useAuth();
-  const [isAdmin, setIsAdmin] = useState<Boolean>(false);
 
   const router = useRouter();
   const {
@@ -60,9 +56,6 @@ const TimeFinalisation: NextPage = () => {
     let potentialTimes: TimeBracket[] = [];
     await getEvent(eventId!.toString()).then((val: Event) => {
       eventTitle = val.title;
-      if (val.admin === userId) {
-        setIsAdmin(true);
-      }
       startDate = getTZDate(val.startDate);
       endDate = getTZDate(val.endDate);
 
@@ -129,6 +122,13 @@ const TimeFinalisation: NextPage = () => {
     setPageNum(pageNum);
   };
 
+  const confirmSelection = async () => {
+    await finaliseEventTime(eventId!.toString(), selectedTimes!);
+    router.push({
+      pathname: '/finalised/',
+    });
+  };
+
   return (
     <div>
       <Row align="baseline" className="mb-[10px]">
@@ -184,7 +184,21 @@ const TimeFinalisation: NextPage = () => {
         <Col>
           <Row>Options</Row>
           <Row>
-            <TimeOptionsList options={potentialTimes} />
+            <TimeOptionsList
+              options={potentialTimes}
+              setCheckedTime={setSelectedTimes}
+            />
+          </Row>
+          <Row>
+            <button
+              className={
+                'bg-secondary text-black w-[100px] cursor-pointer rounded-md px-2 py-1 font-semibold hover:bg-secondarylight absolute right-0 mr-[120px] mt-[55px] ' +
+                (selectedTimes ? 'block' : 'hidden')
+              }
+              onClick={() => confirmSelection()}
+            >
+              Confirm {'>'}
+            </button>
           </Row>
         </Col>
       </Row>
