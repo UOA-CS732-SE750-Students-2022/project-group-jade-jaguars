@@ -8,3 +8,7 @@ export function formatTimeRange(
   if (timeRange[0] && timeRange[1])
     return `${formatTime(timeRange[0])} - ${formatTime(timeRange[1])}`;
 }
+
+export function getTZDate(date: Date) {
+  return new Date(new Date(date).toISOString().slice(0, 19).replace('Z', ' '));
+}

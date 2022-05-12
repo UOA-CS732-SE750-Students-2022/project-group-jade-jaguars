@@ -16,6 +16,9 @@ import {
   finaliseEventTime,
 } from '../../helpers/apiCalls/apiCalls';
 import { TimeOptionsList } from '../../components/TimeOptionsList';
+import { getTZDate } from '../../helpers/timeFormatter';
+
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
 
 const TimeFinalisation: NextPage = () => {
   const [timeOptions, setTimeOptions] = useState<TimeBracket>({
@@ -41,12 +44,6 @@ const TimeFinalisation: NextPage = () => {
   const {
     query: { eventId },
   } = router;
-
-  const getTZDate = (date: Date) => {
-    return new Date(
-      new Date(date).toISOString().slice(0, 19).replace('Z', ' '),
-    );
-  };
 
   async function fetchData() {
     let startDate = timeOptions.startDate;
@@ -82,13 +79,10 @@ const TimeFinalisation: NextPage = () => {
   useEffect(() => {
     fetchData().catch(console.error);
 
-    const io = socketio('http://localhost:3000');
+    const io = socketio(BASE_URL!);
     io.on(`event:${eventId}`, (args: Event) => {
-      console.log('event changed');
-      console.log(args);
       setAllAvailabilities(args!.availability!.attendeeAvailability!);
     });
-    console.log(`listening to event: ${eventId}`);
   }, [eventId]);
 
   const [info, setInfo] = useState<JSX.Element[]>([]);
@@ -99,7 +93,9 @@ const TimeFinalisation: NextPage = () => {
   }) => {
     async function getInfoMap() {
       const infoMap = peopleInfo.people.map(async (person, index) => {
-        const { firstName, lastName } = await getUser(person.uuid);
+        let { firstName, lastName } = await getUser(person.uuid);
+        firstName = firstName ? firstName : 'first name';
+        lastName = lastName ? lastName : 'last name';
         return (
           <p key={index} className="block">
             {firstName +
@@ -125,15 +121,19 @@ const TimeFinalisation: NextPage = () => {
   const confirmSelection = async () => {
     await finaliseEventTime(eventId!.toString(), selectedTimes!);
     router.push({
-      pathname: '/finalised/',
+      pathname: `/finalised/${eventId}`,
     });
   };
 
   return (
     <div>
+      <Row>
+        <h1 className="mr-[30px] my-0 leading-none">
+          Finalise your event time!
+        </h1>
+      </Row>
       <Row align="baseline" className="mb-[10px]">
-        <h1 className="mr-[30px] my-0 leading-none">{eventTitle}</h1>
-        <ShareLinkButton eventLink={'https://www.google.com/'} />
+        <h1 className="mr-[30px] my-0 leading-none mt-[10px]">{eventTitle}</h1>
       </Row>
       <Row gap={1}>
         <Col>

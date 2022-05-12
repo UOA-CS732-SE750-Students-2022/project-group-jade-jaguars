@@ -20,6 +20,9 @@ import {
   deleteAvailability,
   getUser,
 } from '../../helpers/apiCalls/apiCalls';
+import { getTZDate } from '../../helpers/timeFormatter';
+
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
 
 const Availability: NextPage = () => {
   const [timeOptions, setTimeOptions] = useState<TimeBracket>({
@@ -43,12 +46,6 @@ const Availability: NextPage = () => {
   const {
     query: { eventId },
   } = router;
-
-  const getTZDate = (date: Date) => {
-    return new Date(
-      new Date(date).toISOString().slice(0, 19).replace('Z', ' '),
-    );
-  };
 
   async function fetchData() {
     let startDate = timeOptions.startDate;
@@ -93,13 +90,10 @@ const Availability: NextPage = () => {
   useEffect(() => {
     fetchData().catch(console.error);
 
-    const io = socketio('http://localhost:3000');
+    const io = socketio(BASE_URL!);
     io.on(`event:${eventId}`, (args: Event) => {
-      console.log('event changed');
-      console.log(args);
       setAllAvailabilities(args!.availability!.attendeeAvailability!);
     });
-    console.log(`listening to event: ${eventId}`);
   }, [eventId]);
 
   const [status, setStatus] = useState<AvailabilityStatusStrings>(
@@ -120,7 +114,9 @@ const Availability: NextPage = () => {
   }) => {
     async function getInfoMap() {
       const infoMap = peopleInfo.people.map(async (person, index) => {
-        const { firstName, lastName } = await getUser(person.uuid);
+        let { firstName, lastName } = await getUser(person.uuid);
+        firstName = firstName ? firstName : 'first name';
+        lastName = lastName ? lastName : 'last name';
         return (
           <p key={index} className="block">
             {firstName +
