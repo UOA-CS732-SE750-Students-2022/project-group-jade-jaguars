@@ -1,6 +1,6 @@
 import { deleteData, getData, patchData, postData } from './helpers';
 import User from '../../types/User';
-import Team from '../../types/Team';
+import Team, { TeamResponseDTO } from '../../types/Team';
 import Event from '../../types/Event';
 import {
   AvailabilityConfirmation,
@@ -94,17 +94,20 @@ export const updateAvailabilityConfirmation = async (
 };
 
 // team api calls
-export const getTeam = async (teamId: string) => {
+export const getTeam = async (teamId: string): Promise<TeamResponseDTO> => {
   const data = await getData(`/team/${teamId}`);
   return data;
 };
 
-export const createTeam = async (payload: Team) => {
+export const createTeam = async (payload: Team): Promise<TeamResponseDTO> => {
   const data = await postData(`/team`, payload);
   return data;
 };
 
-export const updateTeam = async (teamId: string, payload: Team) => {
+export const updateTeam = async (
+  teamId: string,
+  payload: Team,
+): Promise<TeamResponseDTO> => {
   const data = await patchData(`/team/${teamId}`, payload);
   return data;
 };

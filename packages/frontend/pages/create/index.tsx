@@ -49,6 +49,7 @@ const CreateEventPage: NextPage = () => {
   });
 
   useEffect(() => {
+    // Fetch a list of existing teams in the database and display each of the names as an option
     const getTeamList = async () => {
       const response = await fetch(`${URL}/user/${userId}/team`, {
         headers: new Headers({
@@ -63,13 +64,17 @@ const CreateEventPage: NextPage = () => {
     };
     getTeamList();
   }, []);
+
+  // Helper, create and event from using form data
   const createNewTeam = async () => {
-    const res = await createTeam({
+    const data = await createTeam({
       title: form.values.newTeamName,
       admin: userId,
     });
-    return await res;
+    return data;
   };
+
+  // Helper, create and event from using form data
   const createEventMethod = async (teamId: string) => {
     const startDate = form.values.dateRange[0];
     const endDate = form.values.dateRange[1];
@@ -94,19 +99,21 @@ const CreateEventPage: NextPage = () => {
     return res;
   };
   const onCreateEvent = async () => {
-    console.log('hit create event');
     let teamId;
+    // Create a new team
     if (form.values.newTeam) {
-      if (form.values.newTeamName != '') {
-        const data = await createNewTeam();
-        console.log(data);
-        teamId = await data.id;
-      }
-    } else {
+      // TODO: Move validation for form so that invalid teams do not attempt to be created (invalid team name for example)
+      const data = await createNewTeam();
+      console.log(data);
+      teamId = data.id;
+    }
+    // Find a team
+    else {
       teamId = teamList.find((o) => o.label == form.values.teamName)!.id;
     }
+
+    // Create event
     const response = await createEventMethod(teamId);
-    console.log(response);
   };
   return (
     <Container>
