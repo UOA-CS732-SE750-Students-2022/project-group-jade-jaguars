@@ -129,7 +129,7 @@ const CreateEventPage: NextPage = () => {
 
     // Forward router to event selection page
     router.push('/availability', {
-      query: { eventId: '${}' },
+      query: { eventId: `${response.id}` },
     });
   };
   return (
