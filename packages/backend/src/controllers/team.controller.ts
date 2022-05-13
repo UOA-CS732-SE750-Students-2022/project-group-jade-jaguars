@@ -8,7 +8,6 @@ import { returnError } from '../libs/error.lib';
 import { UserModel } from '../schemas/user.schema';
 
 interface CreateTeamDTO {
-  _id: string;
   title: string;
   description?: string;
   color?: Colour;

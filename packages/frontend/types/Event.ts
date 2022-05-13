@@ -13,6 +13,31 @@ export default interface Event {
   admin?: string; // id
 }
 
+export interface CreateEventDTO {
+  title: string;
+  description?: string;
+  status?: EventStatus;
+  startDate: Date;
+  endDate: Date;
+  availability?: EventAvailability;
+  location?: string;
+  team?: string; // id
+  admin: string; // id
+}
+
+export interface EventResponseDTO {
+  id: string;
+  title: string;
+  description?: string;
+  status: EventStatus;
+  startDate: Date;
+  endDate: Date;
+  availability: EventAvailability;
+  location?: string;
+  team: string;
+  admin: string;
+}
+
 export enum EventStatus {
   Pending = 'Pending',
   Accepted = 'Accepted',

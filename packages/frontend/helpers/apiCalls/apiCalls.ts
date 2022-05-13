@@ -1,24 +1,27 @@
 import { deleteData, getData, patchData, postData } from './helpers';
-import User from '../../types/User';
-import Team, { TeamResponseDTO } from '../../types/Team';
-import Event from '../../types/Event';
+import { User, UserResponseDTO } from '../../types/User';
+import { CreateTeamDTO, Team, TeamResponseDTO } from '../../types/Team';
+import Event, { EventResponseDTO } from '../../types/Event';
 import {
   AvailabilityConfirmation,
   AvailabilityPayload,
 } from '../../types/Availability';
 
 // user api calls
-export const getUser = async (userId: string) => {
+export const getUser = async (userId: string): Promise<UserResponseDTO> => {
   const data = await getData(`/user/${userId}`);
   return data;
 };
 
-export const createUser = async (payload: User) => {
+export const createUser = async (payload: User): Promise<UserResponseDTO> => {
   const data = await postData(`/user`, payload);
   return data;
 };
 
-export const updateUser = async (userId: string, payload: User) => {
+export const updateUser = async (
+  userId: string,
+  payload: User,
+): Promise<UserResponseDTO> => {
   const data = await patchData(`/user/${userId}`, payload);
   return data;
 };
@@ -34,7 +37,9 @@ export const getEvent = async (eventId: string) => {
   return data;
 };
 
-export const createEvent = async (payload: Event) => {
+export const createEvent = async (
+  payload: Event,
+): Promise<EventResponseDTO> => {
   const data = await postData(`/event`, payload);
   return data;
 };
@@ -99,7 +104,9 @@ export const getTeam = async (teamId: string): Promise<TeamResponseDTO> => {
   return data;
 };
 
-export const createTeam = async (payload: Team): Promise<TeamResponseDTO> => {
+export const createTeam = async (
+  payload: CreateTeamDTO,
+): Promise<TeamResponseDTO> => {
   const data = await postData(`/team`, payload);
   return data;
 };

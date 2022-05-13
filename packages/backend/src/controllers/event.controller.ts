@@ -20,7 +20,6 @@ import { UserResponseDTO } from './user.controller';
 import { splitDays } from '../service/event.service';
 
 export interface CreateEventDTO {
-  _id: string;
   title: string;
   description?: string;
   status?: EventStatus;
