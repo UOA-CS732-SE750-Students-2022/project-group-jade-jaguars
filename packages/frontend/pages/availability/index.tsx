@@ -11,7 +11,7 @@ import {
   AvailabilityBlock,
   AvailabilityStatusStrings,
 } from '../../types/Availability';
-import Event from '../../types/Event';
+import Event, { EventResponseDTO } from '../../types/Event';
 import { TimeBracket, AttendeeAvailability } from '../../types/Event';
 import socketio from 'socket.io-client';
 import {
@@ -22,6 +22,7 @@ import {
 } from '../../helpers/apiCalls/apiCalls';
 import { getTZDate } from '../../helpers/apiCalls/helpers';
 
+const HOST: string = process.env.NEXT_PUBLIC_HOST as string;
 const URL: string =
   (process.env.NEXT_PUBLIC_HOST as string) +
   (process.env.NEXT_PUBLIC_BASE as string);
@@ -48,35 +49,43 @@ const Availability: NextPage = () => {
     query: { eventId },
   } = router;
 
+  // Fetch availability of event
   async function fetchData() {
     let startDate = timeOptions.startDate;
     let endDate = timeOptions.endDate;
     let myAvailability: AvailabilityBlock[] = [];
     let allAvailabilities: AttendeeAvailability[] = [];
-    await getEvent(eventId!.toString()).then((val: Event) => {
-      if (val.admin === userId) {
-        setIsAdmin(true);
-      }
-      startDate = getTZDate(val.startDate);
-      endDate = getTZDate(val.endDate);
+    const event = await getEvent(eventId!.toString());
+    if (event.admin === userId) {
+      setIsAdmin(true);
+    }
 
-      setNumPages(
-        Math.ceil(
-          (endDate.getTime() - startDate.getTime()) / (1000 * 3600 * 24 * 7),
-        ),
-      );
+    // Convert to local timezone
+    startDate = getTZDate(event.startDate);
+    endDate = getTZDate(event.endDate);
 
-      allAvailabilities = val ? val!.availability!.attendeeAvailability! : [];
-      if (
-        allAvailabilities.find((attendee) => {
-          return attendee.attendee === userId;
-        })
-      ) {
-        myAvailability = allAvailabilities.find((attendee) => {
-          return attendee.attendee === userId;
-        })!.availability;
-      }
-    });
+    // Set page range availabile for the user to naviage
+    setNumPages(
+      Math.ceil(
+        (endDate.getTime() - startDate.getTime()) / (1000 * 3600 * 24 * 7), // One page per week
+      ),
+    );
+
+    allAvailabilities = event.availability.attendeeAvailability;
+
+    // Set the users own availability, leave as empty if user not found
+    // TODO: Simplify to a reduceRight chain
+    if (
+      allAvailabilities.find((attendee) => {
+        return attendee.attendee === userId;
+      })
+    ) {
+      myAvailability = allAvailabilities.find((attendee) => {
+        return attendee.attendee === userId;
+      })!.availability;
+    }
+
+    // Update state
     setTimeOptions({
       startDate: startDate,
       endDate: endDate,
@@ -88,7 +97,8 @@ const Availability: NextPage = () => {
   useEffect(() => {
     fetchData().catch(console.error);
 
-    const io = socketio(URL, { port: 3000 });
+    console.log(`host: ${HOST}`);
+    const io = socketio(HOST, { port: 3000 });
     io.on(`event:${eventId}`, (args: Event) => {
       console.log('event changed');
       console.log(args);
@@ -102,12 +112,13 @@ const Availability: NextPage = () => {
   );
   const [info, setInfo] = useState<JSX.Element[]>([]);
 
+  // Display who is availabile in a mouse hovered time block
   const handleHover = async (peopleInfo: {
     people: AttendeeStatus[];
     numPeople: number;
   }) => {
     async function getInfoMap() {
-      const infoMap = peopleInfo.people.map(async (person, index) => {
+      const infoMapPromises = peopleInfo.people.map(async (person, index) => {
         const { firstName, lastName } = await getUser(person.uuid);
         return (
           <p key={index} className="block">
@@ -119,13 +130,13 @@ const Availability: NextPage = () => {
           </p>
         );
       });
-      Promise.all(infoMap).then((values: JSX.Element[]) => {
-        setInfo(values);
-      });
+      const infoMap = await Promise.all(infoMapPromises);
+      setInfo(infoMap);
     }
     getInfoMap();
   };
 
+  // Add a block of user availability for event
   const handleSelection = async (selection: {
     startDate: Date;
     endDate: Date;
@@ -146,6 +157,7 @@ const Availability: NextPage = () => {
     return true;
   };
 
+  // Delete a block of user availability for event
   const handleDeletion = async (deletion: {
     startDate: Date;
     endDate: Date;

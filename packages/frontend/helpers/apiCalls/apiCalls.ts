@@ -32,7 +32,7 @@ export const deleteUser = async (userId: string) => {
 };
 
 // event api calls
-export const getEvent = async (eventId: string) => {
+export const getEvent = async (eventId: string): Promise<EventResponseDTO> => {
   const data = await getData(`/event/${eventId}`);
   return data;
 };

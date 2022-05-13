@@ -84,7 +84,9 @@ const CreateEventPage: NextPage = () => {
   };
 
   // Helper, create and event from using form data
-  const createEventMethod = async (teamId?: string): EventResponseDTO => {
+  const createEventMethod = async (
+    teamId?: string,
+  ): Promise<EventResponseDTO> => {
     const startDate = form.values.dateRange[0];
     const endDate = form.values.dateRange[1];
     const startTime = form.values.timeRange[0];
@@ -104,8 +106,7 @@ const CreateEventPage: NextPage = () => {
       team: teamId,
     };
 
-    const res = await createEvent(data);
-    return res;
+    return createEvent(data);
   };
   const onCreateEvent = async () => {
     let teamId = undefined;
@@ -128,7 +129,8 @@ const CreateEventPage: NextPage = () => {
     const response = await createEventMethod(teamId);
 
     // Forward router to event selection page
-    router.push('/availability', {
+    router.push({
+      pathname: '/availability/',
       query: { eventId: `${response.id}` },
     });
   };
