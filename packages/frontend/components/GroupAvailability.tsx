@@ -4,6 +4,7 @@ import {
   AttendeeStatus,
   AvailabilityStatusStrings,
 } from '../types/Availability';
+import { getTZDate } from '../helpers/apiCalls/helpers';
 
 /*
  *  Assumption: no more than 7 days sent through as timeOptions.
@@ -142,17 +143,11 @@ function GroupAvailability(props: {
               AvailabilityStatusStrings.Unavailable
             )
               continue;
-            const startDT = new Date(
-              new Date(props.availabilities[i].availability[j].startDate)
-                .toISOString()
-                .slice(0, 19)
-                .replace('Z', ' '),
+            const startDT = getTZDate(
+              new Date(props.availabilities[i].availability[j].startDate),
             );
-            const endDT = new Date(
-              new Date(props.availabilities[i].availability[j].endDate)
-                .toISOString()
-                .slice(0, 19)
-                .replace('Z', ' '),
+            const endDT = getTZDate(
+              new Date(props.availabilities[i].availability[j].endDate),
             );
             if (dateTime >= startDT && dateTime < endDT) {
               if (

@@ -1,33 +1,36 @@
+import { StatusCodes } from 'http-status-codes';
 import { Container, Grid, Group } from '@mantine/core';
 import type { NextPage } from 'next';
 import { useEffect } from 'react';
 import { useAuth } from '../src/context/AuthContext';
 import { useRouter } from 'next/router';
-
 import Image from 'next/image';
+
+const HOST_URL: string =
+  process.env.NEXT_PUBLIC_HOST! + process.env.NEXT_PUBLIC_BASE!;
+
 const Login: NextPage = () => {
   const { user, userId, authToken, login, signedIn, anonymousLogin } =
     useAuth();
   const router = useRouter();
 
-  const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
-
   useEffect(() => {
+    // Check that a mongo user exists
     const checkUserOnMongo = async () => {
-      const response = await fetch(BASE_URL + `/user/${userId}`, {
+      const response = await fetch(HOST_URL + `/user/${userId}`, {
         headers: new Headers({
           Authorization: 'Bearer ' + authToken,
         }),
       });
 
-      if (response.status == 404) {
+      if (response.status == StatusCodes.NOT_FOUND) {
         const nameArray = user!.displayName!.split(' ');
         // Incase firstname or lastname isn't defined we set a default
-        // TODO: Validation rules from backend require a length of atleast
+        // TODO: Validation rules from backend require a length of atleast one
         // ...for firstname and lastname, either backend changes these rules or frontend follow them
         const firstName = nameArray[0] ?? 'Firstname';
         const lastName = nameArray[1] ?? 'Lastname';
-        const createUserResponse = await fetch(BASE_URL + '/user', {
+        const createUserResponse = await fetch(HOST_URL + '/user', {
           method: 'POST',
           headers: {
             Authorization: 'Bearer ' + authToken,

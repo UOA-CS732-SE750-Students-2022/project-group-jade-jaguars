@@ -1,14 +1,13 @@
-import { deleteData, getData, patchData, postData, putData } from './helpers';
-import Event, { SearchEventPayload } from '../../types/Event';
+import { deleteData, getData, patchData, postData } from './helpers';
 import User from '../../types/User';
+import Team from '../../types/Team';
+import Event from '../../types/Event';
 import {
   AvailabilityConfirmation,
   AvailabilityPayload,
 } from '../../types/Availability';
-import Team from '../../types/Team';
 
 // user api calls
-
 export const getUser = async (userId: string) => {
   const data = await getData(`/user/${userId}`);
   return data;
@@ -30,7 +29,6 @@ export const deleteUser = async (userId: string) => {
 };
 
 // event api calls
-
 export const getEvent = async (eventId: string) => {
   const data = await getData(`/event/${eventId}`);
   return data;
@@ -60,7 +58,6 @@ export const searchEvent = async (payload: string) => {
 };
 
 // availability api calls
-
 export const createAvailability = async (
   eventId: string,
   payload: AvailabilityPayload,
@@ -97,7 +94,6 @@ export const updateAvailabilityConfirmation = async (
 };
 
 // team api calls
-
 export const getTeam = async (teamId: string) => {
   const data = await getData(`/team/${teamId}`);
   return data;

@@ -435,11 +435,7 @@ export async function addUserAvailabilityById(
       }
     }
 
-    console.log('formData');
-    console.log(formData);
     const timeList = splitDays(formData.startDate, formData.endDate);
-    console.log('after splitdays');
-    console.log(timeList);
 
     const userEventAvailabilityIndex =
       eventDoc.availability.attendeeAvailability.findIndex(

@@ -5,7 +5,6 @@ import React, { useEffect, useState } from 'react';
 import EventForm from '../../components/EventForm';
 import { useAuth } from '../../src/context/AuthContext';
 import { createTeam, createEvent } from '../../helpers/apiCalls/apiCalls';
-
 interface FormValues {
   title: string;
   dateRange: [Date | null, Date | null];
@@ -22,6 +21,10 @@ interface Team {
   id: string;
   label: string;
 }
+
+const URL: string =
+  (process.env.NEXT_PUBLIC_HOST as string) +
+  (process.env.NEXT_PUBLIC_BASE as string);
 
 const CreateEventPage: NextPage = () => {
   const { userId, authToken } = useAuth();
@@ -47,14 +50,11 @@ const CreateEventPage: NextPage = () => {
 
   useEffect(() => {
     const getTeamList = async () => {
-      const response = await fetch(
-        `http://149.28.170.219/api/v1/user/${userId}/team`,
-        {
-          headers: new Headers({
-            Authorization: 'Bearer ' + authToken,
-          }),
-        },
-      );
+      const response = await fetch(`${URL}/user/${userId}/team`, {
+        headers: new Headers({
+          Authorization: 'Bearer ' + authToken,
+        }),
+      });
       const data = await response.json();
       const team = await data.teams.map((team: any) => {
         return { id: team._id, label: team.title };
@@ -94,10 +94,12 @@ const CreateEventPage: NextPage = () => {
     return res;
   };
   const onCreateEvent = async () => {
+    console.log('hit create event');
     let teamId;
     if (form.values.newTeam) {
       if (form.values.newTeamName != '') {
         const data = await createNewTeam();
+        console.log(data);
         teamId = await data.id;
       }
     } else {

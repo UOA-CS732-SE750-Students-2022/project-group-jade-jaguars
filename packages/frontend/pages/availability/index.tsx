@@ -20,6 +20,11 @@ import {
   deleteAvailability,
   getUser,
 } from '../../helpers/apiCalls/apiCalls';
+import { getTZDate } from '../../helpers/apiCalls/helpers';
+
+const URL: string =
+  (process.env.NEXT_PUBLIC_HOST as string) +
+  (process.env.NEXT_PUBLIC_BASE as string);
 
 const Availability: NextPage = () => {
   const [timeOptions, setTimeOptions] = useState<TimeBracket>({
@@ -42,12 +47,6 @@ const Availability: NextPage = () => {
   const {
     query: { eventId },
   } = router;
-
-  const getTZDate = (date: Date) => {
-    return new Date(
-      new Date(date).toISOString().slice(0, 19).replace('Z', ' '),
-    );
-  };
 
   async function fetchData() {
     let startDate = timeOptions.startDate;
@@ -89,7 +88,7 @@ const Availability: NextPage = () => {
   useEffect(() => {
     fetchData().catch(console.error);
 
-    const io = socketio('http://localhost:3000');
+    const io = socketio(URL, { port: 3000 });
     io.on(`event:${eventId}`, (args: Event) => {
       console.log('event changed');
       console.log(args);
@@ -175,7 +174,7 @@ const Availability: NextPage = () => {
     <div>
       <Row align="baseline" className="mb-[10px]">
         <h1 className="mr-[30px] my-0 leading-none">Event Title</h1>
-        <ShareLinkButton eventLink={'https://www.google.com/'} />
+        <ShareLinkButton eventLink={'http://'} />
       </Row>
       <Row>
         <Col>

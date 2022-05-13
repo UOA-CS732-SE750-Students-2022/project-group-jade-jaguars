@@ -46,7 +46,9 @@ const EventForm = ({ teamData, form, onCreateEvent }: EventFormProps) => {
             <TextInput
               required
               label="Event Title"
-              placeholder="add event title"
+              type="text"
+              minLength={3}
+              placeholder="Add Event Title"
               value={form.values.title}
               onChange={(e) =>
                 form.setFieldValue('title', e.currentTarget.value)
@@ -78,7 +80,9 @@ const EventForm = ({ teamData, form, onCreateEvent }: EventFormProps) => {
             {form.values.newTeam ? (
               <TextInput
                 required
+                type="text"
                 label="New Team Name"
+                minLength={3}
                 value={form.values.newTeamName}
                 onChange={(e) =>
                   form.setFieldValue('newTeamName', e.currentTarget.value)
@@ -87,6 +91,7 @@ const EventForm = ({ teamData, form, onCreateEvent }: EventFormProps) => {
             ) : (
               <Select
                 data={labelArray}
+                type="text"
                 label="Select a Team"
                 value={form.values.teamName}
                 onChange={(e) => form.setFieldValue('teamName', e!)}
@@ -133,7 +138,8 @@ const EventForm = ({ teamData, form, onCreateEvent }: EventFormProps) => {
             <Textarea
               required
               label="Description"
-              placeholder="event details"
+              minLength={3}
+              placeholder="Event Details"
               autosize
               minRows={2}
               maxRows={4}
@@ -147,7 +153,8 @@ const EventForm = ({ teamData, form, onCreateEvent }: EventFormProps) => {
             <TextInput
               required
               label="Location"
-              placeholder="location or meeting link"
+              minLength={3}
+              placeholder="Location or Meeting Link"
               value={form.values.location}
               onChange={(e) =>
                 form.setFieldValue('location', e.currentTarget.value)

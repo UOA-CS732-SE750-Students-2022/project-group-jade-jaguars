@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { useState, useEffect, useRef } from 'react';
+import { getTZDate } from '../helpers/apiCalls/helpers';
 import {
   AvailabilityBlock,
   AvailabilityStatusStrings,
@@ -161,18 +162,10 @@ function AvailabilitySelector(props: {
             AvailabilityStatusStrings.Unavailable
           )
             continue;
-          const startDT = new Date(
-            new Date(props.availability[index].startDate)
-              .toISOString()
-              .slice(0, 19)
-              .replace('Z', ' '),
+          const startDT = getTZDate(
+            new Date(props.availability[index].startDate),
           );
-          const endDT = new Date(
-            new Date(props.availability[index].endDate)
-              .toISOString()
-              .slice(0, 19)
-              .replace('Z', ' '),
-          );
+          const endDT = getTZDate(new Date(props.availability[index].endDate));
           if (dateTime >= startDT && dateTime < endDT) {
             currentStatus = props.availability[index].status;
             break;

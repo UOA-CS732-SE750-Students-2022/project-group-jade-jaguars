@@ -1,22 +1,27 @@
 import axios from 'axios';
 import { auth } from '../../src/config/firebase.config';
 
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
+// URL for endpoint
+const HOST_URL: string =
+  process.env.NEXT_PUBLIC_HOST! + process.env.NEXT_PUBLIC_BASE!;
 
+// Fetch the authToken of the user
 export const getToken = async () => {
   const authToken = await auth.currentUser?.getIdToken();
   return authToken;
 };
 
+// Set the API call headers with bearer token
 export const getHeaders = async () => {
   const authToken = await getToken();
   const headers = { Authorization: `Bearer ${authToken}` };
   return headers;
 };
 
-export const getData = async (url: string, payload?: any) => {
+// GET an endpoint
+export const getData = async (endpoint: string, payload?: any) => {
   const data = await axios
-    .get(`${BASE_URL}${url}`, {
+    .get(`${HOST_URL}${endpoint}`, {
       headers: await getHeaders(),
       ...(payload && { params: payload }),
     })
@@ -33,9 +38,10 @@ export const getData = async (url: string, payload?: any) => {
   return data;
 };
 
-export const postData = async (url: string, payload?: any) => {
+// POST an endpoint
+export const postData = async (endpoint: string, payload?: any) => {
   const data = await axios
-    .post(`${BASE_URL}${url}`, payload, {
+    .post(`${HOST_URL}${endpoint}`, payload, {
       headers: await getHeaders(),
     })
     .then((response) => {
@@ -51,9 +57,10 @@ export const postData = async (url: string, payload?: any) => {
   return data;
 };
 
-export const putData = async (url: string, payload?: any) => {
+// PATCH an endpoint
+export const patchData = async (endpoint: string, payload?: any) => {
   const data = await axios
-    .put(`${BASE_URL}${url}`, payload, {
+    .patch(`${HOST_URL}${endpoint}`, payload, {
       headers: await getHeaders(),
     })
     .then((response) => {
@@ -69,27 +76,10 @@ export const putData = async (url: string, payload?: any) => {
   return data;
 };
 
-export const patchData = async (url: string, payload?: any) => {
+// DELETE an endpoint with a payload
+export const deleteData = async (endpoint: string, payload?: any) => {
   const data = await axios
-    .patch(`${BASE_URL}${url}`, payload, {
-      headers: await getHeaders(),
-    })
-    .then((response) => {
-      return response.data;
-    })
-    .catch((error) => {
-      if (!error?.response) {
-        throw new Error(
-          'The server is down at the moment, please try again later',
-        );
-      }
-    });
-  return data;
-};
-
-export const deleteData = async (url: string, payload?: any) => {
-  const data = await axios
-    .delete(`${BASE_URL}${url}`, {
+    .delete(`${HOST_URL}${endpoint}`, {
       headers: await getHeaders(),
       ...(payload && { params: payload }),
     })
@@ -104,4 +94,10 @@ export const deleteData = async (url: string, payload?: any) => {
       }
     });
   return data;
+};
+
+// Convert a ISO date into a local date without changing the time by applying the timezone,
+// converts the date into exactly the date presented by the ISO date
+export const getTZDate = (date: Date) => {
+  return new Date(new Date(date).toISOString().slice(0, 19).replace('Z', ' '));
 };
