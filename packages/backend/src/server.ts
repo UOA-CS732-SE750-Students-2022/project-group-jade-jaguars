@@ -13,8 +13,10 @@ import * as firebase from 'firebase-admin';
 import cors from 'cors';
 
 dotenv.config({ path: `.env.${process.env.ENV_PATH}` });
+console.log(`Loaded env from ${'.env.' + process.env.ENV_PATH}`);
+
 const PORT: number = parseInt(process.env.PORT);
-const NODE_ENV: string = process.env.NODE_ENV; // Jest sets this to 'test'
+const NODE_ENV: string = process.env.NODE_ENV; // Jest sets this to 'test', this should not be manually set in env files
 const BASE_URL: string = process.env.BASE_URL;
 const DATABASE_URL: string = process.env.DATABASE_URL;
 

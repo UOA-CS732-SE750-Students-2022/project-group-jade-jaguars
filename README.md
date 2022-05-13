@@ -72,6 +72,13 @@ npm run start
 
 This will start the frontend and backend together. By default the backend will start with production credentials, use `npm run start:dev` to run with development credentials
 
+## Hosting
+
+When you have the project running the following endpoints will be available in order to use the project. To use the application follow the frontend link
+
+- Frontend: http://localhost:3001
+- backend: http://localhost:3000
+
 ## Running unit tests
 
 Run `npm test` in the project root to execute the unit tests via [Jest](https://jestjs.io).
