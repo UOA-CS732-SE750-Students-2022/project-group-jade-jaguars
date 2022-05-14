@@ -15,7 +15,7 @@ import {
   getUser,
   finaliseEventTime,
 } from '../../helpers/apiCalls/apiCalls';
-import { TimeOptionsList } from '../../components/TimeOptionsList';
+import { TimeOptionsList } from '../../components/TimeOptionsList/TimeOptionsList';
 import { getTZDate } from '../../helpers/timeFormatter';
 
 const BASE_URL = process.env.NEXT_PUBLIC_SOCKET_URL;
