@@ -2,7 +2,7 @@ import { useForm } from '@mantine/hooks';
 import { render, screen } from '@testing-library/react';
 import EventForm from '../EventForm';
 
-it('EventForm details render and displayt correctly', () => {
+it('EventForm details render and display correctly', () => {
   interface FormValues {
     title: string;
     dateRange: [Date | null, Date | null];
@@ -32,15 +32,7 @@ it('EventForm details render and displayt correctly', () => {
     },
   });
 
-  render(
-    <EventForm
-      teamData={[]}
-      form={form}
-      onCreateEvent={function (): void {
-        throw new Error('Function not implemented.');
-      }}
-    />,
-  );
+  render(<EventForm teamData={[]} form={form} onCreateEvent={jest.fn()} />);
 
   const eventTitle = screen.getByText(/Event Title/i);
   const newTeam = screen.getByText(/New Team/i);
