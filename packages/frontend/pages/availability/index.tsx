@@ -22,7 +22,7 @@ import {
 } from '../../helpers/apiCalls/apiCalls';
 import { getTZDate } from '../../helpers/timeFormatter';
 
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
+const SOCKET_URL = process.env.NEXT_PUBLIC_SOCKET_URL!;
 
 const Availability: NextPage = () => {
   const [timeOptions, setTimeOptions] = useState<TimeBracket>({
@@ -90,7 +90,7 @@ const Availability: NextPage = () => {
   useEffect(() => {
     fetchData().catch(console.error);
 
-    const io = socketio(BASE_URL!);
+    const io = socketio(SOCKET_URL!);
     io.on(`event:${eventId}`, (args: Event) => {
       setAllAvailabilities(args!.availability!.attendeeAvailability!);
     });

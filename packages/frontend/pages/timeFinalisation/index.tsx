@@ -18,7 +18,7 @@ import {
 import { TimeOptionsList } from '../../components/TimeOptionsList';
 import { getTZDate } from '../../helpers/timeFormatter';
 
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
+const BASE_URL = process.env.NEXT_PUBLIC_SOCKET_URL;
 
 const TimeFinalisation: NextPage = () => {
   const [timeOptions, setTimeOptions] = useState<TimeBracket>({
