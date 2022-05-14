@@ -44,17 +44,16 @@ const CreateEventPage: NextPage = () => {
       recurring: false,
     },
   });
+  const BASE_URL =
+    process.env.NEXT_PUBLIC_SOCKET_URL! + process.env.NEXT_PUBLIC_BASE_URL!;
 
   useEffect(() => {
     const getTeamList = async () => {
-      const response = await fetch(
-        `http://149.28.170.219/api/v1/user/${userId}/team`,
-        {
-          headers: new Headers({
-            Authorization: 'Bearer ' + authToken,
-          }),
-        },
-      );
+      const response = await fetch(BASE_URL + `/user/${userId}/team`, {
+        headers: new Headers({
+          Authorization: 'Bearer ' + authToken,
+        }),
+      });
       const data = await response.json();
       const team = await data.teams.map((team: any) => {
         return { id: team._id, label: team.title };
@@ -88,6 +87,7 @@ const CreateEventPage: NextPage = () => {
       admin: userId,
       location: form.values.location,
       team: teamId ? teamId : undefined,
+      repeat: form.values.recurring,
     };
 
     const res = await createEvent(data);
