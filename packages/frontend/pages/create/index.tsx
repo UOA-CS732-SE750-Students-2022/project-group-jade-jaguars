@@ -6,7 +6,7 @@ import EventForm from '../../components/EventForm';
 import { useAuth } from '../../src/context/AuthContext';
 import { createTeam, createEvent } from '../../helpers/apiCalls/apiCalls';
 
-interface FormValues {
+export interface FormValues {
   title: string;
   dateRange: [Date | null, Date | null];
   timeRange: [Date, Date];
