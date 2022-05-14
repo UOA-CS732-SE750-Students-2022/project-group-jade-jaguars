@@ -13,7 +13,7 @@ import {
 } from '../../types/Availability';
 import Event from '../../types/Event';
 import { TimeBracket, AttendeeAvailability } from '../../types/Event';
-import socketio from 'socket.io-client';
+import socketio, { io } from 'socket.io-client';
 import {
   getEvent,
   createAvailability,
@@ -46,6 +46,8 @@ const Availability: NextPage = () => {
   const {
     query: { eventId },
   } = router;
+
+  const io = socketio(SOCKET_URL!);
 
   async function fetchData() {
     let startDate = timeOptions.startDate;
@@ -90,7 +92,6 @@ const Availability: NextPage = () => {
   useEffect(() => {
     fetchData().catch(console.error);
 
-    const io = socketio(SOCKET_URL!);
     io.on(`event:${eventId}`, (args: Event) => {
       setAllAvailabilities(args!.availability!.attendeeAvailability!);
     });
@@ -102,6 +103,7 @@ const Availability: NextPage = () => {
   const [info, setInfo] = useState<JSX.Element[]>([]);
 
   function finaliseTimes() {
+    io.disconnect();
     router.push({
       pathname: '/timeFinalisation/',
       query: { eventId: eventId },

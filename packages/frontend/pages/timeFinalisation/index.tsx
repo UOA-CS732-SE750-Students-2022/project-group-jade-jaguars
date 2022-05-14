@@ -45,6 +45,8 @@ const TimeFinalisation: NextPage = () => {
     query: { eventId },
   } = router;
 
+  const io = socketio(BASE_URL!);
+
   async function fetchData() {
     let startDate = timeOptions.startDate;
     let endDate = timeOptions.endDate;
@@ -79,7 +81,6 @@ const TimeFinalisation: NextPage = () => {
   useEffect(() => {
     fetchData().catch(console.error);
 
-    const io = socketio(BASE_URL!);
     io.on(`event:${eventId}`, (args: Event) => {
       setAllAvailabilities(args!.availability!.attendeeAvailability!);
     });
@@ -120,6 +121,7 @@ const TimeFinalisation: NextPage = () => {
 
   const confirmSelection = async () => {
     await finaliseEventTime(eventId!.toString(), selectedTimes!);
+    io.disconnect();
     router.push({
       pathname: `/finalised`,
       query: { eventId: eventId },

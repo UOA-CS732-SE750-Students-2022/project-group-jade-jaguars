@@ -23,8 +23,6 @@ const FinalisedEventPage: NextPage = () => {
       setTitle(data.title);
       data.description && setDescription(data.description);
       data.location && setLocation(data.location);
-      // const startDate = data.availability.finalisedTime?.startDate;
-      // const endDate = data.availability.finalisedTime?.endDate;
       const startDate = getTZDate(data.availability!.finalisedTime!.startDate);
       const endDate = getTZDate(data.availability!.finalisedTime!.endDate);
 
