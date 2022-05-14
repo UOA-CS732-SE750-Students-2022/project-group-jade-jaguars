@@ -203,7 +203,7 @@ export async function patchEventById(
     // If a team is present then we have to add the event to the team
     if (formData.team) {
       const teamDoc = await TeamModel.findById(formData.team);
-      teamDoc.events.push(eventId);
+      teamDoc.events.push(formData.eventId);
       await teamDoc.save();
     }
 
