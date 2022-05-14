@@ -1,3 +1,4 @@
+import { Socket } from 'socket.io';
 import { StatusCodes } from 'http-status-codes';
 import { Request, Response, NextFunction } from 'express';
 import { getAuth, DecodedIdToken } from 'firebase-admin/auth';
@@ -45,6 +46,35 @@ export async function isAuthenticated(
     }
 
     return returnError(Error('Unknown Error'), res);
+  }
+}
+
+export async function isSocketAuth(socket: Socket, next: NextFunction) {
+  try {
+    console.log(socket.handshake.headers.authorization);
+    if (!socket.handshake.headers.authorization) {
+      return Error('No authorization header');
+    }
+    const token = socket.handshake.headers.authorization.split(' ')[1];
+
+    const decodedValue = await getAuth().verifyIdToken(token);
+
+    if (decodedValue) {
+      console.log('valid');
+      return next();
+    }
+
+    return Error('Unauthenticated');
+  } catch (error) {
+    if (error.code === 'auth/id-token-expired') {
+      return Error('Token expired');
+    }
+
+    if (error.code === 'auth/argument-error') {
+      Error('Malformed Auth Token');
+    }
+
+    return Error('Unknown Error');
   }
 }
 
