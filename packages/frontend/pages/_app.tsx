@@ -10,7 +10,7 @@ export default function App(props: AppProps) {
   const { Component, pageProps } = props;
 
   return (
-    <>
+    <div className="bg-backgroundgrey">
       <Head>
         <title>Count Me In</title>
         <meta
@@ -34,6 +34,6 @@ export default function App(props: AppProps) {
           </AppShell>
         </AuthProvider>
       </MantineProvider>
-    </>
+    </div>
   );
 }

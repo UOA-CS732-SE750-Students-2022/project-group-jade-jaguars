@@ -111,11 +111,7 @@ const CreateEventPage: NextPage = () => {
       <h1>Create Event</h1>
       <Grid>
         <Grid.Col>
-          <EventForm
-            teamData={teamList}
-            form={form}
-            onCreateEvent={onCreateEvent}
-          />
+          <EventForm teamData={teamList} form={form} onSubmit={onCreateEvent} />
         </Grid.Col>
       </Grid>
     </Container>

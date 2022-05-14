@@ -57,3 +57,18 @@ export interface EventResponseDTO {
   team: string;
   admin: string;
 }
+export interface EventPayload {
+  id?: string;
+  title?: string;
+  description?: string;
+  status?: EventStatus;
+  startDate?: Date;
+  endDate?: Date;
+  availability?: EventAvailability;
+  attendees?: [];
+  location?: string;
+  team?: string; // id
+  admin?: string; // id
+  date?: Date;
+  participants?: Member[];
+}
