@@ -51,8 +51,8 @@ export async function isAuthenticated(
 
 export async function isSocketAuth(socket: Socket, next: NextFunction) {
   try {
-    console.log(socket.handshake.headers.authorization);
     if (!socket.handshake.headers.authorization) {
+      socket.emit('error', 'No authorization header');
       return Error('No authorization header');
     }
     const token = socket.handshake.headers.authorization.split(' ')[1];
@@ -60,12 +60,14 @@ export async function isSocketAuth(socket: Socket, next: NextFunction) {
     const decodedValue = await getAuth().verifyIdToken(token);
 
     if (decodedValue) {
-      console.log('valid');
       return next();
     }
 
+    socket.emit('error', 'Unauthenticated');
     return Error('Unauthenticated');
   } catch (error) {
+    socket.emit('error', error);
+
     if (error.code === 'auth/id-token-expired') {
       return Error('Token expired');
     }
