@@ -5,6 +5,7 @@ import {
   getUserById,
   getUserTeamsById,
   patchUserById,
+  getUserCalendar,
 } from '../controllers/user.controller';
 export const usersRouter = express.Router();
 
@@ -17,3 +18,5 @@ usersRouter.post('/user', createUser);
 usersRouter.patch('/user/:userId', patchUserById);
 
 usersRouter.delete('/user/:userId', deleteUserById);
+
+usersRouter.get('/user/ical/:userId', getUserCalendar);

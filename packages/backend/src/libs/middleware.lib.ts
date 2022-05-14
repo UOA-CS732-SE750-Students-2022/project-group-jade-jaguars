@@ -9,6 +9,11 @@ export async function isAuthenticated(
   next: NextFunction,
 ) {
   try {
+    // ! ical is a static link which cannot use authentication
+    if (req.path.includes('/user/ical/')) {
+      return next();
+    }
+
     if (!req.headers.authorization) {
       return returnError(
         Error('No authorization header'),

@@ -7,6 +7,8 @@ import { validate, validators } from '../libs/validate.lib';
 import { StatusCodes } from 'http-status-codes';
 import { returnError } from '../libs/error.lib';
 import { ITeam, TeamModel } from '../schemas/team.schema';
+import { EventModel } from '../schemas/event.schema';
+import ical from 'ical-generator';
 
 interface CreateUserDTO {
   firstName: string;
@@ -192,6 +194,56 @@ export async function getUserTeamsById(
         teams: teamDocs,
       });
     }
+  } catch (err) {
+    returnError(err, res);
+  }
+}
+
+/**
+ *
+ * @param req Request
+ * @param res Response
+ * @returns undefined
+ *
+ * @description Sends a responses of an Ical file containing all events for the user
+ */
+export async function getUserCalendar(req: Request, res: Response) {
+  try {
+    const userId = req.params.userId;
+
+    const userDoc = await UserModel.findOne({ _id: userId });
+    if (!userDoc) {
+      return returnError(Error('User Not Found'), res);
+    }
+
+    const events = userDoc.events;
+
+    const eventDocs = await EventModel.find({
+      _id: { $in: events },
+    });
+
+    if (!eventDocs) return returnError(Error('Cannot Find User Events'), res);
+
+    // convert to ical
+
+    const calendar = ical({ name: 'Count Me In Calendar' });
+    const startTime = new Date();
+    const endTime = new Date();
+    endTime.setHours(startTime.getHours() + 1);
+
+    eventDocs.forEach((event) => {
+      console.log(event);
+
+      calendar.createEvent({
+        start: startTime,
+        end: endTime,
+        summary: event.title,
+        description: event.description,
+        location: event.location,
+      });
+    });
+
+    calendar.serve(res);
   } catch (err) {
     returnError(err, res);
   }
