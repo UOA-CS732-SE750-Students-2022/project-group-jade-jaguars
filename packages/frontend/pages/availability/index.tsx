@@ -180,6 +180,15 @@ const Availability: NextPage = () => {
     setPageNum(pageNum);
   };
 
+  const isAvailabilityEmpty = () => {
+    return (
+      allAvailabilities.length == 0 ||
+      !allAvailabilities.every((attendee) => {
+        return attendee.availability.length;
+      })
+    );
+  };
+
   return (
     <div>
       <Row align="baseline" className="mb-[10px]">
@@ -258,7 +267,9 @@ const Availability: NextPage = () => {
               <h2 className="mb-[35px]">Group Availability</h2>
             </Col>
             <Col>
-              <h2 className="ml-[50px]">{allAvailabilities.length}</h2>
+              <h2 className="ml-[50px]">
+                {isAvailabilityEmpty() ? '0' : allAvailabilities.length}
+              </h2>
             </Col>
           </Row>
           <Row>
@@ -280,7 +291,7 @@ const Availability: NextPage = () => {
             <button
               className={
                 'bg-secondary text-black w-[100px] cursor-pointer rounded-md px-2 py-1 font-semibold hover:bg-secondarylight absolute right-0 ' +
-                (isAdmin ? 'block' : 'hidden')
+                (isAdmin && !isAvailabilityEmpty() ? 'block' : 'hidden')
               }
               onClick={() => finaliseTimes()}
             >
