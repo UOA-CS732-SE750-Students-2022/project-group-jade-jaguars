@@ -199,6 +199,14 @@ export async function getUserTeamsById(
   }
 }
 
+/**
+ *
+ * @param req Request
+ * @param res Response
+ * @returns undefined
+ *
+ * @description Sends a responses of an Ical file containing all events for the user
+ */
 export async function getUserCalendar(req: Request, res: Response) {
   try {
     const userId = req.params.userId;
