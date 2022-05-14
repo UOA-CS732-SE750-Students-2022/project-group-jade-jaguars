@@ -28,7 +28,7 @@ interface Team {
   label: string;
 }
 
-const URL: string =
+const BASE_URL: string =
   (process.env.NEXT_PUBLIC_HOST as string) +
   (process.env.NEXT_PUBLIC_BASE as string);
 
@@ -58,7 +58,7 @@ const CreateEventPage: NextPage = () => {
   useEffect(() => {
     // Fetch a list of existing teams in the database and display each of the names as an option
     const getTeamList = async () => {
-      const response = await fetch(`${URL}/user/${userId}/team`, {
+      const response = await fetch(`${BASE_URL}/user/${userId}/team`, {
         headers: new Headers({
           Authorization: 'Bearer ' + authToken,
         }),
@@ -109,7 +109,7 @@ const CreateEventPage: NextPage = () => {
     return createEvent(data);
   };
   const onCreateEvent = async () => {
-    let teamId = undefined;
+    let teamId;
     // Create a new team
     if (form.values.newTeam) {
       // TODO: Move validation for form so that invalid teams do not attempt to be created (invalid team name for example)
@@ -127,7 +127,8 @@ const CreateEventPage: NextPage = () => {
 
     // Create event
     const response = await createEventMethod(teamId);
-
+    console.log('response');
+    console.log(response);
     // Forward router to event selection page
     router.push({
       pathname: '/availability/',

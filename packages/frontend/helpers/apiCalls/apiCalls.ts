@@ -5,7 +5,11 @@ import {
   AvailabilityConfirmation,
   AvailabilityPayload,
 } from '../../types/Availability';
-import { EventResponseDTO, TimeBracket } from '../../types/Event';
+import {
+  CreateEventDTO,
+  EventResponseDTO,
+  TimeBracket,
+} from '../../types/Event';
 
 // user api calls
 export const getUser = async (userId: string): Promise<UserResponseDTO> => {
@@ -38,7 +42,7 @@ export const getEvent = async (eventId: string): Promise<EventResponseDTO> => {
 };
 
 export const createEvent = async (
-  payload: Event,
+  payload: CreateEventDTO,
 ): Promise<EventResponseDTO> => {
   const data = await postData(`/event`, payload);
   return data;

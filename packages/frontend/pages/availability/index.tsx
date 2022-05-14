@@ -22,7 +22,13 @@ import {
 } from '../../helpers/apiCalls/apiCalls';
 import { getTZDate } from '../../helpers/timeFormatter';
 
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
+// Base url including
+const BASE_URL: string =
+  (process.env.NEXT_PUBLIC_HOST as string) +
+  (process.env.NEXT_PUBLIC_BASE as string);
+
+// Host for socket io
+const HOST = process.env.NEXT_PUBLIC_HOST as string;
 
 const Availability: NextPage = () => {
   const [timeOptions, setTimeOptions] = useState<TimeBracket>({
@@ -54,7 +60,7 @@ const Availability: NextPage = () => {
     let myAvailability: AvailabilityBlock[] = [];
     let allAvailabilities: AttendeeAvailability[] = [];
     let eventTitle = 'Event Title';
-    await getEvent(eventId!.toString()).then((val: Event) => {
+    await getEvent(eventId as string).then((val: EventResponseDTO) => {
       eventTitle = val.title;
       if (val.admin === userId) {
         setIsAdmin(true);
@@ -89,7 +95,8 @@ const Availability: NextPage = () => {
   useEffect(() => {
     fetchData().catch(console.error);
 
-    const io = socketio(BASE_URL!);
+    // Host does not include the base of the endpoints (.../api/v1/)
+    const io = socketio(HOST, { port: 3000 });
     io.on(`event:${eventId}`, (args: Event) => {
       setAllAvailabilities(args!.availability!.attendeeAvailability!);
     });

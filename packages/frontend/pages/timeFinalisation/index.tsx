@@ -7,7 +7,7 @@ import { AttendeeStatus } from '../../types/Availability';
 import GroupAvailability from '../../components/GroupAvailability';
 import { useAuth } from '../../src/context/AuthContext';
 import { AvailabilityStatusStrings } from '../../types/Availability';
-import Event from '../../types/Event';
+import Event, { EventResponseDTO } from '../../types/Event';
 import { TimeBracket, AttendeeAvailability } from '../../types/Event';
 import socketio from 'socket.io-client';
 import {
@@ -18,7 +18,11 @@ import {
 import { TimeOptionsList } from '../../components/TimeOptionsList';
 import { getTZDate } from '../../helpers/timeFormatter';
 
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
+const BASE_URL: string =
+  (process.env.NEXT_PUBLIC_HOST as string) +
+  (process.env.NEXT_PUBLIC_BASE as string);
+// Host for socket io
+const HOST = process.env.NEXT_PUBLIC_HOST as string;
 
 const TimeFinalisation: NextPage = () => {
   const [timeOptions, setTimeOptions] = useState<TimeBracket>({
@@ -51,7 +55,7 @@ const TimeFinalisation: NextPage = () => {
     let allAvailabilities: AttendeeAvailability[] = [];
     let eventTitle = 'Event Title';
     let potentialTimes: TimeBracket[] = [];
-    await getEvent(eventId!.toString()).then((val: Event) => {
+    await getEvent(eventId!.toString()).then((val: EventResponseDTO) => {
       eventTitle = val.title;
       startDate = getTZDate(val.startDate);
       endDate = getTZDate(val.endDate);
@@ -79,7 +83,7 @@ const TimeFinalisation: NextPage = () => {
   useEffect(() => {
     fetchData().catch(console.error);
 
-    const io = socketio(BASE_URL!);
+    const io = socketio(HOST, { port: 3000 });
     io.on(`event:${eventId}`, (args: Event) => {
       setAllAvailabilities(args!.availability!.attendeeAvailability!);
     });

@@ -6,8 +6,9 @@ import { useAuth } from '../src/context/AuthContext';
 import { useRouter } from 'next/router';
 import Image from 'next/image';
 
-const HOST_URL: string =
-  process.env.NEXT_PUBLIC_HOST! + process.env.NEXT_PUBLIC_BASE!;
+const BASE_URL: string =
+  (process.env.NEXT_PUBLIC_HOST as string) +
+  (process.env.NEXT_PUBLIC_BASE as string);
 
 const Login: NextPage = () => {
   const { user, userId, authToken, login, signedIn, anonymousLogin } =
@@ -17,7 +18,7 @@ const Login: NextPage = () => {
   useEffect(() => {
     // Check that a mongo user exists
     const checkUserOnMongo = async () => {
-      const response = await fetch(HOST_URL + `/user/${userId}`, {
+      const response = await fetch(BASE_URL + `/user/${userId}`, {
         headers: new Headers({
           Authorization: 'Bearer ' + authToken,
         }),
@@ -30,7 +31,7 @@ const Login: NextPage = () => {
         // ...for firstname and lastname, either backend changes these rules or frontend follow them
         const firstName = nameArray[0] ?? 'Firstname';
         const lastName = nameArray[1] ?? 'Lastname';
-        const createUserResponse = await fetch(HOST_URL + '/user', {
+        const createUserResponse = await fetch(BASE_URL + '/user', {
           method: 'POST',
           headers: {
             Authorization: 'Bearer ' + authToken,

@@ -2,8 +2,12 @@ import axios from 'axios';
 import { auth } from '../../src/config/firebase.config';
 
 // URL for endpoint
-const HOST_URL: string =
-  process.env.NEXT_PUBLIC_HOST! + process.env.NEXT_PUBLIC_BASE!;
+const BASE_URL: string =
+  (process.env.NEXT_PUBLIC_HOST as string) +
+  (process.env.NEXT_PUBLIC_BASE as string);
+
+console.log('thing');
+console.log(BASE_URL);
 
 // Fetch the authToken of the user
 export const getToken = async () => {
@@ -21,7 +25,7 @@ export const getHeaders = async () => {
 // GET an endpoint
 export const getData = async (endpoint: string, payload?: any) => {
   const data = await axios
-    .get(`${HOST_URL}${endpoint}`, {
+    .get(`${BASE_URL}${endpoint}`, {
       headers: await getHeaders(),
       ...(payload && { params: payload }),
     })
@@ -41,7 +45,7 @@ export const getData = async (endpoint: string, payload?: any) => {
 // POST an endpoint
 export const postData = async (endpoint: string, payload?: any) => {
   const data = await axios
-    .post(`${HOST_URL}${endpoint}`, payload, {
+    .post(`${BASE_URL}${endpoint}`, payload, {
       headers: await getHeaders(),
     })
     .then((response) => {
@@ -60,7 +64,7 @@ export const postData = async (endpoint: string, payload?: any) => {
 // PATCH an endpoint
 export const patchData = async (endpoint: string, payload?: any) => {
   const data = await axios
-    .patch(`${HOST_URL}${endpoint}`, payload, {
+    .patch(`${BASE_URL}${endpoint}`, payload, {
       headers: await getHeaders(),
     })
     .then((response) => {
@@ -79,7 +83,7 @@ export const patchData = async (endpoint: string, payload?: any) => {
 // DELETE an endpoint with a payload
 export const deleteData = async (endpoint: string, payload?: any) => {
   const data = await axios
-    .delete(`${HOST_URL}${endpoint}`, {
+    .delete(`${BASE_URL}${endpoint}`, {
       headers: await getHeaders(),
       ...(payload && { params: payload }),
     })
