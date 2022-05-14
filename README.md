@@ -83,6 +83,10 @@ When you have the project running the following endpoints will be available in o
 
 Run `npm test` in the project root to execute the unit tests via [Jest](https://jestjs.io).
 
+## Wiki
+
+The wiki can contains all meeting notes and major design decisions and rationale. The wiki can be found [here.](https://github.com/UOA-CS732-SE750-Students-2022/project-group-jade-jaguars/wiki).
+
 ## Contributors
 
 - Andreas Knapp (wqsz7xn#9473)
