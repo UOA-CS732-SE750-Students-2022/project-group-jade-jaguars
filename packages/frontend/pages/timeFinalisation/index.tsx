@@ -1,6 +1,6 @@
 import { NextPage } from 'next';
 import { useRouter } from 'next/router';
-import { ShareLinkButton } from '../../components/ShareLinkButton';
+import { ShareLinkButton } from '../../components/ShareLinkButton/ShareLinkButton';
 import { Row, Col } from '@nextui-org/react';
 import { useState, useEffect } from 'react';
 import { AttendeeStatus } from '../../types/Availability';
