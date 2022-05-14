@@ -21,7 +21,7 @@ export enum EventStatus {
 }
 
 export interface EventAvailability {
-  potentialTimes: TimeBracket;
+  potentialTimes: TimeBracket[];
   finalisedTime?: TimeBracket;
   attendeeAvailability?: AttendeeAvailability[];
 }

@@ -20,6 +20,9 @@ import {
   deleteAvailability,
   getUser,
 } from '../../helpers/apiCalls/apiCalls';
+import { getTZDate } from '../../helpers/timeFormatter';
+
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
 
 const Availability: NextPage = () => {
   const [timeOptions, setTimeOptions] = useState<TimeBracket>({
@@ -32,6 +35,7 @@ const Availability: NextPage = () => {
     AttendeeAvailability[]
   >([]);
 
+  const [eventTitle, setEventTitle] = useState<String>('Event Title');
   const [pageNum, setPageNum] = useState<number>(1);
   const [numPages, setNumPages] = useState<number>(1);
 
@@ -43,18 +47,14 @@ const Availability: NextPage = () => {
     query: { eventId },
   } = router;
 
-  const getTZDate = (date: Date) => {
-    return new Date(
-      new Date(date).toISOString().slice(0, 19).replace('Z', ' '),
-    );
-  };
-
   async function fetchData() {
     let startDate = timeOptions.startDate;
     let endDate = timeOptions.endDate;
     let myAvailability: AvailabilityBlock[] = [];
     let allAvailabilities: AttendeeAvailability[] = [];
+    let eventTitle = 'Event Title';
     await getEvent(eventId!.toString()).then((val: Event) => {
+      eventTitle = val.title;
       if (val.admin === userId) {
         setIsAdmin(true);
       }
@@ -78,6 +78,7 @@ const Availability: NextPage = () => {
         })!.availability;
       }
     });
+    setEventTitle(eventTitle);
     setTimeOptions({
       startDate: startDate,
       endDate: endDate,
@@ -89,13 +90,10 @@ const Availability: NextPage = () => {
   useEffect(() => {
     fetchData().catch(console.error);
 
-    const io = socketio('http://localhost:3000');
+    const io = socketio(BASE_URL!);
     io.on(`event:${eventId}`, (args: Event) => {
-      console.log('event changed');
-      console.log(args);
       setAllAvailabilities(args!.availability!.attendeeAvailability!);
     });
-    console.log(`listening to event: ${eventId}`);
   }, [eventId]);
 
   const [status, setStatus] = useState<AvailabilityStatusStrings>(
@@ -103,13 +101,22 @@ const Availability: NextPage = () => {
   );
   const [info, setInfo] = useState<JSX.Element[]>([]);
 
+  function finaliseTimes() {
+    router.push({
+      pathname: '/timeFinalisation/',
+      query: { eventId: eventId },
+    });
+  }
+
   const handleHover = async (peopleInfo: {
     people: AttendeeStatus[];
     numPeople: number;
   }) => {
     async function getInfoMap() {
       const infoMap = peopleInfo.people.map(async (person, index) => {
-        const { firstName, lastName } = await getUser(person.uuid);
+        let { firstName, lastName } = await getUser(person.uuid);
+        firstName = firstName ? firstName : 'first name';
+        lastName = lastName ? lastName : 'last name';
         return (
           <p key={index} className="block">
             {firstName +
@@ -174,7 +181,7 @@ const Availability: NextPage = () => {
   return (
     <div>
       <Row align="baseline" className="mb-[10px]">
-        <h1 className="mr-[30px] my-0 leading-none">Event Title</h1>
+        <h1 className="mr-[30px] my-0 leading-none">{eventTitle}</h1>
         <ShareLinkButton eventLink={'https://www.google.com/'} />
       </Row>
       <Row>
@@ -273,7 +280,7 @@ const Availability: NextPage = () => {
                 'bg-secondary text-black w-[100px] cursor-pointer rounded-md px-2 py-1 font-semibold hover:bg-secondarylight absolute right-0 ' +
                 (isAdmin ? 'block' : 'hidden')
               }
-              onClick={() => console.log('finalise')}
+              onClick={() => finaliseTimes()}
             >
               Finalise {'>'}
             </button>
