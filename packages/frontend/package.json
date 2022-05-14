@@ -9,7 +9,7 @@
     "build": "next build",
     "start": "next start -p 3001",
     "lint": "next lint",
-    "test": "jest --watchAll"
+    "test": "jest --runInBand --verbose --force-exit"
   },
   "dependencies": {
     "@ant-design/icons": "^4.7.0",
