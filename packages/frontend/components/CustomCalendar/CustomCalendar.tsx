@@ -16,10 +16,16 @@ export interface EventInterface {
   allDay?: boolean;
   start: Date;
   end: Date;
+  date?: Date | undefined;
   description?: string;
   location?: string;
   reminder?: string;
   participants: Member[];
+  availability?: {};
+  admin?: string;
+  startDate?: string;
+  endDate?: string;
+  status?: string;
 }
 interface CustomCalendarInterface {
   events: EventInterface[];

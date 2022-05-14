@@ -5,9 +5,10 @@ import { Search } from 'tabler-icons-react';
 interface SearchBarProp {
   value: string;
   setValue: React.Dispatch<React.SetStateAction<string>>;
+  getValue: (params?: any) => void;
 }
 
-export const SearchBar = ({ value, setValue }: SearchBarProp) => {
+export const SearchBar = ({ value, setValue, getValue }: SearchBarProp) => {
   return (
     <div className="border-2 w-fit rounded-lg pr-4 py-1">
       <Group>
@@ -18,7 +19,9 @@ export const SearchBar = ({ value, setValue }: SearchBarProp) => {
           placeholder="Search"
           className="h-full w-[300px] border-1 pl-4 py-2 focus:outline-none "
         />
-        <Search strokeWidth={1} size={20} />
+        <button onClick={() => getValue(value)}>
+          <Search strokeWidth={1} size={20} />
+        </button>
       </Group>
     </div>
   );

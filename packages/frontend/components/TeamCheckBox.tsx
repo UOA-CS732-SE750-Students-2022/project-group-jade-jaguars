@@ -34,6 +34,8 @@ export const TeamCheckBox: React.FC<TeamCheckBoxProps> = ({
         }}
         color={color}
         label={label}
+        // onChange={(value) => {console.log(value)}}
+        // onClick={(value) => {console.log(value)}}
         classNames={{
           root: 'hover:bg-primary bg-cardgrey w-full h-full py-1 px-1 rounded-lg',
           label: hovered

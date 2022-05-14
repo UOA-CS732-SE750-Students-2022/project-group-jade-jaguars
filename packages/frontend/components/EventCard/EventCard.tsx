@@ -93,17 +93,25 @@ const EventCard = (props: EventCardInterface) => {
           size == Sizes.large ? 'text-lg' : 'text-base'
         } font-normal`}
       >
-        <p>
-          {date?.toLocaleDateString()},{' '}
-          {`${timeRange[0].getHours()}:${timeRange[0].getMinutes()}`} -{' '}
-          {`${timeRange[1].getHours()}:${timeRange[1].getMinutes()}`} NZDT
-        </p>
+        <div>
+          {date ? (
+            <p>
+              {date.toLocaleDateString()},{' '}
+              {`${timeRange[0].getHours()}:${timeRange[0].getMinutes()}`} -{' '}
+              {`${timeRange[1].getHours()}:${timeRange[1].getMinutes()}`} NZDT
+            </p>
+          ) : (
+            <p>Date not available yet</p>
+          )}
+        </div>
       </div>
       <div
         id="description"
         className={`${size == Sizes.large ? 'mt-3' : ''} text-base`}
       >
-        <p className="line-clamp-3">{description}</p>
+        <p className="line-clamp-3">
+          {description ? description : 'No description'}
+        </p>
       </div>
     </div>
   );

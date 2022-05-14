@@ -5,6 +5,13 @@ import { useAuth } from '../src/context/AuthContext';
 import { useRouter } from 'next/router';
 
 import Image from 'next/image';
+import {
+  createUser,
+  getUser,
+  getUserResponseStatus,
+  updateUser,
+} from '../helpers/apiCalls/apiCalls';
+import { getHeaders } from '../helpers/apiCalls/helpers';
 const Login: NextPage = () => {
   const { user, userId, authToken, login, signedIn, anonymousLogin } =
     useAuth();
@@ -16,33 +23,38 @@ const Login: NextPage = () => {
 
   useEffect(() => {
     const checkUserOnMongo = async () => {
-      const response = await fetch(BASE_URL + `/user/${userId}`, {
-        headers: new Headers({
-          Authorization: 'Bearer ' + authToken,
-        }),
-      });
+      console.log('display name: ', user!.displayName);
 
-      if (response.status == 404) {
-        const nameArray = user?.displayName
-          ? user.displayName!.split(' ')
-          : ['Anonymous', 'User'];
-        // Incase firstname or lastname isn't defined we set a default
-        // TODO: Validation rules from backend require a length of atleast
-        // ...for firstname and lastname, either backend changes these rules or frontend follow them
-        const firstName = nameArray[0];
-        const lastName = nameArray[1];
-        const createUserResponse = await fetch(BASE_URL + '/user', {
-          method: 'POST',
-          headers: {
-            Authorization: 'Bearer ' + authToken,
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
+      const userNameArray = user?.displayName
+      ? user.displayName!.split(' ')
+      : ['Anonymous', 'User'];
+      const firstName = userNameArray[0];
+      const lastName = userNameArray[1];
+
+      const status = await getUserResponseStatus(userId);
+      console.log(status);
+
+      if (status != 404) {
+        const dbUser = await getUser(userId);
+        if (dbUser.firstName != firstName || dbUser.lastName != lastName) {
+          const res = await updateUser(userId, {
             firstName: firstName,
             lastName: lastName,
-          }),
+          });
+          console.log(res);
+        }
+      } else {
+        const res = await createUser({
+            // const nameArray = user!.displayName!.split(' ');
+            // // Incase firstname or lastname isn't defined we set a default
+            // // TODO: Validation rules from backend require a length of atleast
+            // // ...for firstname and lastname, either backend changes these rules or frontend follow them
+            // const firstName = nameArray[0] ?? 'Firstname';
+            // const lastName = nameArray[1] ?? 'Lastname';
+          firstName: firstName,
+          lastName: lastName,
         });
-        console.log(createUserResponse);
+        console.log(res);
       }
     };
     userId && checkUserOnMongo();
