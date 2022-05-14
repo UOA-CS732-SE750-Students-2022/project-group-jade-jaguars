@@ -7,8 +7,8 @@ import EditIcon from '../../assets/Edit.svg';
 import { formatTimeRange } from '../../helpers/timeFormatter';
 import Member from '../../types/Member';
 
-interface EventDetailsCardInterface {
-  title: string;
+export interface EventDetailsCardInterface {
+  title: string | undefined;
   date: Date | undefined;
   timeRange: [Date | undefined, Date | undefined];
   description?: string;

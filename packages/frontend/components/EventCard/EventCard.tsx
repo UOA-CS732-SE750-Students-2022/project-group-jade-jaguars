@@ -3,13 +3,13 @@ import { Avatar } from '@nextui-org/react';
 
 interface EventCardInterface {
   title: string;
-  date: Date;
+  date: Date | undefined;
   timeRange: [Date, Date];
   participants: {
     name: string;
     profilePic?: string;
   }[];
-  description: string;
+  description: string | undefined;
   onClick?: (props?: any) => void;
   onHover?: (props?: any) => void;
 }

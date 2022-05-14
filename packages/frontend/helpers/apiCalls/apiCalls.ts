@@ -59,6 +59,19 @@ export const searchEvent = async (payload: string) => {
   return data;
 };
 
+export const getEventsByUserId = async (payload: string) => {
+  const dataPayload = {
+    userId: payload,
+  };
+  const data = await postData(`/event/search`, dataPayload);
+  return data;
+};
+
+export const getEventParticipants = async (eventId: string | undefined) => {
+  const data = await getData(`/event/${eventId}/users`);
+  return data;
+};
+
 export const finaliseEventTime = async (
   eventId: string,
   payload: TimeBracket,
