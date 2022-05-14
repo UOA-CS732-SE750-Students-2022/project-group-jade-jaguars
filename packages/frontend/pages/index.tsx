@@ -11,9 +11,6 @@ const Home: NextPage = () => {
     signedIn ? router.push('/') : router.push('/login');
   }, [signedIn]);
 
-  // stage event: ce282192-a323-49c9-8260-28a842dea19c
-  // prod event: a78d55d9-278b-4512-a1f8-5ea9faafd110
-
   function eventAvailability() {
     router.push({
       pathname: '/availability/',

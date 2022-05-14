@@ -13,7 +13,7 @@ import {
 } from '../../types/Availability';
 import Event from '../../types/Event';
 import { TimeBracket, AttendeeAvailability } from '../../types/Event';
-import socketio, { io } from 'socket.io-client';
+import socketio from 'socket.io-client';
 import {
   getEvent,
   createAvailability,
@@ -55,6 +55,7 @@ const Availability: NextPage = () => {
     let myAvailability: AvailabilityBlock[] = [];
     let allAvailabilities: AttendeeAvailability[] = [];
     let eventTitle = 'Event Title';
+    let newFinalisedTime;
     await getEvent(eventId!.toString()).then((val: Event) => {
       eventTitle = val.title;
       if (val.admin === userId) {
@@ -62,6 +63,7 @@ const Availability: NextPage = () => {
       }
       startDate = getTZDate(val.startDate);
       endDate = getTZDate(val.endDate);
+      newFinalisedTime = val.availability!.finalisedTime;
 
       setNumPages(
         Math.ceil(
@@ -87,10 +89,20 @@ const Availability: NextPage = () => {
     });
     setMyAvailability(myAvailability);
     setAllAvailabilities(allAvailabilities);
+    return newFinalisedTime;
   }
 
   useEffect(() => {
-    fetchData().catch(console.error);
+    fetchData()
+      .then((newFinalisedTime) => {
+        if (newFinalisedTime) {
+          router.push({
+            pathname: '/finalised/',
+            query: { eventId: eventId },
+          });
+        }
+      })
+      .catch(console.error);
 
     io.on(`event:${eventId}`, (args: Event) => {
       setAllAvailabilities(args!.availability!.attendeeAvailability!);
