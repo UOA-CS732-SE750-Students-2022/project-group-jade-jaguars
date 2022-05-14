@@ -40,3 +40,16 @@ export interface AttendeeAvailability {
 export interface SearchEventPayload {
   titleSubStr: string;
 }
+
+export interface EventResponseDTO {
+  id: string;
+  title: string;
+  description?: string;
+  status: EventStatus;
+  startDate: Date;
+  endDate: Date;
+  availability: EventAvailability;
+  location?: string;
+  team: string;
+  admin: string;
+}

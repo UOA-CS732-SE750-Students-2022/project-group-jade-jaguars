@@ -11,7 +11,7 @@ import {
   AvailabilityBlock,
   AvailabilityStatusStrings,
 } from '../../types/Availability';
-import Event from '../../types/Event';
+import Event, { EventResponseDTO } from '../../types/Event';
 import { TimeBracket, AttendeeAvailability } from '../../types/Event';
 import socketio from 'socket.io-client';
 import {
@@ -56,32 +56,31 @@ const Availability: NextPage = () => {
     let allAvailabilities: AttendeeAvailability[] = [];
     let eventTitle = 'Event Title';
     let newFinalisedTime;
-    await getEvent(eventId!.toString()).then((val: Event) => {
-      eventTitle = val.title;
-      if (val.admin === userId) {
-        setIsAdmin(true);
-      }
-      startDate = getTZDate(val.startDate);
-      endDate = getTZDate(val.endDate);
-      newFinalisedTime = val.availability!.finalisedTime;
+    const val: EventResponseDTO = await getEvent(eventId!.toString());
+    eventTitle = val.title;
+    if (val.admin === userId) {
+      setIsAdmin(true);
+    }
+    startDate = getTZDate(val.startDate);
+    endDate = getTZDate(val.endDate);
+    newFinalisedTime = val.availability!.finalisedTime;
 
-      setNumPages(
-        Math.ceil(
-          (endDate.getTime() - startDate.getTime()) / (1000 * 3600 * 24 * 7),
-        ),
-      );
+    setNumPages(
+      Math.ceil(
+        (endDate.getTime() - startDate.getTime()) / (1000 * 3600 * 24 * 7),
+      ),
+    );
 
-      allAvailabilities = val ? val!.availability!.attendeeAvailability! : [];
-      if (
-        allAvailabilities.find((attendee) => {
-          return attendee.attendee === userId;
-        })
-      ) {
-        myAvailability = allAvailabilities.find((attendee) => {
-          return attendee.attendee === userId;
-        })!.availability;
-      }
-    });
+    allAvailabilities = val ? val!.availability!.attendeeAvailability! : [];
+    if (
+      allAvailabilities.find((attendee) => {
+        return attendee.attendee === userId;
+      })
+    ) {
+      myAvailability = allAvailabilities.find((attendee) => {
+        return attendee.attendee === userId;
+      })!.availability;
+    }
     setEventTitle(eventTitle);
     setTimeOptions({
       startDate: startDate,

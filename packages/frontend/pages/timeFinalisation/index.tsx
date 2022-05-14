@@ -52,22 +52,21 @@ const TimeFinalisation: NextPage = () => {
     let allAvailabilities: AttendeeAvailability[] = [];
     let eventTitle = 'Event Title';
     let potentialTimes: TimeBracket[] = [];
-    await getEvent(eventId!.toString()).then((val: Event) => {
-      eventTitle = val.title;
-      startDate = getTZDate(val.startDate);
-      endDate = getTZDate(val.endDate);
+    const val = await getEvent(eventId!.toString());
+    eventTitle = val.title;
+    startDate = getTZDate(val.startDate);
+    endDate = getTZDate(val.endDate);
 
-      setNumPages(
-        Math.ceil(
-          (endDate.getTime() - startDate.getTime()) / (1000 * 3600 * 24 * 7),
-        ),
-      );
+    setNumPages(
+      Math.ceil(
+        (endDate.getTime() - startDate.getTime()) / (1000 * 3600 * 24 * 7),
+      ),
+    );
 
-      allAvailabilities = val ? val!.availability!.attendeeAvailability! : [];
-      potentialTimes = val!.availability!.potentialTimes
-        ? val!.availability!.potentialTimes!
-        : [];
-    });
+    allAvailabilities = val ? val!.availability!.attendeeAvailability! : [];
+    potentialTimes = val!.availability!.potentialTimes
+      ? val!.availability!.potentialTimes!
+      : [];
     setEventTitle(eventTitle);
     setTimeOptions({
       startDate: startDate,
@@ -79,10 +78,6 @@ const TimeFinalisation: NextPage = () => {
 
   useEffect(() => {
     fetchData().catch(console.error);
-
-    io.on(`event:${eventId}`, (args: Event) => {
-      setAllAvailabilities(args!.availability!.attendeeAvailability!);
-    });
   }, [eventId]);
 
   const [info, setInfo] = useState<JSX.Element[]>([]);
