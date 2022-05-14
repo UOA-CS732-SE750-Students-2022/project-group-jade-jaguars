@@ -95,6 +95,7 @@ const eventAvailabilitySchema = new Schema<IEventAvailability>({
 eventAvailabilitySchema.virtual('potentialTimes').get(function (this: any) {
   return calculatePotentialTimes(this);
 });
+
 export interface IEvent {
   _id: string;
   title: string;
@@ -106,6 +107,7 @@ export interface IEvent {
   location?: string;
   team?: string; // id
   admin?: string; // id
+  repeat: boolean;
 }
 
 const eventSchema = new Schema<IEvent>(
@@ -164,6 +166,11 @@ const eventSchema = new Schema<IEvent>(
       type: String,
       ref: 'User',
       required: true,
+    },
+    repeat: {
+      type: Boolean,
+      required: true,
+      default: false,
     },
   },
   { timestamps: true },

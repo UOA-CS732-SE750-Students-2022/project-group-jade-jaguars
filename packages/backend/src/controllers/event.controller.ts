@@ -30,6 +30,7 @@ export interface CreateEventDTO {
   location?: string;
   team?: string; // id
   admin: string; // id
+  repeat?: boolean;
 }
 
 // Can change everything but the id
@@ -134,6 +135,7 @@ export async function createEvent(
       location: Joi.string().optional(),
       team: validators.id().optional(),
       admin: validators.id().optional(),
+      repeat: Joi.boolean().optional(),
     });
     const formData = validate(res, rules, req.body, { allowUnknown: true });
     // Validation failed, headers have been set, return
