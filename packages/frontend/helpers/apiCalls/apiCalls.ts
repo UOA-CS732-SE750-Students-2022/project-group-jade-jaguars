@@ -1,11 +1,11 @@
 import { deleteData, getData, patchData, postData } from './helpers';
 import { User, UserResponseDTO } from '../../types/User';
 import { CreateTeamDTO, Team, TeamResponseDTO } from '../../types/Team';
-import Event, { EventResponseDTO } from '../../types/Event';
 import {
   AvailabilityConfirmation,
   AvailabilityPayload,
 } from '../../types/Availability';
+import { EventResponseDTO, TimeBracket } from '../../types/Event';
 
 // user api calls
 export const getUser = async (userId: string): Promise<UserResponseDTO> => {
@@ -59,6 +59,14 @@ export const searchEvent = async (payload: string) => {
     titleSubStr: payload,
   };
   const data = await postData(`/event/search`, dataPayload);
+  return data;
+};
+
+export const finaliseEventTime = async (
+  eventId: string,
+  payload: TimeBracket,
+) => {
+  const data = await postData(`/event/${eventId}/finalize`, payload);
   return data;
 };
 

@@ -20,12 +20,9 @@ import {
   deleteAvailability,
   getUser,
 } from '../../helpers/apiCalls/apiCalls';
-import { getTZDate } from '../../helpers/apiCalls/helpers';
+import { getTZDate } from '../../helpers/timeFormatter';
 
-const HOST: string = process.env.NEXT_PUBLIC_HOST as string;
-const URL: string =
-  (process.env.NEXT_PUBLIC_HOST as string) +
-  (process.env.NEXT_PUBLIC_BASE as string);
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
 
 const Availability: NextPage = () => {
   const [timeOptions, setTimeOptions] = useState<TimeBracket>({
@@ -38,6 +35,7 @@ const Availability: NextPage = () => {
     AttendeeAvailability[]
   >([]);
 
+  const [eventTitle, setEventTitle] = useState<String>('Event Title');
   const [pageNum, setPageNum] = useState<number>(1);
   const [numPages, setNumPages] = useState<number>(1);
 
@@ -55,37 +53,31 @@ const Availability: NextPage = () => {
     let endDate = timeOptions.endDate;
     let myAvailability: AvailabilityBlock[] = [];
     let allAvailabilities: AttendeeAvailability[] = [];
-    const event = await getEvent(eventId!.toString());
-    if (event.admin === userId) {
-      setIsAdmin(true);
-    }
+    let eventTitle = 'Event Title';
+    await getEvent(eventId!.toString()).then((val: Event) => {
+      eventTitle = val.title;
+      if (val.admin === userId) {
+        setIsAdmin(true);
+      }
+      startDate = getTZDate(val.startDate);
+      endDate = getTZDate(val.endDate);
 
-    // Convert to local timezone
-    startDate = getTZDate(event.startDate);
-    endDate = getTZDate(event.endDate);
+      // Convert to local timezone
+      startDate = getTZDate(val.startDate);
+      endDate = getTZDate(val.endDate);
 
-    // Set page range availabile for the user to naviage
-    setNumPages(
-      Math.ceil(
-        (endDate.getTime() - startDate.getTime()) / (1000 * 3600 * 24 * 7), // One page per week
-      ),
-    );
-
-    allAvailabilities = event.availability.attendeeAvailability;
-
-    // Set the users own availability, leave as empty if user not found
-    // TODO: Simplify to a reduceRight chain
-    if (
-      allAvailabilities.find((attendee) => {
-        return attendee.attendee === userId;
-      })
-    ) {
-      myAvailability = allAvailabilities.find((attendee) => {
-        return attendee.attendee === userId;
-      })!.availability;
-    }
-
-    // Update state
+      allAvailabilities = val ? val!.availability!.attendeeAvailability! : [];
+      if (
+        allAvailabilities.find((attendee) => {
+          return attendee.attendee === userId;
+        })
+      ) {
+        myAvailability = allAvailabilities.find((attendee) => {
+          return attendee.attendee === userId;
+        })!.availability;
+      }
+    });
+    setEventTitle(eventTitle);
     setTimeOptions({
       startDate: startDate,
       endDate: endDate,
@@ -97,14 +89,10 @@ const Availability: NextPage = () => {
   useEffect(() => {
     fetchData().catch(console.error);
 
-    console.log(`host: ${HOST}`);
-    const io = socketio(HOST, { port: 3000 });
+    const io = socketio(BASE_URL!);
     io.on(`event:${eventId}`, (args: Event) => {
-      console.log('event changed');
-      console.log(args);
       setAllAvailabilities(args!.availability!.attendeeAvailability!);
     });
-    console.log(`listening to event: ${eventId}`);
   }, [eventId]);
 
   const [status, setStatus] = useState<AvailabilityStatusStrings>(
@@ -113,13 +101,22 @@ const Availability: NextPage = () => {
   const [info, setInfo] = useState<JSX.Element[]>([]);
 
   // Display who is availabile in a mouse hovered time block
+  function finaliseTimes() {
+    router.push({
+      pathname: '/timeFinalisation/',
+      query: { eventId: eventId },
+    });
+  }
+
   const handleHover = async (peopleInfo: {
     people: AttendeeStatus[];
     numPeople: number;
   }) => {
     async function getInfoMap() {
       const infoMapPromises = peopleInfo.people.map(async (person, index) => {
-        const { firstName, lastName } = await getUser(person.uuid);
+        let { firstName, lastName } = await getUser(person.uuid);
+        firstName = firstName ? firstName : 'first name';
+        lastName = lastName ? lastName : 'last name';
         return (
           <p key={index} className="block">
             {firstName +
@@ -185,8 +182,8 @@ const Availability: NextPage = () => {
   return (
     <div>
       <Row align="baseline" className="mb-[10px]">
-        <h1 className="mr-[30px] my-0 leading-none">Event Title</h1>
-        <ShareLinkButton eventLink={'http://'} />
+        <h1 className="mr-[30px] my-0 leading-none">{eventTitle}</h1>
+        <ShareLinkButton eventLink={'https://www.google.com/'} />
       </Row>
       <Row>
         <Col>
@@ -284,7 +281,7 @@ const Availability: NextPage = () => {
                 'bg-secondary text-black w-[100px] cursor-pointer rounded-md px-2 py-1 font-semibold hover:bg-secondarylight absolute right-0 ' +
                 (isAdmin ? 'block' : 'hidden')
               }
-              onClick={() => console.log('finalise')}
+              onClick={() => finaliseTimes()}
             >
               Finalise {'>'}
             </button>
