@@ -121,7 +121,8 @@ const TimeFinalisation: NextPage = () => {
   const confirmSelection = async () => {
     await finaliseEventTime(eventId!.toString(), selectedTimes!);
     router.push({
-      pathname: `/finalised/${eventId}`,
+      pathname: `/finalised`,
+      query: { eventId: eventId },
     });
   };
 

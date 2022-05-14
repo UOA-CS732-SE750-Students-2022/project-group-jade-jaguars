@@ -2,6 +2,7 @@ import { ScrollArea } from '@mantine/core';
 import React, { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import { TimeOptionCheckBox } from './TimeOptionCheckBox';
 import { TimeBracket } from '../types/Event';
+import { formatTimeBracket, getTZDate } from '../helpers/timeFormatter';
 
 interface TimeOptionsListProp {
   options: TimeBracket[];
@@ -18,31 +19,15 @@ export const TimeOptionsList = ({
     setCheckedTime(options[index]);
   };
 
-  const getTZDate = (date: Date) => {
-    return new Date(
-      new Date(date).toISOString().slice(0, 19).replace('Z', ' '),
-    );
-  };
-
   useEffect(() => {
     let stringOptions: string[] = [];
     options.forEach((option) => {
       let startDate = getTZDate(option.startDate);
       let endDate = getTZDate(option.endDate);
-      stringOptions.push(
-        startDate.toDateString() +
-          ', ' +
-          startDate.getHours() +
-          ':' +
-          startDate.getMinutes() +
-          (startDate.getMinutes() == 0 ? '0 - ' : ' - ') +
-          endDate.getHours() +
-          ':' +
-          endDate.getMinutes() +
-          (endDate.getMinutes() == 0 ? '0' : ''),
-      );
+      stringOptions.push(formatTimeBracket(startDate, endDate));
     });
     setStringOptions(stringOptions);
+    handleClick(0);
   }, [options]);
 
   return (
