@@ -223,7 +223,7 @@ const Event: NextPage = () => {
               </button>
               <button
                 className="py-2 px-3 rounded-md bg-secondary hover:bg-secondarylight"
-                onClick={() => handleDeleteConfirm(selectedEvent)}
+                onClick={() => handleDeleteConfirm(selectedEvent!)}
               >
                 <span>Confirm</span>
               </button>
