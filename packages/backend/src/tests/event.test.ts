@@ -110,6 +110,19 @@ describe('Events', () => {
     it('Patch', async () => {
       const spy = jest.spyOn(server.webSocket, 'send');
 
+      let memberDoc = await UserModel.create({
+        _id: 'y'.repeat(25),
+        firstName: 'firstName',
+        lastName: 'lastName',
+      });
+
+      let teamDoc = await TeamModel.create({
+        admin: userId,
+        members: [memberDoc._id],
+        title: 'title',
+        color: Colour.BLUE,
+      });
+
       const eventDoc = await EventModel.create({
         admin: userId,
         title: 'title',
@@ -122,11 +135,16 @@ describe('Events', () => {
         .patch(`/api/v1/event/${eventId}`)
         .send({
           title: 'changed',
+          team: teamDoc._id,
         })
         .expect(StatusCodes.OK);
 
       expect(eventUpdateResponse.body.title).toEqual('changed');
       expect(spy).toHaveBeenCalled();
+
+      // Expect that the team has the event id
+      teamDoc = await TeamModel.findById(teamDoc._id);
+      expect(teamDoc.events).toEqual([eventId]);
     });
 
     it('Delete', async () => {

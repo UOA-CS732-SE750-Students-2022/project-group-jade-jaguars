@@ -200,6 +200,13 @@ export async function patchEventById(
     // Validation failed, headers have been set, return
     if (!formData) return;
 
+    // If a team is present then we have to add the event to the team
+    if (formData.team) {
+      const teamDoc = await TeamModel.findById(formData.team);
+      teamDoc.events.push(formData.eventId);
+      await teamDoc.save();
+    }
+
     const eventDoc = await EventModel.findOneAndUpdate(
       { _id: eventId },
       { $set: formData },
