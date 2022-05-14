@@ -1,14 +1,12 @@
 import React from 'react';
 import { Avatar } from '@nextui-org/react';
+import Member from '../../types/Member';
 
 interface EventCardInterface {
   title: string;
   date: Date | undefined;
   timeRange: [Date, Date];
-  participants: {
-    name: string;
-    profilePic?: string;
-  }[];
+  participants: Member[] | undefined;
   description: string | undefined;
   onClick?: (props?: any) => void;
   onHover?: (props?: any) => void;

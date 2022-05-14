@@ -27,22 +27,27 @@ const Event: NextPage = () => {
 
   const [events, setEvents] = useState<Event[]>();
 
+  const [loading, setLoading] = useState(true);
+
   const getEvents = async () => {
+    setLoading(true);
     const events: Event[] = await getEventsByUserId(userId);
     if (events) {
-      Object.values(events).map(async (event: Event) => {
-        console.log(event.id);
-        const eventId = event.id;
-        const users: EventUser[] = await getEventParticipants(eventId);
-        let participants: Member[] = [];
-        Object.values(users).map((user: EventUser) => {
-          participants.push({
-            name: user.firstName + ' ' + user.lastName,
+      await Promise.all(
+        Object.values(events).map(async (event: Event) => {
+          const eventId = event.id;
+          const users: EventUser[] = await getEventParticipants(eventId);
+          let participants: Member[] = [];
+          Object.values(users).map((user: EventUser) => {
+            participants.push({
+              name: user.firstName + ' ' + user.lastName,
+            });
           });
-        });
-        event.participants = participants;
-      });
+          event.participants = participants;
+        }),
+      );
       setEvents(events);
+      setLoading(false);
     }
   };
 
@@ -60,7 +65,7 @@ const Event: NextPage = () => {
       <section className="w-fit">
         <h1>Events</h1>
         <div className="flex flex-col gap-8">
-          {events != undefined ? (
+          {!loading && events != undefined ? (
             events.map((event, index) => {
               return (
                 <EventCard
