@@ -1,4 +1,5 @@
-import { Modal } from '@mantine/core';
+import { Button, Modal, TextInput } from '@mantine/core';
+import { useForm } from '@mantine/hooks';
 import type { NextPage } from 'next';
 import { useEffect, useState } from 'react';
 import TeamCard from '../components/TeamCard';
@@ -7,6 +8,7 @@ import {
   deleteTeam,
   getUser,
   getUserTeamsById,
+  updateTeam,
 } from '../helpers/apiCalls/apiCalls';
 import { useAuth } from '../src/context/AuthContext';
 import Member from '../types/Member';
@@ -21,6 +23,15 @@ const Team: NextPage = () => {
   const [loading, setLoading] = useState(true);
 
   const [selectedTeam, setSelectedTeam] = useState<Team>();
+
+  const [editTeamModalOpen, setEditTeamModalOpen] = useState(false);
+
+  const form = useForm({
+    initialValues: {
+      title: '',
+      description: '',
+    },
+  });
 
   const getTeams = async () => {
     setLoading(true);
@@ -70,6 +81,24 @@ const Team: NextPage = () => {
     }
   };
 
+  const handleEditSubmit = async (
+    value: any,
+    selectedTeam: Team | undefined,
+  ) => {
+    if (selectedTeam && selectedTeam._id) {
+      const payload = value;
+      if (value.title == '') {
+        delete payload.title;
+      }
+      if (value.description == '') {
+        delete payload.description;
+      }
+      await updateTeam(selectedTeam._id, value);
+      setEditTeamModalOpen(false);
+      refresh();
+    }
+  };
+
   return (
     <div className="flex flex-row gap-[2vw] w-full h-full p-10 bg-backgroundgrey">
       <section className="w-[50vw] max-w-[840px]">
@@ -99,7 +128,7 @@ const Team: NextPage = () => {
             <TeamDetailsCard
               team={selectedTeam}
               editTeam={() => {
-                'edit';
+                setEditTeamModalOpen(true);
               }}
               deleteTeam={() => handleDeleteTeam(selectedTeam)}
               addUser={() => {
@@ -112,7 +141,46 @@ const Team: NextPage = () => {
           )}
         </div>
       </section>
-      <section>modal</section>
+      <section>
+        <Modal
+          centered
+          opened={editTeamModalOpen}
+          onClose={() => setEditTeamModalOpen(false)}
+          title={'Edit Team'}
+        >
+          <div className="my-3">
+            <div className="flex flex-col gap-3 mx-4">
+              <TextInput
+                label="Team name"
+                placeholder="Enter a team name"
+                value={form.values.title}
+                onChange={(e) =>
+                  form.setFieldValue('title', e.currentTarget.value)
+                }
+              />
+              <TextInput
+                label="Team description"
+                placeholder="Enter a team descriptoin"
+                value={form.values.description}
+                onChange={(e) =>
+                  form.setFieldValue('description', e.currentTarget.value)
+                }
+              />
+            </div>
+            <div className="mt-5 flex-1 flex flex-row justify-end mx-4">
+              <Button
+                classNames={{
+                  filled: 'bg-[#FFDF74] hover:bg-[#FFDF74]',
+                  label: 'text-black',
+                }}
+                onClick={() => handleEditSubmit(form.values, selectedTeam)}
+              >
+                Done
+              </Button>
+            </div>
+          </div>
+        </Modal>
+      </section>
     </div>
   );
 };

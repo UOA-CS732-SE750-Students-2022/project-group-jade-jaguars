@@ -11,7 +11,7 @@ import EditIcon from '../assets/Edit.svg';
 
 function TeamDetailsCard(props: {
   team: Team;
-  editTeam: MouseEventHandler<SVGElement>;
+  editTeam: (param?: any) => void;
   deleteTeam: (param?: any) => void;
   addUser: MouseEventHandler<SVGElement>;
   deleteUser: (param?: any) => void;
@@ -27,7 +27,7 @@ function TeamDetailsCard(props: {
           {team.title}
         </p>
         <div id="tools" className="flex flex-row gap-5 mt-2">
-          <div onClick={() => editTeam} className="cursor-pointer">
+          <div onClick={editTeam} className="cursor-pointer">
             <EditIcon />
           </div>
           <div onClick={deleteTeam} className="cursor-pointer">
