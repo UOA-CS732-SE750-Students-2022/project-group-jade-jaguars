@@ -27,8 +27,8 @@ export interface EventAvailability {
 }
 
 export interface TimeBracket {
-  startDate: Date | string;
-  endDate: Date | string;
+  startDate: Date;
+  endDate: Date;
 }
 
 export interface AttendeeAvailability {
