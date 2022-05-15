@@ -6,7 +6,7 @@ import EventForm from '../../components/EventForm';
 import { useAuth } from '../../src/context/AuthContext';
 import { createTeam, createEvent } from '../../helpers/apiCalls/apiCalls';
 
-interface FormValues {
+export interface FormValues {
   title: string;
   dateRange: [Date | null, Date | null];
   timeRange: [Date, Date];
@@ -111,11 +111,7 @@ const CreateEventPage: NextPage = () => {
       <h1>Create Event</h1>
       <Grid>
         <Grid.Col>
-          <EventForm
-            teamData={teamList}
-            form={form}
-            onCreateEvent={onCreateEvent}
-          />
+          <EventForm teamData={teamList} form={form} onSubmit={onCreateEvent} />
         </Grid.Col>
       </Grid>
     </Container>
