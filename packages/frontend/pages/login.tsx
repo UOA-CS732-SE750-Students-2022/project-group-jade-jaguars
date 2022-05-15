@@ -11,7 +11,8 @@ const Login: NextPage = () => {
   const router = useRouter();
 
   const BASE_URL =
-    process.env.NEXT_PUBLIC_SOCKET_URL! + process.env.NEXT_PUBLIC_BASE_URL!;
+    process.env.NEXT_PUBLIC_SOCKET_URL! +
+    (process.env.NEXT_PUBLIC_BASE_URL ?? 'api/v1');
 
   useEffect(() => {
     const checkUserOnMongo = async () => {
