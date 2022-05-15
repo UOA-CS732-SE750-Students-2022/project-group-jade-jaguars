@@ -1,0 +1,1732 @@
+{
+	"info": {
+		"_postman_id": "7d3328fd-fd25-48d3-b7ee-ab5ed4e2608f",
+		"name": "count Me In",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Production",
+			"item": [
+				{
+					"name": "User",
+					"item": [
+						{
+							"name": "User",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{prod_url}}/api/v1/user/:userId",
+									"host": [
+										"{{prod_url}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"user",
+										":userId"
+									],
+									"variable": [
+										{
+											"key": "userId",
+											"value": "biHOPrkpQPWaLw3V1Mzvrhi3wIV2"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "User",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"firstName\": \"Gamer\",\n    \"lastName\": \"Knapp\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{prod_url}}/api/v1/user",
+									"host": [
+										"{{prod_url}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"user"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "User",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "eyJhbGciOiJSUzI1NiIsImtpZCI6ImJlYmYxMDBlYWRkYTMzMmVjOGZlYTU3ZjliNWJjM2E2YWIyOWY1NTUiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3NlY3VyZXRva2VuLmdvb2dsZS5jb20vY291bnQtbWUtaW4tNTk3ODUiLCJhdWQiOiJjb3VudC1tZS1pbi01OTc4NSIsImF1dGhfdGltZSI6MTY1MTk4OTkyOCwidXNlcl9pZCI6IlZyWVJob0diY3pNeENIeXBtMlluaWNQR25LYzIiLCJzdWIiOiJWcllSaG9HYmN6TXhDSHlwbTJZbmljUEduS2MyIiwiaWF0IjoxNjUxOTg5OTI4LCJleHAiOjE2NTE5OTM1MjgsImVtYWlsIjoiYWRmc2RzZHNkZmRmZzRAYXNkLmFzZGFhYXNzIiwiZW1haWxfdmVyaWZpZWQiOmZhbHNlLCJmaXJlYmFzZSI6eyJpZGVudGl0aWVzIjp7ImVtYWlsIjpbImFkZnNkc2RzZGZkZmc0QGFzZC5hc2RhYWFzcyJdfSwic2lnbl9pbl9wcm92aWRlciI6InBhc3N3b3JkIn19.K1iwptQN9TeFMjGbGHDeUkr9Jn7B-E20_XSUGKduKUwbDyxoyf-zzQ-V7KEePjrBEVFEP2lBfHKfcZak7BohnGf4-oRYGoF30Iv0-IyB3vsuG5Ba_f4KrAaUnduryPHy2VBcJsXWut4gKde4o143-ravoJn5A0m4QndhuQyVPfN1cV2BrW_nLGiHhAVS94mAKMGtzX4j7lO8X3T0PGtc7flYhpGs73HfbILIuDxd1LWDKy1SqaVZZqj0DLsCPgl9JwMLcwcRoGL0IHwNNNnoi7OZfOAgqxcq23xuJVewEeYmwx3SGNDU0ATZKzAohxJtUzl-hBjuha5nROZafgBKRw",
+											"type": "string"
+										}
+									]
+								},
+								"method": "PATCH",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"_id\":\"3k0NwPEubJTfChrW16iWc4Bm4xdu2\",\n    \"firstName\":\"Hello\",\n    \"lastName\":\"World\",\n    \"events\":[],\n    \"email\":\"test@asd.asdaaas\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{prod_url}}/api/v1/user",
+									"host": [
+										"{{prod_url}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"user"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "User",
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "{{prod_url}}/api/v1/user/:userId",
+									"host": [
+										"{{prod_url}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"user",
+										":userId"
+									],
+									"variable": [
+										{
+											"key": "userId",
+											"value": "FMR7lSZNhIgX0ypObjPJcXP2Xrx2"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Firebase Auth Token",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"email\": \"mc@asd.asdaaass\",\n  \"emailVerified\": true,\n  \"password\": \"asdasdasd\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://www.googleapis.com/identitytoolkit/v3/relyingparty/signupNewUser?key=AIzaSyAa4cPP9kRSpC_Ek-ii4LBu66CggKRpOIM",
+									"protocol": "https",
+									"host": [
+										"www",
+										"googleapis",
+										"com"
+									],
+									"path": [
+										"identitytoolkit",
+										"v3",
+										"relyingparty",
+										"signupNewUser"
+									],
+									"query": [
+										{
+											"key": "key",
+											"value": "AIzaSyAa4cPP9kRSpC_Ek-ii4LBu66CggKRpOIM"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "User Calendar",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{prod_url}}/api/v1/user/ical/:userId",
+									"host": [
+										"{{prod_url}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"user",
+										"ical",
+										":userId"
+									],
+									"variable": [
+										{
+											"key": "userId",
+											"value": "R3chJElq5UhZCv9DsC7ZUlS3bWE2"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Team",
+					"item": [
+						{
+							"name": "Team",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"title\": \"TEST\",\n  \"description\": \"red\",\n  \"admin\": \"rPXvT239fVPJcJj8GaUe8X7Df9s2\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{prod_url}}/api/v1/team",
+									"host": [
+										"{{prod_url}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"team"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Team",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{prod_url}}/api/v1/team/:teamId",
+									"host": [
+										"{{prod_url}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"team",
+										":teamId"
+									],
+									"variable": [
+										{
+											"key": "teamId",
+											"value": "3aea907a-80f7-430c-b509-e3fcb822a265"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Team",
+							"request": {
+								"method": "PATCH",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"members\": [\"FMR7lSZNhIgX0ypObjPJcXP2Xrx2\", \"R3chJElq5UhZCv9DsC7ZUlS3bWE2\", \"rPXvT239fVPJcJj8GaUe8X7Df9s2\"]\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{prod_url}}/api/v1/team/3aea907a-80f7-430c-b509-e3fcb822a265",
+									"host": [
+										"{{prod_url}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"team",
+										"3aea907a-80f7-430c-b509-e3fcb822a265"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Team",
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "{{prod_url}}/api/v1/team/:teamId",
+									"host": [
+										"{{prod_url}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"team",
+										":teamId"
+									],
+									"variable": [
+										{
+											"key": "teamId",
+											"value": "62608719bcc3fccf49452a54"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Events",
+					"item": [
+						{
+							"name": "Event",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{prod_url}}/api/v1/event/:eventId",
+									"host": [
+										"{{prod_url}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"event",
+										":eventId"
+									],
+									"variable": [
+										{
+											"key": "eventId",
+											"value": "7ec3c3a5-01fe-4d5a-9c71-707a5a1b68de"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Event",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"title\": \"long meeting\",\n  \"status\": \"Pending\",\n  \"startDate\": \"2022-05-02T09:00:00.000+00:00\",\n  \"endDate\": \"2022-05-11T17:00:00.000+00:00\",\n  \"admin\": \"rPXvT239fVPJcJj8GaUe8X7Df9s2\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{prod_url}}/api/v1/event",
+									"host": [
+										"{{prod_url}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"event"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Event",
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "{{prod_url}}/api/v1/event/:eventId",
+									"host": [
+										"{{prod_url}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"event",
+										":eventId"
+									],
+									"variable": [
+										{
+											"key": "eventId",
+											"value": "62608719bcc3fccf49452a54"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Availability ",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n \"userId\": \"FMR7lSZNhIgX0ypObjPJcXP2Xrx2\",\n  \"startDate\": \"2022-06-16T12:00:00.000Z\",\n  \"endDate\": \"2022-06-16T14:00:00.000Z\",\n  \"status\": \"Available\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{prod_url}}/api/v1/event/:eventId/availability",
+									"host": [
+										"{{prod_url}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"event",
+										":eventId",
+										"availability"
+									],
+									"variable": [
+										{
+											"key": "eventId",
+											"value": "995f111f-982b-4439-ac85-9c768de1d955"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Availability",
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "{{prod_url}}/api/v1/event/:id/availability?userId=3k0NwPEubJTfChrW16iWc4Bm4xu2&startDate=1999-01-01T00:00:00.000Z&endDate=2100-01-01T00:00:00.000Z",
+									"host": [
+										"{{prod_url}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"event",
+										":id",
+										"availability"
+									],
+									"query": [
+										{
+											"key": "userId",
+											"value": "3k0NwPEubJTfChrW16iWc4Bm4xu2"
+										},
+										{
+											"key": "startDate",
+											"value": "1999-01-01T00:00:00.000Z"
+										},
+										{
+											"key": "endDate",
+											"value": "2100-01-01T00:00:00.000Z"
+										}
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "387961b5-3098-4030-8b2d-fc440f482548"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "search",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n \"titleSubStr\": \"asd\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{prod_url}}/api/v1/event/search",
+									"host": [
+										"{{prod_url}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"event",
+										"search"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Event",
+							"request": {
+								"method": "PATCH",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"title\": \"SOFTENG701 meeting updated\",\n    \"description\": \"This is a meeting for SOFTENG701 updated\",\n    \"location\": \"this is location\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{prod_url}}/api/v1/event/:eventId",
+									"host": [
+										"{{prod_url}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"event",
+										":eventId"
+									],
+									"variable": [
+										{
+											"key": "eventId",
+											"value": "4ae28c5d-6580-4f79-8dff-e9b4d17102d5"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				}
+			],
+			"auth": {
+				"type": "bearer",
+				"bearer": [
+					{
+						"key": "token",
+						"value": "eyJhbGciOiJSUzI1NiIsImtpZCI6ImJlYmYxMDBlYWRkYTMzMmVjOGZlYTU3ZjliNWJjM2E2YWIyOWY1NTUiLCJ0eXAiOiJKV1QifQ.eyJuYW1lIjoiUmFpbmEgU29uZyIsInBpY3R1cmUiOiJodHRwczovL2xoMy5nb29nbGV1c2VyY29udGVudC5jb20vYS9BQVRYQUp3VFQ1UTAyWUN6WU1tU2Y4cVdBNzlWRjZtbXBwcVd5eGZGQmZKdz1zOTYtYyIsImlzcyI6Imh0dHBzOi8vc2VjdXJldG9rZW4uZ29vZ2xlLmNvbS9jb3VudC1tZS1pbi01OTc4NSIsImF1ZCI6ImNvdW50LW1lLWluLTU5Nzg1IiwiYXV0aF90aW1lIjoxNjUyNDg2MzUzLCJ1c2VyX2lkIjoiVzJjbEtlbDdSb2RheDNFemdTNnZ3VFRyRXY2MiIsInN1YiI6IlcyY2xLZWw3Um9kYXgzRXpnUzZ2d1RUckV2NjIiLCJpYXQiOjE2NTI1OTI4NjEsImV4cCI6MTY1MjU5NjQ2MSwiZW1haWwiOiJ5c29uNTkwQGF1Y2tsYW5kdW5pLmFjLm56IiwiZW1haWxfdmVyaWZpZWQiOnRydWUsImZpcmViYXNlIjp7ImlkZW50aXRpZXMiOnsiZ29vZ2xlLmNvbSI6WyIxMDcwMzAyNTM4NjQ5NTA3Njc4NTQiXSwiZW1haWwiOlsieXNvbjU5MEBhdWNrbGFuZHVuaS5hYy5ueiJdfSwic2lnbl9pbl9wcm92aWRlciI6Imdvb2dsZS5jb20ifX0.ZnL9gqu-m6HX74aENABKvvPAKtnSLrPtxOC_XiUxwAIgdUtp7gAArzjBHZlPllc2e9yjjrnalFDCd2sMSse89dR35SgxK5kQmbdl0TeoK85L4ZXrp-o4VcLvS2UKRBRI-r--npWajGARd_sRXKTCCi0x7KD2J2WYyBWt63lSvYy5PmHOxGMIvPCw9O6VYRVG7-UUmOoIISW1SBSi1uqi3sKsFw4LbM-ii0_6wGhywpJ7cF-B-KF77mAYUtFNb_z11hOK11MhXtGiNnnO7Wl6hvCSHiDPgQOaqnOApYmpnM7J_qfWmeg3XR0K67faBtJ5ZyLvBWUzEdGPEOi7nVoCWA",
+						"type": "string"
+					}
+				]
+			},
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "Stage",
+			"item": [
+				{
+					"name": "User",
+					"item": [
+						{
+							"name": "User",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{stage_url}}/api/v1/user/:userId",
+									"host": [
+										"{{stage_url}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"user",
+										":userId"
+									],
+									"variable": [
+										{
+											"key": "userId",
+											"value": "biHOPrkpQPWaLw3V1Mzvrhi3wIV2"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "User",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"firstName\": \"\",\n    \"lastName\": \"c\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{stage_url}}/api/v1/user",
+									"host": [
+										"{{stage_url}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"user"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "User",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "eyJhbGciOiJSUzI1NiIsImtpZCI6ImM2NzNkM2M5NDdhZWIxOGI2NGU1OGUzZWRlMzI1NWZiZjU3NTI4NWIiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3NlY3VyZXRva2VuLmdvb2dsZS5jb20vY291bnQtbWUtaW4tc3RhZ2UiLCJhdWQiOiJjb3VudC1tZS1pbi1zdGFnZSIsImF1dGhfdGltZSI6MTY1MDc2NDMxMywidXNlcl9pZCI6IjNrME53UEV1YkpUZkNoclcxNmlXYzRCbTR4dTIiLCJzdWIiOiIzazBOd1BFdWJKVGZDaHJXMTZpV2M0Qm00eHUyIiwiaWF0IjoxNjUwNzY0MzEzLCJleHAiOjE2NTA3Njc5MTMsImVtYWlsIjoidGVzdEBhc2QuYXNkYWFhcyIsImVtYWlsX3ZlcmlmaWVkIjpmYWxzZSwiZmlyZWJhc2UiOnsiaWRlbnRpdGllcyI6eyJlbWFpbCI6WyJ0ZXN0QGFzZC5hc2RhYWFzIl19LCJzaWduX2luX3Byb3ZpZGVyIjoicGFzc3dvcmQifX0.gBerNJyVwbqLNBkpUtkDDfOGp6IvAGNmJzZz3PhVh60bJNPocuScuZUsSDiO6PnkgZTqGGJb3qyRgrYC32JAR7fkKaZwsPkW8bk3TfVWgngpLog70bYWI_ZDk1KXf5Qln1KguYNsy4iFJrsPN_cFgia2f5IfRC2dra3KKZkX25T71H2OtgtKO_K5tiEZZKiA5B59VN5DuPyIcy2oTK6OaA1PSRIW-VGsEwJYqlLnfnulGILbDQMCbS8FCOUra4PfTkp4Ge4-MWHCRPgkVGDclxJ1qS29mO1bmc4czQeiMhMiNZSB36i37Xk8EFkGqHdiX74CPU89EMlNCe7zc2YCXQ",
+											"type": "string"
+										}
+									]
+								},
+								"method": "PATCH",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"_id\":\"3k0NwPEubJTfChrW16iWc4Bm4xdu2\",\n    \"firstName\":\"Hello\",\n    \"lastName\":\"World\",\n    \"events\":[],\n    \"email\":\"test@asd.asdaaas\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{stage_url}}/api/v1/user",
+									"host": [
+										"{{stage_url}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"user"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "User",
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "{{stage_url}}/api/v1/user/:id",
+									"host": [
+										"{{stage_url}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"user",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "XpzjerLWcHUDavEkAN8pdtA1Urh1"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Stage Firebase Auth",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"disabled\": true,\n  \"email\": \"user@user.user\",\n  \"emailVerified\": true,\n  \"password\": \"asdasdasd\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://www.googleapis.com/identitytoolkit/v3/relyingparty/signupNewUser?key=AIzaSyCKTAzQpyUGa9AFPaZz2Xs52ipER8inwZM",
+									"protocol": "https",
+									"host": [
+										"www",
+										"googleapis",
+										"com"
+									],
+									"path": [
+										"identitytoolkit",
+										"v3",
+										"relyingparty",
+										"signupNewUser"
+									],
+									"query": [
+										{
+											"key": "key",
+											"value": "AIzaSyCKTAzQpyUGa9AFPaZz2Xs52ipER8inwZM"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get User Teams",
+							"request": {
+								"method": "GET",
+								"header": []
+							},
+							"response": []
+						},
+						{
+							"name": "User Calendar",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{stage_url}}/api/v1/user/ical/:userId",
+									"host": [
+										"{{stage_url}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"user",
+										"ical",
+										":userId"
+									],
+									"variable": [
+										{
+											"key": "userId",
+											"value": "biHOPrkpQPWaLw3V1Mzvrhi3wIV2"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Events",
+					"item": [
+						{
+							"name": "Event",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{stage_url}}/api/v1/event/:eventId",
+									"host": [
+										"{{stage_url}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"event",
+										":eventId"
+									],
+									"variable": [
+										{
+											"key": "eventId",
+											"value": "e20d710c-57f7-42ce-ba17-b27ee4ed1307"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Event",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"title\": \"This is the available\",\n    \"description\": \"event description\",\n    \"status\": \"Pending\",\n    \"startDate\": \"2022-06-05T12:00:00.000Z\",\n    \"endDate\": \"2022-06-10T22:00:00.000Z\",\n    \"admin\": \"biHOPrkpQPWaLw3V1Mzvrhi3wIV2\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{stage_url}}/api/v1/event",
+									"host": [
+										"{{stage_url}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"event"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Event",
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "{{stage_url}}/api/v1/event/5f3d7da8-cc4e-4f09-b93e-a88c490ed2ee",
+									"host": [
+										"{{stage_url}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"event",
+										"5f3d7da8-cc4e-4f09-b93e-a88c490ed2ee"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Availability ",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"userId\": \"ERF7TlqZb6Utqzi4hLEFD9aXSmm1\",\n  \"startDate\": \"2019-09-26T05:58:30.996+00:00\",\n  \"endDate\": \"2019-09-26T05:58:40.996+00:00\",\n  \"status\": \"Available\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{stage_url}}/api/v1/event/:eventId/availability",
+									"host": [
+										"{{stage_url}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"event",
+										":eventId",
+										"availability"
+									],
+									"query": [
+										{
+											"key": "",
+											"value": null,
+											"disabled": true
+										}
+									],
+									"variable": [
+										{
+											"key": "eventId",
+											"value": "c0eb3af5-dd0a-4eac-93a2-7043f1b4fcf8"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Search",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n \"titleSubStr\": \"asd\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{stage_url}}/api/v1/event/search",
+									"host": [
+										"{{stage_url}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"event",
+										"search"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Availability",
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "{{stage_url}}/api/v1/event/:eventId/availability?userId=ERF7TlqZb6Utqzi4hLEFD9aXSmm1&startDate=1999-01-01T00:00:00.000Z&endDate=2100-01-01T00:00:00.000Z",
+									"host": [
+										"{{stage_url}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"event",
+										":eventId",
+										"availability"
+									],
+									"query": [
+										{
+											"key": "userId",
+											"value": "ERF7TlqZb6Utqzi4hLEFD9aXSmm1"
+										},
+										{
+											"key": "startDate",
+											"value": "1999-01-01T00:00:00.000Z"
+										},
+										{
+											"key": "endDate",
+											"value": "2100-01-01T00:00:00.000Z"
+										}
+									],
+									"variable": [
+										{
+											"key": "eventId",
+											"value": "e20d710c-57f7-42ce-ba17-b27ee4ed1307"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Team",
+					"item": [
+						{
+							"name": "Team",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "eyJhbGciOiJSUzI1NiIsImtpZCI6ImM2NzNkM2M5NDdhZWIxOGI2NGU1OGUzZWRlMzI1NWZiZjU3NTI4NWIiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3NlY3VyZXRva2VuLmdvb2dsZS5jb20vY291bnQtbWUtaW4tc3RhZ2UiLCJhdWQiOiJjb3VudC1tZS1pbi1zdGFnZSIsImF1dGhfdGltZSI6MTY1MDg4NjU4NCwidXNlcl9pZCI6IllWSXZTOGxhZlFSRXBYUmRwSTdCTU14OG5DZzEiLCJzdWIiOiJZVkl2UzhsYWZRUkVwWFJkcEk3Qk1NeDhuQ2cxIiwiaWF0IjoxNjUwODg2NTg0LCJleHAiOjE2NTA4OTAxODQsImVtYWlsIjoidGVzdDVAYXNkLmFzZGFhYXMiLCJlbWFpbF92ZXJpZmllZCI6ZmFsc2UsImZpcmViYXNlIjp7ImlkZW50aXRpZXMiOnsiZW1haWwiOlsidGVzdDVAYXNkLmFzZGFhYXMiXX0sInNpZ25faW5fcHJvdmlkZXIiOiJwYXNzd29yZCJ9fQ.Z1m35T2nvvZ2k2Dj8V7OZZ6L4aIS636jPRo06pgMpU4C_s4xIW7cSTp2JpRQAHgVdZXemVT0wTOc2q4-ODCzSwJF8f-QbEdY17sWPnj2KL2VNqAYtEsiqRaIhjlwLRIsq_uMD_5WK4gqPbUM8rgIL73DD_SQfV4D2KHUzOyKOzC-kJHLf-W2k7A6PyyI41i-ImIqxaGYkDS5nWesLjWKP6da2KhbtvnuYKJxq-q9ruzI70zI6IQRm7HiW_s_PxSuUJdBUawkM3nu6I6tpss3gvOCpTfRJ9Li5pgvbVnUPiAr0HyZLd3FtGB1Lt5XV8zvLJdcyHrgznvul1l77Nlzaw",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"title\": \"TEST\",\n  \"description\": \"red\",\n  \"admin\": \"4607c961-f5a0-4bd3-9a22-288220aed59d\"\n  \n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{stage_url}}/api/v1/team",
+									"host": [
+										"{{stage_url}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"team"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Team",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{stage_url}}/api/v1/team/:teamId",
+									"host": [
+										"{{stage_url}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"team",
+										":teamId"
+									],
+									"variable": [
+										{
+											"key": "teamId",
+											"value": "62608719bcc3fccf49452a54"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Team",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "eyJhbGciOiJSUzI1NiIsImtpZCI6ImM2NzNkM2M5NDdhZWIxOGI2NGU1OGUzZWRlMzI1NWZiZjU3NTI4NWIiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3NlY3VyZXRva2VuLmdvb2dsZS5jb20vY291bnQtbWUtaW4tc3RhZ2UiLCJhdWQiOiJjb3VudC1tZS1pbi1zdGFnZSIsImF1dGhfdGltZSI6MTY1MDg4NjU4NCwidXNlcl9pZCI6IllWSXZTOGxhZlFSRXBYUmRwSTdCTU14OG5DZzEiLCJzdWIiOiJZVkl2UzhsYWZRUkVwWFJkcEk3Qk1NeDhuQ2cxIiwiaWF0IjoxNjUwODg2NTg0LCJleHAiOjE2NTA4OTAxODQsImVtYWlsIjoidGVzdDVAYXNkLmFzZGFhYXMiLCJlbWFpbF92ZXJpZmllZCI6ZmFsc2UsImZpcmViYXNlIjp7ImlkZW50aXRpZXMiOnsiZW1haWwiOlsidGVzdDVAYXNkLmFzZGFhYXMiXX0sInNpZ25faW5fcHJvdmlkZXIiOiJwYXNzd29yZCJ9fQ.Z1m35T2nvvZ2k2Dj8V7OZZ6L4aIS636jPRo06pgMpU4C_s4xIW7cSTp2JpRQAHgVdZXemVT0wTOc2q4-ODCzSwJF8f-QbEdY17sWPnj2KL2VNqAYtEsiqRaIhjlwLRIsq_uMD_5WK4gqPbUM8rgIL73DD_SQfV4D2KHUzOyKOzC-kJHLf-W2k7A6PyyI41i-ImIqxaGYkDS5nWesLjWKP6da2KhbtvnuYKJxq-q9ruzI70zI6IQRm7HiW_s_PxSuUJdBUawkM3nu6I6tpss3gvOCpTfRJ9Li5pgvbVnUPiAr0HyZLd3FtGB1Lt5XV8zvLJdcyHrgznvul1l77Nlzaw",
+											"type": "string"
+										}
+									]
+								},
+								"method": "PATCH",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"title\": \"TEST\",\n  \"description\": \"red\",\n  \"color\": \"red\",\n\n  \"members\": [],\n  \"events\": []\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{stage_url}}/api/v1/team",
+									"host": [
+										"{{stage_url}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"team"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Team",
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "{{stage_url}}/api/v1/team/:teamId",
+									"host": [
+										"{{stage_url}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"team",
+										":teamId"
+									],
+									"variable": [
+										{
+											"key": "teamId",
+											"value": "62608719bcc3fccf49452a54"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				}
+			],
+			"auth": {
+				"type": "bearer",
+				"bearer": [
+					{
+						"key": "token",
+						"value": "eyJhbGciOiJSUzI1NiIsImtpZCI6ImJlYmYxMDBlYWRkYTMzMmVjOGZlYTU3ZjliNWJjM2E2YWIyOWY1NTUiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3NlY3VyZXRva2VuLmdvb2dsZS5jb20vY291bnQtbWUtaW4tc3RhZ2UiLCJhdWQiOiJjb3VudC1tZS1pbi1zdGFnZSIsImF1dGhfdGltZSI6MTY1MjQ5OTk1NSwidXNlcl9pZCI6Imw2Znl5ZWR5VzFRQ2J0dnV0QkFGR04xQ2ZsaDIiLCJzdWIiOiJsNmZ5eWVkeVcxUUNidHZ1dEJBRkdOMUNmbGgyIiwiaWF0IjoxNjUyNDk5OTU1LCJleHAiOjE2NTI1MDM1NTUsImVtYWlsIjoidXNlckB1c2VyLnVzZXIiLCJlbWFpbF92ZXJpZmllZCI6ZmFsc2UsImZpcmViYXNlIjp7ImlkZW50aXRpZXMiOnsiZW1haWwiOlsidXNlckB1c2VyLnVzZXIiXX0sInNpZ25faW5fcHJvdmlkZXIiOiJwYXNzd29yZCJ9fQ.fhbkTJoV6TmB2_U1Lu5cJokq8uA48t2qcd1zPF61lrePB9iKDNRvEFf6KScTcQZHOCr4djJEyOh5RCy16UTaOJATmX1D1RfqCtp26JgH8p8RWWpqyXzwVZBDyN5BsYkoCaO8ANyGi7P_2IdZTrGzh69H3gNC9RB-0i2srzBq9wSu91YIJEJflFJuNZOEn1g5_4iL7P9cOkktCyzMppL02T-SyT3dwkpe0gh8QoHR7pLBb6ZDmGZx34OiRGnIpooNcOQrV6ZcLKRVHcyC0Sil22KU4xwAzi8yx7h7eN9UKtW8E34Mxy-6FToRvkbFLcfsTWEljwn5nUipVDGtym9Iug",
+						"type": "string"
+					}
+				]
+			},
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "Etienne tests",
+			"item": [
+				{
+					"name": "User",
+					"item": [
+						{
+							"name": "User",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{stage_url}}/api/v1/user/:userId",
+									"host": [
+										"{{stage_url}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"user",
+										":userId"
+									],
+									"variable": [
+										{
+											"key": "userId",
+											"value": "biHOPrkpQPWaLw3V1Mzvrhi3wIV2"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "User",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"firstName\": \"TEST\",\n    \"lastName\": \"TEST\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{stage_url}}/api/v1/user",
+									"host": [
+										"{{stage_url}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"user"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "User",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "eyJhbGciOiJSUzI1NiIsImtpZCI6ImM2NzNkM2M5NDdhZWIxOGI2NGU1OGUzZWRlMzI1NWZiZjU3NTI4NWIiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3NlY3VyZXRva2VuLmdvb2dsZS5jb20vY291bnQtbWUtaW4tc3RhZ2UiLCJhdWQiOiJjb3VudC1tZS1pbi1zdGFnZSIsImF1dGhfdGltZSI6MTY1MDc2NDMxMywidXNlcl9pZCI6IjNrME53UEV1YkpUZkNoclcxNmlXYzRCbTR4dTIiLCJzdWIiOiIzazBOd1BFdWJKVGZDaHJXMTZpV2M0Qm00eHUyIiwiaWF0IjoxNjUwNzY0MzEzLCJleHAiOjE2NTA3Njc5MTMsImVtYWlsIjoidGVzdEBhc2QuYXNkYWFhcyIsImVtYWlsX3ZlcmlmaWVkIjpmYWxzZSwiZmlyZWJhc2UiOnsiaWRlbnRpdGllcyI6eyJlbWFpbCI6WyJ0ZXN0QGFzZC5hc2RhYWFzIl19LCJzaWduX2luX3Byb3ZpZGVyIjoicGFzc3dvcmQifX0.gBerNJyVwbqLNBkpUtkDDfOGp6IvAGNmJzZz3PhVh60bJNPocuScuZUsSDiO6PnkgZTqGGJb3qyRgrYC32JAR7fkKaZwsPkW8bk3TfVWgngpLog70bYWI_ZDk1KXf5Qln1KguYNsy4iFJrsPN_cFgia2f5IfRC2dra3KKZkX25T71H2OtgtKO_K5tiEZZKiA5B59VN5DuPyIcy2oTK6OaA1PSRIW-VGsEwJYqlLnfnulGILbDQMCbS8FCOUra4PfTkp4Ge4-MWHCRPgkVGDclxJ1qS29mO1bmc4czQeiMhMiNZSB36i37Xk8EFkGqHdiX74CPU89EMlNCe7zc2YCXQ",
+											"type": "string"
+										}
+									]
+								},
+								"method": "PATCH",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"_id\":\"3k0NwPEubJTfChrW16iWc4Bm4xdu2\",\n    \"firstName\":\"Hello\",\n    \"lastName\":\"World\",\n    \"events\":[],\n    \"email\":\"test@asd.asdaaas\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{stage_url}}/api/v1/user",
+									"host": [
+										"{{stage_url}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"user"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "User",
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "{{stage_url}}/api/v1/user/:id",
+									"host": [
+										"{{stage_url}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"user",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "XpzjerLWcHUDavEkAN8pdtA1Urh1"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Stage Firebase Auth",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"disabled\": true,\n  \"email\": \"user@user.user\",\n  \"emailVerified\": true,\n  \"password\": \"asdasdasd\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://www.googleapis.com/identitytoolkit/v3/relyingparty/signupNewUser?key=AIzaSyAa4cPP9kRSpC_Ek-ii4LBu66CggKRpOIM",
+									"protocol": "https",
+									"host": [
+										"www",
+										"googleapis",
+										"com"
+									],
+									"path": [
+										"identitytoolkit",
+										"v3",
+										"relyingparty",
+										"signupNewUser"
+									],
+									"query": [
+										{
+											"key": "key",
+											"value": "AIzaSyAa4cPP9kRSpC_Ek-ii4LBu66CggKRpOIM"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get User Teams",
+							"request": {
+								"method": "GET",
+								"header": []
+							},
+							"response": []
+						},
+						{
+							"name": "User Calendar",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{stage_url}}/api/v1/user/ical/:userId",
+									"host": [
+										"{{stage_url}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"user",
+										"ical",
+										":userId"
+									],
+									"variable": [
+										{
+											"key": "userId",
+											"value": "R3chJElq5UhZCv9DsC7ZUlS3bWE2"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Events",
+					"item": [
+						{
+							"name": "Event",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{stage_url}}/api/v1/event/:eventId",
+									"host": [
+										"{{stage_url}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"event",
+										":eventId"
+									],
+									"variable": [
+										{
+											"key": "eventId",
+											"value": "e20d710c-57f7-42ce-ba17-b27ee4ed1307"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Event",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"title\": \"NEW EVENT\",\n    \"description\": \"NEW EVENT\",\n    \"status\": \"Pending\",\n    \"startDate\": \"2022-05-14T12:00:00.000Z\",\n    \"endDate\": \"2022-05-14T22:00:00.000Z\",\n    \"admin\": \"biHOPrkpQPWaLw3V1Mzvrhi3wIV2\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{stage_url}}/api/v1/event",
+									"host": [
+										"{{stage_url}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"event"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Event",
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "{{stage_url}}/api/v1/event/5f3d7da8-cc4e-4f09-b93e-a88c490ed2ee",
+									"host": [
+										"{{stage_url}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"event",
+										"5f3d7da8-cc4e-4f09-b93e-a88c490ed2ee"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Availability ",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"userId\": \"ERF7TlqZb6Utqzi4hLEFD9aXSmm1\",\n  \"startDate\": \"2019-09-26T05:58:30.996+00:00\",\n  \"endDate\": \"2019-09-26T05:58:40.996+00:00\",\n  \"status\": \"Available\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{stage_url}}/api/v1/event/:eventId/availability",
+									"host": [
+										"{{stage_url}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"event",
+										":eventId",
+										"availability"
+									],
+									"query": [
+										{
+											"key": "",
+											"value": null,
+											"disabled": true
+										}
+									],
+									"variable": [
+										{
+											"key": "eventId",
+											"value": "c0eb3af5-dd0a-4eac-93a2-7043f1b4fcf8"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Search",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n \"titleSubStr\": \"asd\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{stage_url}}/api/v1/event/search",
+									"host": [
+										"{{stage_url}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"event",
+										"search"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Availability",
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "{{stage_url}}/api/v1/event/:eventId/availability?userId=ERF7TlqZb6Utqzi4hLEFD9aXSmm1&startDate=1999-01-01T00:00:00.000Z&endDate=2100-01-01T00:00:00.000Z",
+									"host": [
+										"{{stage_url}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"event",
+										":eventId",
+										"availability"
+									],
+									"query": [
+										{
+											"key": "userId",
+											"value": "ERF7TlqZb6Utqzi4hLEFD9aXSmm1"
+										},
+										{
+											"key": "startDate",
+											"value": "1999-01-01T00:00:00.000Z"
+										},
+										{
+											"key": "endDate",
+											"value": "2100-01-01T00:00:00.000Z"
+										}
+									],
+									"variable": [
+										{
+											"key": "eventId",
+											"value": "e20d710c-57f7-42ce-ba17-b27ee4ed1307"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Team",
+					"item": [
+						{
+							"name": "Team",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "eyJhbGciOiJSUzI1NiIsImtpZCI6ImM2NzNkM2M5NDdhZWIxOGI2NGU1OGUzZWRlMzI1NWZiZjU3NTI4NWIiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3NlY3VyZXRva2VuLmdvb2dsZS5jb20vY291bnQtbWUtaW4tc3RhZ2UiLCJhdWQiOiJjb3VudC1tZS1pbi1zdGFnZSIsImF1dGhfdGltZSI6MTY1MDg4NjU4NCwidXNlcl9pZCI6IllWSXZTOGxhZlFSRXBYUmRwSTdCTU14OG5DZzEiLCJzdWIiOiJZVkl2UzhsYWZRUkVwWFJkcEk3Qk1NeDhuQ2cxIiwiaWF0IjoxNjUwODg2NTg0LCJleHAiOjE2NTA4OTAxODQsImVtYWlsIjoidGVzdDVAYXNkLmFzZGFhYXMiLCJlbWFpbF92ZXJpZmllZCI6ZmFsc2UsImZpcmViYXNlIjp7ImlkZW50aXRpZXMiOnsiZW1haWwiOlsidGVzdDVAYXNkLmFzZGFhYXMiXX0sInNpZ25faW5fcHJvdmlkZXIiOiJwYXNzd29yZCJ9fQ.Z1m35T2nvvZ2k2Dj8V7OZZ6L4aIS636jPRo06pgMpU4C_s4xIW7cSTp2JpRQAHgVdZXemVT0wTOc2q4-ODCzSwJF8f-QbEdY17sWPnj2KL2VNqAYtEsiqRaIhjlwLRIsq_uMD_5WK4gqPbUM8rgIL73DD_SQfV4D2KHUzOyKOzC-kJHLf-W2k7A6PyyI41i-ImIqxaGYkDS5nWesLjWKP6da2KhbtvnuYKJxq-q9ruzI70zI6IQRm7HiW_s_PxSuUJdBUawkM3nu6I6tpss3gvOCpTfRJ9Li5pgvbVnUPiAr0HyZLd3FtGB1Lt5XV8zvLJdcyHrgznvul1l77Nlzaw",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"title\": \"TEST\",\n  \"description\": \"red\",\n  \"admin\": \"4607c961-f5a0-4bd3-9a22-288220aed59d\"\n  \n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{stage_url}}/api/v1/team",
+									"host": [
+										"{{stage_url}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"team"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Team",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{stage_url}}/api/v1/team/:teamId",
+									"host": [
+										"{{stage_url}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"team",
+										":teamId"
+									],
+									"variable": [
+										{
+											"key": "teamId",
+											"value": "62608719bcc3fccf49452a54"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Team",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "eyJhbGciOiJSUzI1NiIsImtpZCI6ImM2NzNkM2M5NDdhZWIxOGI2NGU1OGUzZWRlMzI1NWZiZjU3NTI4NWIiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3NlY3VyZXRva2VuLmdvb2dsZS5jb20vY291bnQtbWUtaW4tc3RhZ2UiLCJhdWQiOiJjb3VudC1tZS1pbi1zdGFnZSIsImF1dGhfdGltZSI6MTY1MDg4NjU4NCwidXNlcl9pZCI6IllWSXZTOGxhZlFSRXBYUmRwSTdCTU14OG5DZzEiLCJzdWIiOiJZVkl2UzhsYWZRUkVwWFJkcEk3Qk1NeDhuQ2cxIiwiaWF0IjoxNjUwODg2NTg0LCJleHAiOjE2NTA4OTAxODQsImVtYWlsIjoidGVzdDVAYXNkLmFzZGFhYXMiLCJlbWFpbF92ZXJpZmllZCI6ZmFsc2UsImZpcmViYXNlIjp7ImlkZW50aXRpZXMiOnsiZW1haWwiOlsidGVzdDVAYXNkLmFzZGFhYXMiXX0sInNpZ25faW5fcHJvdmlkZXIiOiJwYXNzd29yZCJ9fQ.Z1m35T2nvvZ2k2Dj8V7OZZ6L4aIS636jPRo06pgMpU4C_s4xIW7cSTp2JpRQAHgVdZXemVT0wTOc2q4-ODCzSwJF8f-QbEdY17sWPnj2KL2VNqAYtEsiqRaIhjlwLRIsq_uMD_5WK4gqPbUM8rgIL73DD_SQfV4D2KHUzOyKOzC-kJHLf-W2k7A6PyyI41i-ImIqxaGYkDS5nWesLjWKP6da2KhbtvnuYKJxq-q9ruzI70zI6IQRm7HiW_s_PxSuUJdBUawkM3nu6I6tpss3gvOCpTfRJ9Li5pgvbVnUPiAr0HyZLd3FtGB1Lt5XV8zvLJdcyHrgznvul1l77Nlzaw",
+											"type": "string"
+										}
+									]
+								},
+								"method": "PATCH",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"title\": \"TEST\",\n  \"description\": \"red\",\n  \"color\": \"red\",\n\n  \"members\": [],\n  \"events\": []\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{stage_url}}/api/v1/team",
+									"host": [
+										"{{stage_url}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"team"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Team",
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "{{stage_url}}/api/v1/team/:teamId",
+									"host": [
+										"{{stage_url}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"team",
+										":teamId"
+									],
+									"variable": [
+										{
+											"key": "teamId",
+											"value": "62608719bcc3fccf49452a54"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				}
+			],
+			"auth": {
+				"type": "bearer",
+				"bearer": [
+					{
+						"key": "token",
+						"value": "eyJhbGciOiJSUzI1NiIsImtpZCI6ImJlYmYxMDBlYWRkYTMzMmVjOGZlYTU3ZjliNWJjM2E2YWIyOWY1NTUiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3NlY3VyZXRva2VuLmdvb2dsZS5jb20vY291bnQtbWUtaW4tNTk3ODUiLCJhdWQiOiJjb3VudC1tZS1pbi01OTc4NSIsImF1dGhfdGltZSI6MTY1MjUwMDUxMCwidXNlcl9pZCI6IlFockU3WW1YajlVbUlVNm1GRWY2UFdyc3FPdDIiLCJzdWIiOiJRaHJFN1ltWGo5VW1JVTZtRkVmNlBXcnNxT3QyIiwiaWF0IjoxNjUyNTAwNTEwLCJleHAiOjE2NTI1MDQxMTAsImVtYWlsIjoidXNlckB1c2VyLnVzZXIiLCJlbWFpbF92ZXJpZmllZCI6ZmFsc2UsImZpcmViYXNlIjp7ImlkZW50aXRpZXMiOnsiZW1haWwiOlsidXNlckB1c2VyLnVzZXIiXX0sInNpZ25faW5fcHJvdmlkZXIiOiJwYXNzd29yZCJ9fQ.B-tTQWu-n0yg7ZwY6EwvW8Q7oPM0zUwIgouxrnZNvIgRrP6Hx0z0XAyU09edmHql_5pTMxSSmg5ZPsV2vCCGNo1XD-SvfpR4HJWDiGzGz2Ogf2aNDVF0ProkxG0Z3ENb0rWUfmk0aVulpYLbWeORI9oYtkAhxV41shshmRyem6HbRm3mx8lO6ZKNO3GRXTNIi84wHN-fgR3zn8z_Wn5VX_R-al3INC2xMGiGh8zYaRxFm_BOcGFGtUusGuS0Z_lM2PXpOIUbWFJmDVobxVzp9ohkOhI51tW-UgZ9KtwD_OZk7G1LsCg_4OiQ0_Ni9esnmMIFKU8P7movLPEoPdKsMA",
+						"type": "string"
+					}
+				]
+			},
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "stage_url",
+			"value": "localhost:3000"
+		},
+		{
+			"key": "prod_url",
+			"value": "149.28.170.219"
+		}
+	]
+}
