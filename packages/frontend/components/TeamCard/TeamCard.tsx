@@ -4,49 +4,39 @@ import { Card, Text, Grid, Avatar } from '@nextui-org/react';
 import { useEffect, useState } from 'react';
 
 function TeamCard(team: TeamDetails) {
-  const [members, setMembers] = useState<Member[]>([]);
-  const [count, setCount] = useState<number>(0);
-
-  useEffect(() => {
-    let members = [...team.members];
-    let count = members.length - 7;
-    if (count < 0) {
-      count = 0;
-    }
-    setCount(count);
-    setMembers(members.splice(0, 7));
-  }, [team]);
+  const { members, onClick } = team;
 
   return (
-    <Card
-      css={{
-        mw: '295px',
-        height: '180px',
-        '&:hover': {
-          background: '#99C08B',
-        },
-      }}
+    <div
+      onClick={onClick}
+      className="flex flex-col h-[270px] gap-1 px-10 py-12 transition-colors bg-white cursor-pointer select-none w-[400px] rounded-2xl hover:bg-primary hover:text-white"
     >
-      <Text h4 css={{ paddingTop: '20px', marginLeft: '5px' }}>
-        {team.title}
-      </Text>
-      <Text css={{ fontSize: '$tiny', marginLeft: '5px' }}>
-        {team.description}
-      </Text>
-      <Avatar.Group count={count} className="mt-[20px] ml-[5px] p-[5px]">
-        {/* Map each member profile pic to an avatar */}
-        {members.map((member, index) => {
-          let photoUrl: string =
-            'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png';
-          if (member.profilePic) {
-            photoUrl = member.profilePic;
-          }
-          return (
-            <Avatar key={index} size="md" src={photoUrl} bordered stacked />
-          );
-        })}
-      </Avatar.Group>
-    </Card>
+      <p className="text-[25px] font-medium truncate ... mr-5">{team.title}</p>
+      <div id="description" className="mt-3 text-base">
+        <p className="line-clamp-1">{team.description}</p>
+      </div>
+      <div className="mt-8 ml-2">
+        {members && members.length > 0 && (
+          <Avatar.Group
+            count={members.length - 12 > 0 ? members.length - 12 : undefined}
+            animated={false}
+          >
+            {members.slice(0, 4).map((participant, index) => (
+              <Avatar
+                key={index}
+                size="lg"
+                pointer
+                text={participant.name}
+                src={participant.profilePic}
+                stacked
+                bordered
+                borderWeight={'light'}
+              />
+            ))}
+          </Avatar.Group>
+        )}
+      </div>
+    </div>
   );
 }
 

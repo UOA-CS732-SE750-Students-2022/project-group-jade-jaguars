@@ -3,12 +3,12 @@ import { getAuth } from 'firebase/auth';
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_API_KEY,
-  authDomain: process.env.NEXT_PUBLIC_AUTH_DOMAIN,
-  projectId: process.env.NEXT_PUBLIC_PROJECT_ID,
-  storageBucket: process.env.NEXT_PUBLIC_STORAGE_BUCKET,
-  messagingSenderId: process.env.NEXT_PUBLIC_MESSAGING_SENDER_ID,
-  appId: process.env.NEXT_PUBLIC_APP_ID,
-  measurementId: process.env.NEXT_PUBLIC_MEASUREMENT_ID,
+  authDomain: 'count-me-in-59785.firebaseapp.com',
+  projectId: 'count-me-in-59785',
+  storageBucket: 'count-me-in-59785.appspot.com',
+  messagingSenderId: '922325414737',
+  appId: '1:922325414737:web:5f625b9ebff529b8b2d970',
+  measurementId: 'G-HGDHQD3RN4',
 };
 
 const app = initializeApp(firebaseConfig);

@@ -1,11 +1,11 @@
-import { Card, User } from '@nextui-org/react';
+import { Avatar, Card, User } from '@nextui-org/react';
 import { CloseButton } from '@mantine/core';
 import { MouseEventHandler, useEffect, useState } from 'react';
 import Member from '../types/Member';
 
 function MemberCard(props: {
   member: Member;
-  deleteUser: MouseEventHandler<HTMLButtonElement>;
+  deleteUser: (param?: any) => void;
 }) {
   const [profilePic, setProfilePic] = useState<string>(
     'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png',
@@ -18,29 +18,22 @@ function MemberCard(props: {
   }, [props]);
 
   return (
-    <Card
-      className="mw-px-220 m-px-5"
-      bordered={false}
-      shadow={false}
-      css={{
-        '&:hover': {
-          background: '#99C08B',
-        },
-      }}
-    >
-      <div>
-        <User
-          src={profilePic}
-          name={props.member.name}
+    <div className="flex flex-row items-center justify-between gap-2 px-4 py-2 transition-colors rounded-lg cursor-pointer w-auto hover:bg-primary hover:text-white">
+      <div className="flex flex-row gap-2 items-center">
+        <Avatar
+          pointer
+          src={props.member.profilePic}
+          text={props.member.name}
           bordered
-          className="p-0 max-w-fit"
+          borderWeight="light"
         />
-        <CloseButton
-          onClick={props.deleteUser}
-          className="mt-[7px] float-right"
-        />
+        <p className="w-36 overflow-hidden truncate ...">{props.member.name}</p>
       </div>
-    </Card>
+
+      <div>
+        <CloseButton onClick={props.deleteUser} />
+      </div>
+    </div>
   );
 }
 

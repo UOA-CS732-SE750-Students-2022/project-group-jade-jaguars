@@ -14,8 +14,7 @@ import {
 import { TimePicker } from 'antd';
 import moment from 'moment';
 import { UseForm } from '@mantine/hooks/lib/use-form/use-form';
-import Event from '../types/Event';
-interface FormValues {
+export interface FormValues {
   title: string;
   dateRange: [Date | null, Date | null];
   timeRange: [Date, Date];
@@ -23,6 +22,7 @@ interface FormValues {
   location?: string;
   newTeam: boolean;
   newTeamName: string;
+  newTeamDescription: string;
   teamName?: string;
   recurring: boolean;
 }
@@ -87,14 +87,27 @@ const EventForm = ({
           {!isEdit && teamData && (
             <Grid.Col sm={8} xs={12}>
               {form.values.newTeam ? (
-                <TextInput
-                  required
-                  label="New Team Name"
-                  value={form.values.newTeamName}
-                  onChange={(e) =>
-                    form.setFieldValue('newTeamName', e.currentTarget.value)
-                  }
-                />
+                <div>
+                  <TextInput
+                    required
+                    label="New Team Name"
+                    value={form.values.newTeamName}
+                    onChange={(e) =>
+                      form.setFieldValue('newTeamName', e.currentTarget.value)
+                    }
+                  />
+                  <TextInput
+                    required
+                    label="New Team Description"
+                    value={form.values.newTeamDescription}
+                    onChange={(e) =>
+                      form.setFieldValue(
+                        'newTeamDescription',
+                        e.currentTarget.value,
+                      )
+                    }
+                  />
+                </div>
               ) : (
                 <Select
                   data={teamData.map((team) => team.label)}

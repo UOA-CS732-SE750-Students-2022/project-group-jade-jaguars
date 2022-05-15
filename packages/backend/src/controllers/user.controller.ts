@@ -253,3 +253,22 @@ export async function getUserCalendar(req: Request, res: Response) {
     returnError(err, res);
   }
 }
+
+// Fetch all the users in the database
+export async function getAllUsers(req: Request, res: Response) {
+  try {
+    const userDocs = await UserModel.find({});
+    const users: UserResponseDTO[] = userDocs.map((u) => {
+      return {
+        id: u._id,
+        firstName: u.firstName,
+        lastName: u.lastName,
+        events: u.events,
+      };
+    });
+
+    res.status(StatusCodes.OK).send(users);
+  } catch (err) {
+    returnError(err, res);
+  }
+}
