@@ -245,7 +245,7 @@ export async function removeMemberById(req: Request, res: Response) {
       return returnError(Error('Team Not Found'), res, StatusCodes.NOT_FOUND);
     }
 
-    // Add member to the team, note that addToSet means set membership only
+    // Remove member from team
     const teamDoc = await TeamModel.findById(formData.teamId);
     const filteredArray = teamDoc.members.filter((e) => e !== formData.userId);
     teamDoc.members = filteredArray;
