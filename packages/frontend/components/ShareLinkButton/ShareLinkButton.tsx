@@ -10,15 +10,6 @@ interface ShareLinkButtonProp {
 
 export const ShareLinkButton = ({ eventLink }: ShareLinkButtonProp) => {
   const clipboard = useClipboard();
-  const router = useRouter();
-  const [ogUrl, setOgUrl] = useState('');
-
-  useEffect(() => {
-    const host = window.location.href;
-    const baseUrl = `${host}`;
-
-    setOgUrl(`${baseUrl}`);
-  }, [router.pathname]);
   return (
     <Tooltip
       label="Event Link Copied"
@@ -27,7 +18,7 @@ export const ShareLinkButton = ({ eventLink }: ShareLinkButtonProp) => {
     >
       <div
         onClick={() => {
-          clipboard.copy(ogUrl);
+          clipboard.copy(eventLink);
         }}
         className="text-black border-2 w-fit cursor-pointer rounded-md px-2 py-1 font-semibold bg-secondarylight border-black hover:bg-secondary "
       >

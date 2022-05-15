@@ -25,6 +25,8 @@ import { getTZDate } from '../../helpers/timeFormatter';
 const SOCKET_URL = process.env.NEXT_PUBLIC_SOCKET_URL!;
 
 const Availability: NextPage = () => {
+  const [ogUrl, setOgUrl] = useState('');
+
   const [timeOptions, setTimeOptions] = useState<TimeBracket>({
     startDate: new Date('2022-05-01T21:00:00.000Z'),
     endDate: new Date('2022-05-05T05:00:00.000Z'),
@@ -46,7 +48,12 @@ const Availability: NextPage = () => {
   const {
     query: { eventId },
   } = router;
+  useEffect(() => {
+    const host = window.location.href;
+    const baseUrl = `${host}`;
 
+    setOgUrl(`${baseUrl}`);
+  }, [router.pathname]);
   const [io, setIO] = useState<Socket>();
 
   async function fetchData() {
@@ -214,7 +221,7 @@ const Availability: NextPage = () => {
     <div>
       <Row align="baseline" className="mb-[10px]">
         <h1 className="mr-[30px] my-0 leading-none">{eventTitle}</h1>
-        <ShareLinkButton eventLink={router.asPath} />
+        <ShareLinkButton eventLink={ogUrl} />
       </Row>
       <Row>
         <Col>
