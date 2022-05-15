@@ -36,6 +36,8 @@ interface AddMemberDTO {
   userId: string;
 }
 
+interface RemoveMemberDTO extends AddMemberDTO {}
+
 // Fetch a team by a teamId
 export async function getTeamById(
   req: Request,
@@ -207,6 +209,47 @@ export async function addMemberById(req: Request, res: Response) {
       { _id: formData.teamId },
       { $addToSet: { members: formData.userId } },
     );
+
+    res.sendStatus(StatusCodes.OK);
+  } catch (err) {
+    returnError(err, res);
+  }
+}
+
+// Remove member from the team
+export async function removeMemberById(req: Request, res: Response) {
+  try {
+    const teamId = req.params.teamId;
+    const userId = req.body.userId;
+    const rules = Joi.object<AddMemberDTO & { teamId: string }>({
+      teamId: validators.id().required(),
+      userId: validators.id().required(),
+    });
+
+    const formData = validate(
+      res,
+      rules,
+      { teamId, userId },
+      { allowUnknown: true },
+    );
+    // Validation failed, headers have been set, return
+    if (!formData) return;
+
+    // Check that the user exists
+    if (!(await UserModel.exists({ _id: formData.userId }))) {
+      return returnError(Error('User Not Found'), res, StatusCodes.NOT_FOUND);
+    }
+
+    // Check that the team exists
+    if (!(await TeamModel.exists({ _id: formData.teamId }))) {
+      return returnError(Error('Team Not Found'), res, StatusCodes.NOT_FOUND);
+    }
+
+    // Add member to the team, note that addToSet means set membership only
+    const teamDoc = await TeamModel.findById(formData.teamId);
+    const filteredArray = teamDoc.members.filter((e) => e !== formData.userId);
+    teamDoc.members = filteredArray;
+    await teamDoc.save();
 
     res.sendStatus(StatusCodes.OK);
   } catch (err) {
