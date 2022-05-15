@@ -264,7 +264,7 @@ const Team: NextPage = () => {
           centered
           opened={addMemberModalOpen}
           onClose={() => setAddMemberModalOpen(false)}
-          title={'Edit Team'}
+          title={'Add Member'}
         >
           <div className="my-3">
             <div className="flex flex-col gap-3 mx-4">
@@ -274,7 +274,7 @@ const Team: NextPage = () => {
                 value={memberForm.values.userId}
                 onChange={(e) => memberForm.setFieldValue('userId', e!)}
               />
-              <div className="mt-5 flex-1 flex flex-row justify-end mx-4">
+              <div className="mt-5 flex-1 flex flex-row justify-end">
                 <Button
                   classNames={{
                     filled: 'bg-[#FFDF74] hover:bg-[#FFDF74]',
