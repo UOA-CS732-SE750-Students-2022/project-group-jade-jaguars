@@ -10,6 +10,7 @@ interface EventCardInterface {
   description: string | undefined;
   onClick?: (props?: any) => void;
   onHover?: (props?: any) => void;
+  onViewAvailability?: (props?: any) => void;
   size: Sizes;
 }
 
@@ -42,6 +43,7 @@ const EventCard = (props: EventCardInterface) => {
     size,
     onClick,
     onHover,
+    onViewAvailability,
   } = props;
 
   return (
@@ -118,6 +120,16 @@ const EventCard = (props: EventCardInterface) => {
         <p className="line-clamp-3">
           {description ? description : 'No description'}
         </p>
+      </div>
+      <div>
+        <button
+          className={
+            'bg-secondary text-black border-2bg-secondary text-black w-[200px] cursor-pointer rounded-md px-2 py-1 font-semibold hover:bg-secondarylight float-right'
+          }
+          onClick={onViewAvailability}
+        >
+          View Event Availability
+        </button>
       </div>
     </div>
   );
