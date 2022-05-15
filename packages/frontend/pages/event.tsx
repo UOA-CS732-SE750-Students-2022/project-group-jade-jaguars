@@ -1,5 +1,5 @@
 import { useForm } from '@mantine/hooks';
-import { Modal } from '@mantine/core';
+import { Container, Modal } from '@mantine/core';
 import type { NextPage } from 'next';
 import { useEffect, useState } from 'react';
 import EventCard, { Sizes } from '../components/EventCard/EventCard';
@@ -146,108 +146,107 @@ const Event: NextPage = () => {
   };
 
   return (
-    <div className="flex flex-row gap-[3vw] w-full h-full p-10 bg-backgroundgrey">
-      <section className="w-fit">
-        <h1>Events</h1>
-        <div className="flex flex-col gap-8">
-          {!loading && events != undefined ? (
-            events.map((event, index) => {
-              return (
-                <EventCard
-                  key={index}
-                  title={event.title}
-                  date={event.date ? event.date : new Date(event.startDate)}
-                  timeRange={[
-                    new Date(event.startDate),
-                    new Date(event.endDate),
-                  ]}
-                  participants={event.participants ? event.participants : []}
-                  description={event.description}
-                  onClick={() => {
-                    handleCardOnClick(event);
-                  }}
-                  onViewAvailability={() => {
-                    handleEventCardViewAvailability(event);
-                  }}
-                  size={Sizes.large}
-                />
-              );
-            })
-          ) : (
-            <div>Loading...</div>
-          )}
-        </div>
-      </section>
-      <section className="flex flex-auto">
-        <div className="fixed mt-16">
-          {!loading && displayDetail && (
-            <EventDetailsCard
-              title={selectedEvent?.title}
-              date={
-                selectedEvent?.date
-                  ? selectedEvent.date
-                  : new Date(selectedEvent!.startDate)
-              }
-              timeRange={[
-                new Date(selectedEvent!.startDate),
-                new Date(selectedEvent!.endDate),
-              ]}
-              description={selectedEvent?.description}
-              location={selectedEvent?.location}
-              participants={
-                selectedEvent?.participants ? selectedEvent.participants : []
-              }
-              onEdit={() => handleEdit()}
-              onDelete={() => handleDelete()}
-              onParticipantClick={() => {
-                console.log('participants');
-              }}
-            />
-          )}
-        </div>
-      </section>
-      <section>
-        <Modal
-          opened={editModalOpen}
-          onClose={() => setEditModalOpen(false)}
-          size={'800px'}
-        >
-          <EventForm
-            form={form}
-            onSubmit={(value) => handleEditSubmit(value)}
-            eventId={selectedEvent?.id}
-          />
-        </Modal>
-        <Modal
-          opened={deleteModalOpen}
-          onClose={() => setDeleteModalOpen(false)}
-          centered
-          size={'sm'}
-        >
-          <div>
-            <p className=" text-xl font-medium text-center mx-8">
-              Are you sure to delete this event?
-            </p>
-            <div className="flex flex-row my-8 justify-center gap-5">
-              <button
-                className="py-2 px-3 rounded-md bg-secondary hover:bg-secondarylight"
-                onClick={() => {
-                  setDeleteModalOpen(false);
-                }}
-              >
-                <span>Cancel</span>
-              </button>
-              <button
-                className="py-2 px-3 rounded-md bg-secondary hover:bg-secondarylight"
-                onClick={() => handleDeleteConfirm(selectedEvent!)}
-              >
-                <span>Confirm</span>
-              </button>
-            </div>
+    <Container className="ml-[100px]">
+      <div className="flex flex-row gap-[3vw] w-full h-full p-10 bg-backgroundgrey">
+        <section className="w-fit">
+          <h1>Events</h1>
+          <div className="flex flex-col gap-8">
+            {!loading && events != undefined ? (
+              events.map((event, index) => {
+                return (
+                  <EventCard
+                    key={index}
+                    title={event.title}
+                    date={event.date ? event.date : new Date(event.startDate)}
+                    timeRange={[
+                      new Date(event.startDate),
+                      new Date(event.endDate),
+                    ]}
+                    participants={event.participants ? event.participants : []}
+                    description={event.description}
+                    onClick={() => {
+                      handleCardOnClick(event);
+                    }}
+                    size={Sizes.large}
+                  />
+                );
+              })
+            ) : (
+              <div>Loading...</div>
+            )}
           </div>
-        </Modal>
-      </section>
-    </div>
+        </section>
+        <section className="flex flex-auto">
+          <div className="fixed mt-16">
+            {!loading && displayDetail && (
+              <EventDetailsCard
+                title={selectedEvent?.title}
+                date={
+                  selectedEvent?.date
+                    ? selectedEvent.date
+                    : new Date(selectedEvent!.startDate)
+                }
+                timeRange={[
+                  new Date(selectedEvent!.startDate),
+                  new Date(selectedEvent!.endDate),
+                ]}
+                description={selectedEvent?.description}
+                location={selectedEvent?.location}
+                participants={
+                  selectedEvent?.participants ? selectedEvent.participants : []
+                }
+                onEdit={() => handleEdit()}
+                onDelete={() => handleDelete()}
+                onParticipantClick={() => {
+                  console.log('participants');
+                }}
+              />
+            )}
+          </div>
+        </section>
+        <section>
+          <Modal
+            opened={editModalOpen}
+            onClose={() => setEditModalOpen(false)}
+            size={'800px'}
+          >
+            <EventForm
+              form={form}
+              onSubmit={(value) => handleEditSubmit(value)}
+              eventId={selectedEvent?.id}
+            />
+          </Modal>
+          <Modal
+            opened={deleteModalOpen}
+            onClose={() => setDeleteModalOpen(false)}
+            centered
+            size={'sm'}
+          >
+            <div>
+              <p className=" text-xl font-medium text-center mx-8">
+                Are you sure to delete this event?
+              </p>
+              <div className="flex flex-row my-8 justify-center gap-5">
+                <button
+                  className="py-2 px-3 rounded-md bg-secondary hover:bg-secondarylight"
+                  onClick={() => {
+                    setDeleteModalOpen(false);
+                  }}
+                >
+                  <span>Cancel</span>
+                </button>
+                <button
+                  className="py-2 px-3 rounded-md bg-secondary hover:bg-secondarylight"
+                  onClick={() => handleDeleteConfirm(selectedEvent!)}
+                >
+                  <span>Confirm</span>
+                </button>
+              </div>
+            </div>
+          </Modal>
+        </section>
+      </div>
+    </Container>
   );
 };
 

@@ -8,9 +8,11 @@ import { CustomNavbar } from '../components/CustomNavbar';
 
 export default function App(props: AppProps) {
   const { Component, pageProps } = props;
+  const { signedIn } = useAuth();
+  console.log(signedIn);
 
   return (
-    <div className="bg-backgroundgrey m-0 ml-[100px]">
+    <div className="bg-backgroundgrey m-0">
       <Head>
         <title>Count Me In</title>
         <link rel="icon" type="image/x-icon" href="/logo.svg" />
