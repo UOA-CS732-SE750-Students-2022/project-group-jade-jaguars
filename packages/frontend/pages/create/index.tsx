@@ -2,25 +2,13 @@ import { Container, Grid } from '@mantine/core';
 import { useForm } from '@mantine/hooks';
 import { NextPage } from 'next';
 import React, { useEffect, useState } from 'react';
-import EventForm from '../../components/EventForm';
+import EventForm, { FormValues } from '../../components/EventForm';
 import { useAuth } from '../../src/context/AuthContext';
 import { createTeam, createEvent } from '../../helpers/apiCalls/apiCalls';
 import { EventResponseDTO } from '../../types/Event';
 
 import { useRouter } from 'next/router';
 import { getTZDate } from '../../helpers/timeFormatter';
-
-export interface FormValues {
-  title: string;
-  dateRange: [Date | null, Date | null];
-  timeRange: [Date, Date];
-  description?: string;
-  location?: string;
-  newTeam: boolean;
-  newTeamName: string;
-  teamName?: string;
-  recurring: boolean;
-}
 
 interface Team {
   id: string;
