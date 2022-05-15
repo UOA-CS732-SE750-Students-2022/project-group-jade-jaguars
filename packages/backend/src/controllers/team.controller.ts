@@ -7,6 +7,8 @@ import { StatusCodes } from 'http-status-codes';
 import { returnError } from '../libs/error.lib';
 import { UserModel } from '../schemas/user.schema';
 
+// DTOs
+
 interface CreateTeamDTO {
   _id: string;
   title: string;
@@ -34,6 +36,7 @@ interface AddMemberDTO {
   userId: string;
 }
 
+// Fetch a team by a teamId
 export async function getTeamById(
   req: Request,
   res: Response<TeamResponseDTO>,
@@ -67,6 +70,7 @@ export async function getTeamById(
   }
 }
 
+// Create a new team
 export async function createTeam(
   req: TypedRequestBody<CreateTeamDTO>,
   res: Response<TeamResponseDTO>,
@@ -98,6 +102,7 @@ export async function createTeam(
   }
 }
 
+// Update any fields of the team
 export async function patchTeamById(
   req: TypedRequestBody<PatchTeamDTO>,
   res: Response<TeamResponseDTO>,
@@ -145,6 +150,7 @@ export async function patchTeamById(
   }
 }
 
+// Delete the team using the teamId
 export async function deleteTeamById(req: Request, res: Response) {
   try {
     const teamId = req.params.teamId;
@@ -167,6 +173,7 @@ export async function deleteTeamById(req: Request, res: Response) {
   }
 }
 
+// Add a new member to the team
 export async function addMemberById(req: Request, res: Response) {
   try {
     const teamId = req.params.teamId;

@@ -10,11 +10,12 @@
   </a>
   <a href="https://img.shields.io/badge/License-GPLv3-blue.svg">
     <img alt="Licence" src="https://img.shields.io/badge/License-GPLv3-blue.svg">
-  </a> </br>
-CountMeIn is a application for managing when teams of people should meet. Manage multiple events with a dashboard to organise you life!
+  </a>
 </p>
 
 ## Features:
+
+CountMeIn is a application for managing when teams of people should meet. Manage multiple events with a dashboard to organise you life!
 
 - Create users through Google authentication
 - Create events that you can invite people to through a unique shareable URL
