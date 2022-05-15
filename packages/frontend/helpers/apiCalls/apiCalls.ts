@@ -1,6 +1,7 @@
 import { deleteData, getData, patchData, postData, putData } from './helpers';
 import Event, {
   EventPayload,
+  EventResponseDTO,
   SearchEventPayload,
   TimeBracket,
 } from '../../types/Event';
@@ -40,7 +41,9 @@ export const getEvent = async (eventId: string) => {
   return data;
 };
 
-export const createEvent = async (payload: Event) => {
+export const createEvent = async (
+  payload: Event,
+): Promise<EventResponseDTO> => {
   const data = await postData(`/event`, payload);
   return data;
 };
