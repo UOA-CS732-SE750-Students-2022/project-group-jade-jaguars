@@ -13,9 +13,22 @@
   </a>
 </p>
 
+## Overview
+
+CountMeIn is a application for managing when teams of people should meet.
+
+### Features:
+
+- Create users through Google authentication
+- Create events that you can invite people to through a unique shareable URL
+- Add your availability to an event, view other peoples availability in real time
+- Generate a list of potential times that each team member can go to the the event at
+- Finalise your event with one of the potential times, the eventis then added to your dashboard
+- Alternatively export the event using an ical file and manually add it to a calander of your choice
+
 ## Setup
 
-In order to run the application the frontend and the backend must first be set up with valid environment files in order for the application to be able to launch. These files will be provided on submission as a zip file containing all the files that are needed. If you have any problem with setting up the project please feel free to message our team on discord using any of our [team member handles](##Contributors)
+In order to run the application the project must first be set up with a valid environment file in order for the application to be able to launch. This file will be provided on submission as a zip file containing all the files that are needed. If you have any problem with setting up the project please feel free to message our team on discord using any of our [team member handles](##Contributors)
 
 ### Backend Setup
 
