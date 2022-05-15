@@ -14,8 +14,8 @@ export const ShareLinkButton = ({ eventLink }: ShareLinkButtonProp) => {
   const [ogUrl, setOgUrl] = useState('');
 
   useEffect(() => {
-    const host = window.location.host;
-    const baseUrl = `http://${host}`;
+    const host = window.location.href;
+    const baseUrl = `${host}`;
 
     setOgUrl(`${baseUrl}`);
   }, [router.pathname]);
@@ -27,7 +27,7 @@ export const ShareLinkButton = ({ eventLink }: ShareLinkButtonProp) => {
     >
       <div
         onClick={() => {
-          clipboard.copy(ogUrl + eventLink);
+          clipboard.copy(ogUrl);
         }}
         className="text-black border-2 w-fit cursor-pointer rounded-md px-2 py-1 font-semibold bg-secondarylight border-black hover:bg-secondary "
       >
