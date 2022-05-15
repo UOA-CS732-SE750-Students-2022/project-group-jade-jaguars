@@ -1,6 +1,14 @@
 import { Response } from 'express';
 import { StatusCodes } from 'http-status-codes';
 
+/**
+ *
+ * @param error Error returned by the function
+ * @param res Express header
+ * @param statusCode Status code to return the the client
+ * @description Set the express headers with the particular error that has been faced. If the statusCode is not defined finally try to do a string match in order to return the appropriate error
+ * @returns The response to return to the client
+ */
 export function returnError(
   error: Error,
   res: Response,
