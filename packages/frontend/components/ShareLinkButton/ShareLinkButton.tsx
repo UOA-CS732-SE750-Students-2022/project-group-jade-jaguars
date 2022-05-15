@@ -4,7 +4,7 @@ import React from 'react';
 import { Copy } from 'tabler-icons-react';
 
 interface ShareLinkButtonProp {
-  eventLink: string;
+  eventLink: string | string[] | undefined;
 }
 
 export const ShareLinkButton = ({ eventLink }: ShareLinkButtonProp) => {

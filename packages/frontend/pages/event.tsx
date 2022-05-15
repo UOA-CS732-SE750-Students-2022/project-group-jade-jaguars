@@ -25,7 +25,6 @@ export interface EventUser {
 
 const Event: NextPage = () => {
   const { userId, signedIn } = useAuth();
-  const router = useRouter();
 
   const [selectedEvent, setSelectedEvent] = useState<Event>();
   const [displayDetail, setDisplayDetail] = useState<boolean>(false);
@@ -36,6 +35,10 @@ const Event: NextPage = () => {
 
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const router = useRouter();
+  // useEffect(() => {
+  //   !signedIn && router.push('/login');
+  // }, [signedIn]);
 
   let form = useForm<FormValues>({
     initialValues: {

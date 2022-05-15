@@ -114,6 +114,7 @@ const Availability: NextPage = () => {
 
   useEffect(() => {
     io?.on(`event:${eventId}`, (args: Event) => {
+      console.log(args);
       setAllAvailabilities(args!.availability!.attendeeAvailability!);
     });
   }, [io]);
@@ -214,7 +215,7 @@ const Availability: NextPage = () => {
     <div>
       <Row align="baseline" className="mb-[10px]">
         <h1 className="mr-[30px] my-0 leading-none">{eventTitle}</h1>
-        <ShareLinkButton eventLink={'https://www.google.com/'} />
+        <ShareLinkButton eventLink={eventId} />
       </Row>
       <Row>
         <Col>

@@ -5,6 +5,7 @@ import {
   signInWithPopup,
   signInAnonymously,
 } from 'firebase/auth';
+import { useRouter } from 'next/router';
 import React, { createContext, useEffect, useState } from 'react';
 import { auth } from '../config/firebase.config';
 interface authContext {
@@ -44,6 +45,7 @@ export const AuthProvider: React.FC<{}> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [authToken, setAuthToken] = useState<string>('');
   const [userId, setUserId] = useState<string>('');
+  const router = useRouter();
   const provider = new GoogleAuthProvider();
   const login = () => {
     signInWithPopup(auth, provider)
@@ -68,6 +70,7 @@ export const AuthProvider: React.FC<{}> = ({ children }) => {
 
   const logout = () => {
     auth.signOut();
+    router.push('/login');
     console.log('logout');
   };
 
