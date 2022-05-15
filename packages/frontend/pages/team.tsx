@@ -26,6 +26,8 @@ const Team: NextPage = () => {
 
   const [editTeamModalOpen, setEditTeamModalOpen] = useState(false);
 
+  const [deleteTeamModalOpen, setDeleteTeamModalOpen] = useState(false);
+
   const form = useForm({
     initialValues: {
       title: '',
@@ -75,8 +77,13 @@ const Team: NextPage = () => {
   };
 
   const handleDeleteTeam = async (team: Team) => {
+    setDeleteTeamModalOpen(true);
+  };
+
+  const handleDeleteConfirm = async (team: Team) => {
     if (team._id) {
       await deleteTeam(team._id);
+      setDeleteTeamModalOpen(false);
       refresh();
     }
   };
@@ -177,6 +184,35 @@ const Team: NextPage = () => {
               >
                 Done
               </Button>
+            </div>
+          </div>
+        </Modal>
+
+        <Modal
+          opened={deleteTeamModalOpen}
+          onClose={() => setDeleteTeamModalOpen(false)}
+          centered
+          size={'sm'}
+        >
+          <div>
+            <p className=" text-xl font-medium text-center mx-8">
+              Are you sure to delete this team?
+            </p>
+            <div className="flex flex-row my-8 justify-center gap-5">
+              <button
+                className="py-2 px-3 rounded-md bg-secondary hover:bg-secondarylight"
+                onClick={() => {
+                  setDeleteTeamModalOpen(false);
+                }}
+              >
+                <span>Cancel</span>
+              </button>
+              <button
+                className="py-2 px-3 rounded-md bg-secondary hover:bg-secondarylight"
+                onClick={() => handleDeleteConfirm(selectedTeam!)}
+              >
+                <span>Confirm</span>
+              </button>
             </div>
           </div>
         </Modal>
