@@ -89,8 +89,10 @@ const Team: NextPage = () => {
   };
 
   useEffect(() => {
-    getTeams();
-    getUsers();
+    if (userId) {
+      getTeams();
+      getUsers();
+    }
   }, [signedIn]);
 
   const refresh = () => {
