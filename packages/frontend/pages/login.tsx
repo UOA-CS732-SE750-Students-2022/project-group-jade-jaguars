@@ -26,8 +26,8 @@ const Login: NextPage = () => {
       console.log('display name: ', user!.displayName);
 
       const userNameArray = user?.displayName
-      ? user.displayName!.split(' ')
-      : ['Anonymous', 'User'];
+        ? user.displayName!.split(' ')
+        : ['Anonymous', 'User'];
       const firstName = userNameArray[0];
       const lastName = userNameArray[1];
 
@@ -45,12 +45,12 @@ const Login: NextPage = () => {
         }
       } else {
         const res = await createUser({
-            // const nameArray = user!.displayName!.split(' ');
-            // // Incase firstname or lastname isn't defined we set a default
-            // // TODO: Validation rules from backend require a length of atleast
-            // // ...for firstname and lastname, either backend changes these rules or frontend follow them
-            // const firstName = nameArray[0] ?? 'Firstname';
-            // const lastName = nameArray[1] ?? 'Lastname';
+          // const nameArray = user!.displayName!.split(' ');
+          // // Incase firstname or lastname isn't defined we set a default
+          // // TODO: Validation rules from backend require a length of atleast
+          // // ...for firstname and lastname, either backend changes these rules or frontend follow them
+          // const firstName = nameArray[0] ?? 'Firstname';
+          // const lastName = nameArray[1] ?? 'Lastname';
           firstName: firstName,
           lastName: lastName,
         });
@@ -58,7 +58,7 @@ const Login: NextPage = () => {
       }
     };
     userId && checkUserOnMongo();
-    signedIn ? router.push('/') : router.push('/login');
+    signedIn ? router.push('/dashboard') : router.push('/login');
   }, [signedIn]);
 
   return (

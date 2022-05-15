@@ -66,25 +66,31 @@ const EventCard = (props: EventCardInterface) => {
           {title}
         </p>
         <div>
-          <Avatar.Group
-            count={
-              participants.length - 4 > 0 ? participants.length - 4 : undefined
-            }
-            animated={false}
-          >
-            {participants.slice(0, 4).map((participant, index) => (
-              <Avatar
-                key={index}
-                size={`${size == Sizes.large ? 'md' : 'sm'}`}
-                pointer
-                text={participant.name}
-                src={participant.profilePic}
-                stacked
-                bordered
-                borderWeight={'light'}
-              />
-            ))}
-          </Avatar.Group>
+          {participants ? (
+            <Avatar.Group
+              count={
+                participants.length - 4 > 0
+                  ? participants.length - 4
+                  : undefined
+              }
+              animated={false}
+            >
+              {participants.slice(0, 4).map((participant, index) => (
+                <Avatar
+                  key={index}
+                  size={`${size == Sizes.large ? 'md' : 'sm'}`}
+                  pointer
+                  text={participant.name}
+                  src={participant.profilePic}
+                  stacked
+                  bordered
+                  borderWeight={'light'}
+                />
+              ))}
+            </Avatar.Group>
+          ) : (
+            <div>No participants yet</div>
+          )}
         </div>
       </div>
       <div

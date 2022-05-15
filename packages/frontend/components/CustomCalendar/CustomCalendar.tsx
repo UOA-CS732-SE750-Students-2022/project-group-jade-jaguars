@@ -26,6 +26,7 @@ export interface EventInterface {
   startDate?: string;
   endDate?: string;
   status?: string;
+  team?: string;
 }
 interface CustomCalendarInterface {
   events: EventInterface[];
@@ -70,7 +71,7 @@ const CustomCalendar = (props: CustomCalendarInterface) => {
       <Calendar
         events={events}
         eventPropGetter={eventStyleGetter}
-        defaultView={Views.WEEK}
+        defaultView={Views.MONTH}
         views={[Views.MONTH, Views.WEEK, Views.DAY]}
         localizer={calLocalizer}
         defaultDate={new Date()}

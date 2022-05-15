@@ -4,12 +4,25 @@ import React, { useState } from 'react';
 interface TeamCheckBoxProps {
   label: string;
   order: number;
-  handleClick: (checked: boolean, label: string) => void;
+  handleClick: (
+    checked: boolean,
+    label: string,
+    teamId: string,
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => void;
+  teamId: string;
+  checked?: boolean;
+  initialChecked?: boolean;
+  setChecked?: React.Dispatch<React.SetStateAction<string>>;
 }
 export const TeamCheckBox: React.FC<TeamCheckBoxProps> = ({
   label,
   order,
   handleClick,
+  teamId,
+  checked,
+  setChecked,
+  initialChecked,
 }) => {
   const inputBackgroundColorList = [
     '#BDD8FF',
@@ -22,16 +35,15 @@ export const TeamCheckBox: React.FC<TeamCheckBoxProps> = ({
   const inputBackgroundColor = inputBackgroundColorList[order % 5];
   const inputStyle = `ml-3 border-solid border-black border-2 rounded-md cursor-pointer`;
   const { hovered, ref } = useHover();
-  const [checked, setChecked] = useState(false);
+  // const [checked, setChecked] = useState(false);
   return (
     <div ref={ref}>
       <Checkbox
-        checked={checked}
+        checked={initialChecked ? initialChecked : checked}
         onChange={(e) => {
-          handleClick(checked, label);
-          console.log('first' + checked);
-          setChecked(e.currentTarget.checked);
+          handleClick(e.currentTarget.checked, label, teamId, e);
         }}
+        // onClick={() => setChecked(e.currentTarget.checked)}
         color={color}
         label={label}
         // onChange={(value) => {console.log(value)}}

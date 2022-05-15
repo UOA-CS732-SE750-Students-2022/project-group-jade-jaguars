@@ -10,7 +10,7 @@ export default function App(props: AppProps) {
   const { Component, pageProps } = props;
 
   return (
-    <div className="bg-backgroundgrey m-0">
+    <div className="bg-backgroundgrey m-0 ml-[100px]">
       <Head>
         <title>Count Me In</title>
         <link rel="icon" type="image/x-icon" href="/logo.svg" />

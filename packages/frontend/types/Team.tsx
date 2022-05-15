@@ -12,6 +12,7 @@ export default interface Team {
   events?: string[]; // uuid
 
   membersList?: Member[];
+  eventsList?: EventInterface[] | undefined;
 }
 
 export interface UpdateTeamPayload {
@@ -25,5 +26,4 @@ export interface UpdateTeamPayload {
   events?: string[]; // uuid
 
   membersList?: Member[];
-  eventsList?: EventInterface[] | undefined;
 }

@@ -2,7 +2,7 @@ import { AvailabilityBlock } from './Availability';
 import Member from './Member';
 
 export default interface Event {
-  id?: number;
+  id?: string;
   title: string;
   description?: string;
   status?: EventStatus;

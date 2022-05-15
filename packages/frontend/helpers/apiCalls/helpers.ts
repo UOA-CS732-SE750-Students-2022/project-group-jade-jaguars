@@ -7,7 +7,6 @@ const BASE_URL =
 
 export const getToken = async () => {
   const authToken = await auth.currentUser?.getIdToken();
-  console.log('auth: ' + authToken);
   return authToken;
 };
 

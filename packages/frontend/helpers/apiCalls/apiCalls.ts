@@ -1,4 +1,11 @@
-import { deleteData, getData, patchData, postData, putData } from './helpers';
+import {
+  deleteData,
+  getData,
+  getResponseStatus,
+  patchData,
+  postData,
+  putData,
+} from './helpers';
 import Event, {
   EventPayload,
   EventResponseDTO,
