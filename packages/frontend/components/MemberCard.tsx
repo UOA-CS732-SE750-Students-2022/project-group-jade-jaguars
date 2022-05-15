@@ -31,7 +31,7 @@ function MemberCard(props: {
       </div>
 
       <div>
-        <CloseButton onClick={props.deleteUser} />
+        <CloseButton onClick={() => props.deleteUser(props.member)} />
       </div>
     </div>
   );

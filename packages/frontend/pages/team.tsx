@@ -153,6 +153,10 @@ const Team: NextPage = () => {
     }
   };
 
+  const handleDeleteUser = (user: User) => {
+    console.log(user);
+  };
+
   return (
     <div className="flex flex-row gap-[2vw] w-full h-full p-10 bg-backgroundgrey">
       <section className="w-[50vw] max-w-[840px]">
@@ -186,8 +190,8 @@ const Team: NextPage = () => {
               }}
               deleteTeam={() => handleDeleteTeam(selectedTeam)}
               addUser={() => setAddMemberModalOpen(true)}
-              deleteUser={() => {
-                console.log('delete');
+              deleteUser={(user) => {
+                handleDeleteUser(user);
               }}
             />
           )}
