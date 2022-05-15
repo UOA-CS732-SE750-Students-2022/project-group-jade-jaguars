@@ -21,7 +21,7 @@ module.exports = {
       highlight: '#FAF1E6',
       backgroundgrey: '#F9F9F9',
       cardgrey: '#FAFAFA',
-      darkgrey: '#A1A1A1',
+      darkgrey: '#C1C1C1',
     },
     extend: {
       width: {

@@ -276,7 +276,7 @@ function GroupAvailability(props: {
                   if (timeSlot.percentAvailable === 0) {
                     return 'bg-white';
                   } else {
-                    return 'bg-primary';
+                    return 'bg-primary border-cardgrey';
                   }
                 })()
               }
