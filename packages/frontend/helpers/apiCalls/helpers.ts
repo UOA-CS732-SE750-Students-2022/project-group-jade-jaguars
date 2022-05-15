@@ -1,8 +1,7 @@
 import axios from 'axios';
 import { auth } from '../../src/config/firebase.config';
 
-const BASE_URL =
-  process.env.NEXT_PUBLIC_SOCKET_URL! + process.env.NEXT_PUBLIC_BASE_URL!;
+const BASE_URL = process.env.SERVER_UR! + (process.env.URL_EXT ?? 'api/v1');
 
 export const getToken = async () => {
   const authToken = await auth.currentUser?.getIdToken();
