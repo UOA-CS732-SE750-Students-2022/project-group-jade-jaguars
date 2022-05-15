@@ -135,7 +135,7 @@ const Event: NextPage = () => {
     window.location.reload();
   };
 
-  const handleEventCardViewAvailability = (event: EventInterface) => {
+  const handleEventCardViewAvailability = (event: Event) => {
     router.push({
       pathname: '/availability/',
       query: { eventId: event.id },
