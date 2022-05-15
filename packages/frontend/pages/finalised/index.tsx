@@ -83,7 +83,7 @@ const FinalisedEventPage: NextPage = () => {
                   }}
                   onClick={onClickAddToCalender}
                 >
-                  Export all events to calender
+                  Export all events to calendar
                 </Button>
               </Group>
             </Grid.Col>
