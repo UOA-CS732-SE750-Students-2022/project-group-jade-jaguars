@@ -20,13 +20,13 @@ CountMeIn is a application for managing when teams of people should meet. Manage
 - Create users through Google authentication
 - Create events that you can invite people to through a unique shareable URL
 - Add your availability to an event, view other peoples availability in real time
-- Generate a list of potential times that each team member can go to the the event at
-- Finalise your event with one of the potential times, the eventis then added to your dashboard
-- Alternatively export the event using an ical file and manually add it to a calander of your choice
+- Generate a list of potential times during which team members can go to the event
+- Finalise your event with one of the potential times, the event is then added to your dashboard
+- Alternatively export the event using a .ical file and manually add it to a calendar of your choice
 
 ## Setup
 
-In order to run the application the project must first be set up with a valid environment files in each the frontend and the backend in order for the application to be able to launch. These files will be provided on submission as a zip file containing all the files that are needed. If you have any problem with setting up the project please feel free to message our team on discord using any of our [team member handles](#contributors)
+In order to run the application the project must first be set up with valid environment files in each the frontend and the backend in order for the application to be able to launch. These files will be provided on submission as a zip file containing all the files that are needed. If you have any problem with setting up the project please feel free to message our team on discord using any of our [team member handles](#contributors)
 
 ## Running Project
 
@@ -46,7 +46,9 @@ npm install
 npm run build
 ```
 
-This will create a `dist` output in the backend and a will compile to various parts of the `.next` folder within the frontend. For more information about nextjs compiling please see [this](https://nextjs.org/docs/deployment) 4. Run application
+This will create a `dist` output in the backend and a will compile to various parts of the `.next` folder within the frontend. For more information about NextJS compiling please see [this](https://nextjs.org/docs/deployment)
+
+4. Run application
 
 ```bash
 npm run start
@@ -72,9 +74,10 @@ cp .env.template .env
 
 #### Running
 
-In order to run the backend independently run these commands after navigating to the backend project (`packages/backend`). Please see the top of the file to run the entire project!
+In order to run the backend independently run these commands after navigating to the backend project (`packages/backend`). Please see the top of the file to run the entire project.
 
 1. Ensure that the environment files for backend are setup using the instructions above
+
 2. Install the dependencies
 
 ```bash
@@ -101,7 +104,7 @@ This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next
 
 #### Environment files
 
-Frontend requires a single environment file. You can skip manually setting each environment variable in the file by using the provided submission environment files. Otherwise to setup manually:
+Frontend requires a single environment file. You can skip manually setting each environment variable in the file by using the provided submission environment files. Otherwise to setup the environment file manually:
 
 ```bash
 cd packages/frontend/
@@ -111,7 +114,7 @@ cp .env.template .env.local
 
 #### Running
 
-In order to run the backend independently run these commands after navigating to the frontend project (`packages/frontend`). Please see the top of the file to run the entire project!
+In order to run the frontend independently run these commands after navigating to the frontend project at (`packages/frontend`). Please see the top of the file to run the entire project!
 
 1. Ensure that the environment files for frontend are setup using the instructions above
 2. Install the dependencies
@@ -140,7 +143,7 @@ Run `npm test` in the project root to execute the unit tests via [Jest](https://
 
 ## Wiki
 
-The wiki can contains all meeting notes and major design decisions and rationale. The wiki can be found [here.](https://github.com/UOA-CS732-SE750-Students-2022/project-group-jade-jaguars/wiki).
+The wiki can contains all meeting notes and major design decisions, rationale and project management information. The wiki can be found [here.](https://github.com/UOA-CS732-SE750-Students-2022/project-group-jade-jaguars/wiki).
 
 ## Contributors
 
