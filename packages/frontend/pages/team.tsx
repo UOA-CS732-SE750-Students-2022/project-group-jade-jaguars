@@ -1,6 +1,7 @@
 import { Button, Modal, Select, SelectItem, TextInput } from '@mantine/core';
 import { useForm } from '@mantine/hooks';
 import type { NextPage } from 'next';
+import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import TeamCard from '../components/TeamCard/TeamCard';
 import TeamDetailsCard from '../components/TeamDetailsCard/TeamDetailsCard';
@@ -32,6 +33,11 @@ const Team: NextPage = () => {
   const [addMemberModalOpen, setAddMemberModalOpen] = useState(false);
 
   const [usersList, setUsersList] = useState<SelectItem[]>();
+
+  const router = useRouter();
+  useEffect(() => {
+    !signedIn && router.push('/login');
+  }, [signedIn]);
 
   const teamForm = useForm({
     initialValues: {

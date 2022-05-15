@@ -14,6 +14,7 @@ import {
 import { useAuth } from '../src/context/AuthContext';
 import Event from '../types/Event';
 import Member from '../types/Member';
+import { useRouter } from 'next/router';
 
 export interface EventUser {
   firstName: string;
@@ -34,6 +35,10 @@ const Event: NextPage = () => {
 
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const router = useRouter();
+  useEffect(() => {
+    !signedIn && router.push('/login');
+  }, [signedIn]);
 
   let form = useForm<FormValues>({
     initialValues: {

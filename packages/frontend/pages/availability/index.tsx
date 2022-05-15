@@ -114,6 +114,7 @@ const Availability: NextPage = () => {
 
   useEffect(() => {
     io?.on(`event:${eventId}`, (args: Event) => {
+      console.log(args);
       setAllAvailabilities(args!.availability!.attendeeAvailability!);
     });
   }, [io]);

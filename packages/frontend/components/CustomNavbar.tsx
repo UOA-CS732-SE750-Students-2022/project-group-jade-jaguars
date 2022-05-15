@@ -12,6 +12,7 @@ const linkData = [
   { icon: LayoutDashboard, label: 'Dashboard', address: '/dashboard' },
   { icon: CalendarEvent, label: 'Events', address: '/event' },
   { icon: Users, label: 'Teams', address: '/team' },
+  { icon: Users, label: 'Teams', address: '/join' },
 ];
 export const CustomNavbar = () => {
   const { height, width } = useViewportSize();
@@ -21,7 +22,7 @@ export const CustomNavbar = () => {
   const [isLogin, setIsLogin] = useState(false);
   useEffect(() => {
     user ? setIsLogin(true) : setIsLogin(false);
-    !user && router.push('/dashboard');
+    // !user && router.push('/login');
   }, [user]);
 
   return isLogin ? (
