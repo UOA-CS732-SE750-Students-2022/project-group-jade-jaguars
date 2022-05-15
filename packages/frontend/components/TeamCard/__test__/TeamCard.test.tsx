@@ -46,6 +46,21 @@ it('TeamCard details render and display correctly', async () => {
       {
         name: 'John',
       },
+      {
+        name: 'Kat',
+      },
+      {
+        name: 'Louis',
+      },
+      {
+        name: 'Mike',
+      },
+      {
+        name: 'Nina',
+      },
+      {
+        name: 'Olivia',
+      },
     ],
     events: ['event1'],
   };
@@ -67,5 +82,5 @@ it('TeamCard details render and display correctly', async () => {
   expect(firstImage.src).toBe(
     'https://media-exp1.licdn.com/dms/image/C4E0BAQHUo_h0JGtwYw/company-logo_200_200/0/1606490589727?e=2147483647&v=beta&t=TO869IrmjUEr7VSFzSHaqcEN4_-TTctFucuyBv8cqDA',
   );
-  expect(images).toHaveLength(7);
+  expect(images).toHaveLength(3);
 });
