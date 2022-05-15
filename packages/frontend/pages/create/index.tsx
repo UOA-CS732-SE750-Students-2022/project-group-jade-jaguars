@@ -5,6 +5,8 @@ import React, { useEffect, useState } from 'react';
 import EventForm from '../../components/EventForm';
 import { useAuth } from '../../src/context/AuthContext';
 import { createTeam, createEvent } from '../../helpers/apiCalls/apiCalls';
+import { useRouter } from 'next/router';
+import { getTZDate } from '../../helpers/timeFormatter';
 
 export interface FormValues {
   title: string;
@@ -24,6 +26,7 @@ interface Team {
 }
 
 const CreateEventPage: NextPage = () => {
+  const router = useRouter();
   const { userId, authToken } = useAuth();
   const [teamList, setTeamList] = useState<Team[]>([]);
   const defaultStartTime = new Date();
@@ -70,8 +73,8 @@ const CreateEventPage: NextPage = () => {
     return await res;
   };
   const createEventMethod = async (teamId: string) => {
-    const startDate = form.values.dateRange[0];
-    const endDate = form.values.dateRange[1];
+    const startDate = new Date(form.values.dateRange[0]!);
+    const endDate = new Date(form.values.dateRange[1]!);
     const startTime = form.values.timeRange[0];
     const endTime = form.values.timeRange[1];
     startDate?.setHours(startTime.getHours(), startTime.getMinutes());
@@ -82,8 +85,8 @@ const CreateEventPage: NextPage = () => {
     const data = {
       title: form.values.title,
       description: form.values.description,
-      startDate: new Date(startDateText!),
-      endDate: new Date(endDateText!),
+      startDate: getTZDate(new Date(startDateText)),
+      endDate: getTZDate(new Date(endDateText)),
       admin: userId,
       location: form.values.location,
       team: teamId ? teamId : undefined,
@@ -105,6 +108,10 @@ const CreateEventPage: NextPage = () => {
     }
     const response = await createEventMethod(teamId);
     console.log(response);
+    await router.push({
+      pathname: '/availability/',
+      query: { eventId: response.id },
+    });
   };
   return (
     <Container>
