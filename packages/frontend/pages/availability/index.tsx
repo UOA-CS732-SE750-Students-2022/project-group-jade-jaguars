@@ -302,7 +302,7 @@ const Availability: NextPage = () => {
               })}
             </Col>
           </Row>
-          <Row>
+          <Row className="max-w-[400px]">
             <button
               className={
                 'bg-secondary text-black w-[100px] cursor-pointer rounded-md px-2 py-1 font-semibold hover:bg-secondarylight absolute right-0 ' +
