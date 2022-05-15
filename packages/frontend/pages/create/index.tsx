@@ -44,7 +44,9 @@ const CreateEventPage: NextPage = () => {
       recurring: false,
     },
   });
-  const BASE_URL = process.env.SERVER_UR! + (process.env.URL_EXT ?? 'api/v1');
+  const BASE_URL =
+    process.env.NEXT_PUBLIC_SOCKET_URL! +
+    (process.env.NEXT_PUBLIC_BASE_URL ?? 'api/v1');
 
   useEffect(() => {
     const getTeamList = async () => {

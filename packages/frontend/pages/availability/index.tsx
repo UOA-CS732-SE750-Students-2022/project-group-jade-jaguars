@@ -22,7 +22,7 @@ import {
 } from '../../helpers/apiCalls/apiCalls';
 import { getTZDate } from '../../helpers/timeFormatter';
 
-const SOCKET_URL = process.env.SERVER_URL!;
+const SOCKET_URL = process.env.NEXT_PUBLIC_SOCKET_URL!;
 
 const Availability: NextPage = () => {
   const [timeOptions, setTimeOptions] = useState<TimeBracket>({
