@@ -1,9 +1,7 @@
 import { Paper, Grid, Box, Container, Group, Button } from '@mantine/core';
-import axios from 'axios';
 import { NextPage } from 'next';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
-import { useAuth } from '../../src/context/AuthContext';
 import { getEvent } from '../../helpers/apiCalls/apiCalls';
 import Event from '../../types/Event';
 import { formatTimeBracket, getTZDate } from '../../helpers/timeFormatter';
@@ -23,8 +21,12 @@ const FinalisedEventPage: NextPage = () => {
       setTitle(data.title);
       data.description && setDescription(data.description);
       data.location && setLocation(data.location);
-      const startDate = getTZDate(data.availability!.finalisedTime!.startDate);
-      const endDate = getTZDate(data.availability!.finalisedTime!.endDate);
+      const startDate = getTZDate(
+        new Date(data.availability!.finalisedTime!.startDate),
+      );
+      const endDate = getTZDate(
+        new Date(data.availability!.finalisedTime!.endDate),
+      );
 
       const formattedDate = formatTimeBracket(startDate, endDate);
       setTime(formattedDate);
