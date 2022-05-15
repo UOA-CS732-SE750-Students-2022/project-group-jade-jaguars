@@ -3,10 +3,11 @@ import request from 'supertest';
 import { StatusCodes } from 'http-status-codes';
 import { UserModel } from '../schemas/user.schema';
 import { TeamModel } from '../schemas/team.schema';
+import { UserResponseDTO } from 'src/controllers/user.controller';
 
 // Skipping as there is auth implementation in it which has been skipped making these tests broken!
-describe.skip('Users', () => {
-  it('Get', async () => {
+describe('Users', () => {
+  it.skip('Get', async () => {
     const userDoc = await UserModel.create({
       _id: 'x'.repeat(28), // firebaseId
       firstName: 'firstName',
@@ -21,7 +22,7 @@ describe.skip('Users', () => {
     expect(userGetResponse.body.id).toEqual(userId);
   });
 
-  it('Create', async () => {
+  it.skip('Create', async () => {
     await request(server)
       .post('/api/v1/user')
       .send({
@@ -32,7 +33,7 @@ describe.skip('Users', () => {
       .expect(StatusCodes.CREATED);
   });
 
-  it('Update', async () => {
+  it.skip('Update', async () => {
     const userDoc = await UserModel.create({
       _id: 'x'.repeat(28), // firebaseId
       firstName: 'firstName',
@@ -51,7 +52,7 @@ describe.skip('Users', () => {
     expect(userUpdateResponse.body.lastName).toEqual('lastName');
   });
 
-  it('Delete', async () => {
+  it.skip('Delete', async () => {
     const userDoc = await UserModel.create({
       _id: 'x'.repeat(28), // firebaseId
       firstName: 'first',
@@ -62,5 +63,38 @@ describe.skip('Users', () => {
     await request(server)
       .delete(`/api/v1/user/${userId}`)
       .expect(StatusCodes.NO_CONTENT);
+  });
+
+  it('Fetch all users', async () => {
+    await UserModel.create({
+      _id: 'x'.repeat(28), // firebaseId
+      firstName: 'first',
+      lastName: 'last',
+    });
+
+    await UserModel.create({
+      _id: 'y'.repeat(28), // firebaseId
+      firstName: 'first',
+      lastName: 'last',
+    });
+
+    const response: UserResponseDTO[] = (
+      await request(server).get(`/api/v1/users`).expect(StatusCodes.OK)
+    ).body;
+    expect(response).toEqual([
+      {
+        id: 'x'.repeat(28), // firebaseId
+        firstName: 'first',
+        lastName: 'last',
+        events: [],
+      },
+
+      {
+        id: 'y'.repeat(28), // firebaseId
+        firstName: 'first',
+        lastName: 'last',
+        events: [],
+      },
+    ]);
   });
 });
