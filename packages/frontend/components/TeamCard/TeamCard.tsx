@@ -1,5 +1,5 @@
-import TeamDetails from '../types/TeamDetails';
-import Member from '../types/Member';
+import TeamDetails from '../../types/TeamDetails';
+import Member from '../../types/Member';
 import { Card, Text, Grid, Avatar } from '@nextui-org/react';
 import { useEffect, useState } from 'react';
 
