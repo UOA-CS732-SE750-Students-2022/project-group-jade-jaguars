@@ -63,6 +63,11 @@ export const getAllUsers = async () => {
   return data;
 };
 
+export const exportCalender = async (userId: string) => {
+  const data = await getData(`/user/ical/${userId}`);
+  return data;
+};
+
 // event api calls
 
 export const getEvent = async (eventId: string) => {
