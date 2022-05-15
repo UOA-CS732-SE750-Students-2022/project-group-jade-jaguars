@@ -10,7 +10,7 @@ import {
   AvailabilityConfirmation,
   AvailabilityPayload,
 } from '../../types/Availability';
-import Team from '../../types/Team';
+import Team, { UpdateTeamPayload } from '../../types/Team';
 
 // user api calls
 
@@ -35,7 +35,14 @@ export const deleteUser = async (userId: string) => {
 };
 
 export const getUserTeamsById = async (userId: string) => {
-  const data = await getData(`/user/${userId}/team`);
+  if (userId) {
+    const data = await getData(`/user/${userId}/team`);
+    return data;
+  }
+};
+
+export const getAllUsers = async () => {
+  const data = await getData(`/users`);
   return data;
 };
 
@@ -141,7 +148,10 @@ export const createTeam = async (payload: Team) => {
   return data;
 };
 
-export const updateTeam = async (teamId: string, payload: Team) => {
+export const updateTeam = async (
+  teamId: string,
+  payload: UpdateTeamPayload,
+) => {
   const data = await patchData(`/team/${teamId}`, payload);
   return data;
 };
