@@ -13,7 +13,7 @@ import {
 } from '../../types/Availability';
 import Event, { EventResponseDTO } from '../../types/Event';
 import { TimeBracket, AttendeeAvailability } from '../../types/Event';
-import socketio from 'socket.io-client';
+import socketio, { Socket } from 'socket.io-client';
 import {
   getEvent,
   createAvailability,
@@ -47,11 +47,7 @@ const Availability: NextPage = () => {
     query: { eventId },
   } = router;
 
-  const io = socketio(SOCKET_URL, {
-    extraHeaders: {
-      Authorization: 'Bearer ' + authToken,
-    },
-  });
+  const [io, setIO] = useState<Socket>();
 
   async function fetchData() {
     let startDate = timeOptions.startDate;
@@ -107,10 +103,20 @@ const Availability: NextPage = () => {
       })
       .catch(console.error);
 
-    io.on(`event:${eventId}`, (args: Event) => {
+    setIO(
+      socketio(SOCKET_URL, {
+        extraHeaders: {
+          Authorization: 'Bearer ' + authToken,
+        },
+      }),
+    );
+  }, [eventId]);
+
+  useEffect(() => {
+    io?.on(`event:${eventId}`, (args: Event) => {
       setAllAvailabilities(args!.availability!.attendeeAvailability!);
     });
-  }, [eventId]);
+  }, [io]);
 
   const [status, setStatus] = useState<AvailabilityStatusStrings>(
     AvailabilityStatusStrings.Available,
@@ -118,7 +124,7 @@ const Availability: NextPage = () => {
   const [info, setInfo] = useState<JSX.Element[]>([]);
 
   function finaliseTimes() {
-    io.disconnect();
+    io?.disconnect();
     router.push({
       pathname: '/timeFinalisation/',
       query: { eventId: eventId },
@@ -302,7 +308,7 @@ const Availability: NextPage = () => {
               })}
             </Col>
           </Row>
-          <Row>
+          <Row className="max-w-[400px]">
             <button
               className={
                 'bg-secondary text-black w-[100px] cursor-pointer rounded-md px-2 py-1 font-semibold hover:bg-secondarylight absolute right-0 ' +

@@ -13,37 +13,98 @@
   </a>
 </p>
 
+## Features:
+
+CountMeIn is a application for managing when teams of people should meet. Manage multiple events with a dashboard to organise you life:
+
+- Create users through Google authentication
+- Create events that you can invite people to through a unique shareable URL
+- Add your availability to an event, view other peoples availability in real time
+- Generate a list of potential times during which team members can go to the event
+- Finalise your event with one of the potential times, the event is then added to your dashboard
+- Alternatively export the event using a .ical file and manually add it to a calendar of your choice
+
 ## Setup
 
-In order to run the application the frontend and the backend must first be set up with valid environment files in order for the application to be able to launch. These files will be provided on submission as a zip file containing all the files that are needed. If you have any problem with setting up the project please feel free to message our team on discord using any of our [team member handles](##Contributors)
+In order to run the application the project must first be set up with valid environment files in each the frontend and the backend in order for the application to be able to launch. These files will be provided on submission as a zip file containing all the files that are needed. If you have any problem with setting up the project please feel free to message our team on discord using any of our [team member handles](#contributors)
 
-### Backend Setup
+## Running Project
 
-In order to setup the backend you must place the required environment and firebase files in the directory `packages/backend/`. A template has been provided if you want to fill out these files manually but this setup can be skipped by copying the environment files from the submission zip
+This project has been set up as a monorepo via [Lerna](https://github.com/lerna/lerna). Commands run in the root will apply to all packages (frontend and backend)
+
+1. Setup environment files for both the frontend and the backend using the information in this README. You can find information on setting up the environment files in each of the Environment Files sections below for [Backend](#backend) and [Frontend](#frontend) respectively
+
+2. Install packages
+
+```bash
+npm install
+```
+
+3. Build the application
+
+```bash
+npm run build
+```
+
+This will create a `dist` output in the backend and a will compile to various parts of the `.next` folder within the frontend. For more information about NextJS compiling please see [this](https://nextjs.org/docs/deployment)
+
+4. Run application
+
+```bash
+npm run start
+```
+
+### Backend
+
+The backend of the application is written with Express with MongoDB and a Mongoose database driver
+
+#### Environment files
+
+Environment files have been included as a zip in the submission. Take all files that are in the provided backend folder of the environment file submission zip and extract them to the root of `packages/backend/`
+
+Alternatively you can manually fill out the environment files with your own details by copying the template environment file
 
 ```bash
 cd packages/backend/
-cp .env.template .env.dev
-cp .env.template .env.prod
-cp .env.template .env.test
-# Fill .env.development and .env.production with appropriate secrets
+cp .env.template .env
+# Fill out with your own details
 ```
 
-Download the firebase credentials from firebase console or request them from a developer and add a reference to it in your environment variables. Ensure that when setting the `GOOGLE_APPLICATION_CREDENTIALS` that it is an absolute path to the location of the file.
+**Please ensure that `GOOGLE_APPLICATION_CREDENTIALS` is set the the absolute path of the file `prod.firebase.creds.json` on your local machine, this is the only field in the backend environment file that you have to manually set**
 
-eg
+#### Running
 
-`export GOOGLE_APPLICATION_CREDENTIALS="<PATH TO REPO>/packages/backend/src/firebase/firebase.credentials.json"`
+In order to run the backend independently run these commands after navigating to the backend project (`packages/backend`). Please see the top of the file to run the entire project.
 
-<!--
+1. Ensure that the environment files for backend are setup using the instructions above
 
-If you are a member of the development discord these firebase files can be found [here](https://discord.com/channels/948449593543245824/951328358954860584/971585518267682866). Additionally prefilled environment variables can be found [here](https://discord.com/channels/948449593543245824/951328358954860584/972786304272183336).
+2. Install the dependencies
 
- -->
+```bash
+npm install
+```
 
-### Frontend Setup
+3. Create a production build
 
-Frontend requires a single environment file. You can skip manually setting each environment variable in the file by using the provided submission environment files.
+```bash
+npm run build
+```
+
+4. Start the backend
+
+```bash
+npm run start
+```
+
+If you have configured the backend environment correctly the backend should launch at `http://localhost:3000/api/v1`
+
+### Frontend
+
+This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+
+#### Environment files
+
+Frontend requires a single environment file. You can skip manually setting each environment variable in the file by using the provided submission environment files. Otherwise to setup the environment file manually:
 
 ```bash
 cd packages/frontend/
@@ -51,41 +112,38 @@ cp .env.template .env.local
 # Fill .env.local with appropriate secrets
 ```
 
-## Running the frontend and backend together
+#### Running
 
-This project has been set up as a monorepo via [Lerna](https://github.com/lerna/lerna). Commands run in the root will apply to all packages (frontend and backend)
+In order to run the frontend independently run these commands after navigating to the frontend project at (`packages/frontend`). Please see the top of the file to run the entire project!
 
-1. [Setup environment files](##Setup)
-1. Install packages
+1. Ensure that the environment files for frontend are setup using the instructions above
+2. Install the dependencies
 
 ```bash
 npm install
 ```
 
-3. Run application
+3. Create a production build
 
-From the root of the project run
+```bash
+npm run build
+```
+
+4. Start the frontend
 
 ```bash
 npm run start
 ```
 
-This will start the frontend and backend together. By default the backend will start with production credentials, use `npm run start:dev` to run with development credentials
+If you have configured the frontend environment correctly the backend should launch at `http://localhost:3001`, you should be able to visit this link in your web-browser of choice
 
-## Hosting
-
-When you have the project running the following endpoints will be available in order to use the project. To use the application follow the frontend link
-
-- Frontend: http://localhost:3001
-- backend: http://localhost:3000
-
-## Running unit tests
+## Tests
 
 Run `npm test` in the project root to execute the unit tests via [Jest](https://jestjs.io).
 
 ## Wiki
 
-The wiki can contains all meeting notes and major design decisions and rationale. The wiki can be found [here.](https://github.com/UOA-CS732-SE750-Students-2022/project-group-jade-jaguars/wiki).
+The wiki can contains all meeting notes and major design decisions, rationale and project management information. The wiki can be found [here.](https://github.com/UOA-CS732-SE750-Students-2022/project-group-jade-jaguars/wiki).
 
 ## Contributors
 

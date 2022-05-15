@@ -11,6 +11,8 @@ import { ITeam, TeamModel } from '../schemas/team.schema';
 import { EventModel } from '../schemas/event.schema';
 import ical from 'ical-generator';
 
+// DTOs
+
 interface CreateUserDTO {
   firstName: string;
   _id: string;
@@ -33,14 +35,17 @@ interface GetUserTeamsResponseDTO {
   teams: ITeam[];
 }
 
+// Find a user using their authToken
 export async function getUserById(
   req: Request,
   res: Response<UserResponseDTO>,
 ) {
   try {
+    // Particular firebase user
     const firebaseUser = await getFirebaseUser(req, res);
     const userId = req.params.userId;
 
+    // Check auth
     const authSelf = firebaseUser.uid === userId;
 
     const userDoc = await UserModel.findById(userId);
@@ -59,6 +64,7 @@ export async function getUserById(
   }
 }
 
+// Create a new user, note that the firebase user must be created before this in order for the firebaseId to be valid
 export async function createUser(
   req: TypedRequestBody<CreateUserDTO>,
   res: Response<UserResponseDTO>,
@@ -101,6 +107,7 @@ export async function createUser(
   }
 }
 
+// Update certain fields of a user apart from the users firebaseId (_id)
 export async function patchUserById(
   req: TypedRequestBody<PatchUserDTO>,
   res: Response<UserResponseDTO>,
@@ -150,6 +157,7 @@ export async function patchUserById(
   }
 }
 
+// Remove a user from the database
 export async function deleteUserById(req: Request, res: Response) {
   try {
     const firebaseUser = await getFirebaseUser(req, res);
@@ -170,6 +178,7 @@ export async function deleteUserById(req: Request, res: Response) {
   }
 }
 
+// Fetch all the teams that a user belongs to
 export async function getUserTeamsById(
   req: Request,
   res: Response<GetUserTeamsResponseDTO>,
