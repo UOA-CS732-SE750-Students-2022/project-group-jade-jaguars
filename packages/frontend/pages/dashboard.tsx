@@ -58,9 +58,9 @@ const Dashboard: NextPage = () => {
 
   const [searchEvents, setSearchEvents] = useState<EventInterface[]>();
 
-  useEffect(() => {
-    !signedIn && router.push('/login');
-  }, [signedIn]);
+  // useEffect(() => {
+  //   !signedIn && router.push('/login');
+  // }, [signedIn]);
 
   const handleEventCardOnclick = (event: EventInterface) => {
     setEventSelected(event);

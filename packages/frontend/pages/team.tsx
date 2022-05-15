@@ -35,9 +35,9 @@ const Team: NextPage = () => {
   const [usersList, setUsersList] = useState<SelectItem[]>();
 
   const router = useRouter();
-  useEffect(() => {
-    !signedIn && router.push('/login');
-  }, [signedIn]);
+  // useEffect(() => {
+  //   !signedIn && router.push('/login');
+  // }, [signedIn]);
 
   const teamForm = useForm({
     initialValues: {
