@@ -17,7 +17,7 @@ export const getHeaders = async () => {
 };
 
 export const getData = async (url: string, payload?: any) => {
-  const data = await axios
+  const data = axios
     .get(`${BASE_URL}${url}`, {
       headers: await getHeaders(),
       ...(payload && { params: payload }),
@@ -55,7 +55,7 @@ export const getResponseStatus = async (url: string, payload?: any) => {
 };
 
 export const postData = async (url: string, payload?: any) => {
-  const data = await axios
+  const data = axios
     .post(`${BASE_URL}${url}`, payload, {
       headers: await getHeaders(),
     })
@@ -73,7 +73,7 @@ export const postData = async (url: string, payload?: any) => {
 };
 
 export const putData = async (url: string, payload?: any) => {
-  const data = await axios
+  const data = axios
     .put(`${BASE_URL}${url}`, payload, {
       headers: await getHeaders(),
     })
@@ -91,7 +91,7 @@ export const putData = async (url: string, payload?: any) => {
 };
 
 export const patchData = async (url: string, payload?: any) => {
-  const data = await axios
+  const data = axios
     .patch(`${BASE_URL}${url}`, payload, {
       headers: await getHeaders(),
     })
@@ -109,7 +109,7 @@ export const patchData = async (url: string, payload?: any) => {
 };
 
 export const deleteData = async (url: string, payload?: any) => {
-  const data = await axios
+  const data = axios
     .delete(`${BASE_URL}${url}`, {
       headers: await getHeaders(),
       ...(payload && { params: payload }),
