@@ -233,7 +233,7 @@ const Dashboard: NextPage = () => {
 
   return (
     <Container className="ml-[100px] w-screen">
-      <div className="w-[90vw] h-screen flex flex-row justify-start my-10">
+      <div className="w-[90vw] flex flex-row justify-start my-5">
         <section className="w-[50vw] min-w-[500px] h-full flex flex-col justify-start p-10">
           <div>
             <SearchBar
@@ -360,8 +360,12 @@ const Dashboard: NextPage = () => {
           opened={searchPopUp}
           onClose={() => setSearchPopUp(false)}
           size={'800px'}
+          radius={'lg'}
         >
           <div className="flex flex-col gap-2 h-[80%] overflow-scroll">
+            <span className="text-xl font-medium mb-3 ml-2">
+              Search Results:{' '}
+            </span>
             {searchEvents &&
               searchEvents.map((event, index) => {
                 return (
@@ -373,7 +377,10 @@ const Dashboard: NextPage = () => {
                     timeRange={[event.start, event.end]}
                     participants={event.participants}
                     description={event.description}
-                    onClick={() => {}}
+                    onClick={() => {
+                      setModalOpen(true);
+                      setEventSelected(event);
+                    }}
                   />
                 );
               })}
