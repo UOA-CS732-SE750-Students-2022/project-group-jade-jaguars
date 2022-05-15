@@ -21,7 +21,7 @@ export const CustomNavbar = () => {
   const [isLogin, setIsLogin] = useState(false);
   useEffect(() => {
     user ? setIsLogin(true) : setIsLogin(false);
-    !user && router.push('/dashboard');
+    // !user && router.push('/dashboard');
   }, [user]);
 
   return isLogin ? (
