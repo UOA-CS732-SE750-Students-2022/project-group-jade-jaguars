@@ -1,4 +1,11 @@
-import { deleteData, getData, patchData, postData, putData } from './helpers';
+import {
+  deleteData,
+  getData,
+  getResponseStatus,
+  patchData,
+  postData,
+  putData,
+} from './helpers';
 import Event, {
   EventPayload,
   EventResponseDTO,
@@ -16,6 +23,16 @@ import Team, { UpdateTeamPayload } from '../../types/Team';
 
 export const getUser = async (userId: string) => {
   const data = await getData(`/user/${userId}`);
+  return data;
+};
+
+export const getUserResponseStatus = async (userId: string) => {
+  const response = await getResponseStatus(`/user/${userId}`);
+  return response;
+};
+
+export const getUserTeams = async (userId: string) => {
+  const data = await getData(`/user/${userId}/team`);
   return data;
 };
 
@@ -70,11 +87,8 @@ export const deleteEvent = async (eventId: string) => {
   return data;
 };
 
-export const searchEvent = async (payload: string) => {
-  const dataPayload = {
-    titleSubStr: payload,
-  };
-  const data = await postData(`/event/search`, dataPayload);
+export const searchEvent = async (payload: object) => {
+  const data = await postData(`/event/search`, payload);
   return data;
 };
 

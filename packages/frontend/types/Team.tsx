@@ -1,4 +1,5 @@
 import Member from './Member';
+import { EventInterface } from '../components/CustomCalendar/CustomCalendar';
 
 export default interface Team {
   _id?: string;
@@ -11,6 +12,7 @@ export default interface Team {
   events?: string[]; // uuid
 
   membersList?: Member[];
+  eventsList?: EventInterface[] | undefined;
 }
 
 export interface UpdateTeamPayload {
