@@ -176,7 +176,7 @@ const Team: NextPage = () => {
       </section>
       <section className="flex flex-auto w-fit">
         <div className="fixed mt-16">
-          {selectedTeam && (
+          {!loading && selectedTeam && (
             <TeamDetailsCard
               team={selectedTeam}
               editTeam={() => {
