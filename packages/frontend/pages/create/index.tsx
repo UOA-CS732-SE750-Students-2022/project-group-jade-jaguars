@@ -2,9 +2,11 @@ import { Container, Grid } from '@mantine/core';
 import { useForm } from '@mantine/hooks';
 import { NextPage } from 'next';
 import React, { useEffect, useState } from 'react';
-import EventForm from '../../components/EventForm';
+import EventForm, { FormValues } from '../../components/EventForm';
 import { useAuth } from '../../src/context/AuthContext';
 import { createTeam, createEvent } from '../../helpers/apiCalls/apiCalls';
+import { EventResponseDTO } from '../../types/Event';
+
 import { useRouter } from 'next/router';
 import { getTZDate } from '../../helpers/timeFormatter';
 
@@ -44,11 +46,13 @@ const CreateEventPage: NextPage = () => {
       newTeam: false,
       teamName: '',
       newTeamName: '',
+      newTeamDescription: '',
       recurring: false,
     },
   });
   const BASE_URL =
-    process.env.NEXT_PUBLIC_SOCKET_URL! + process.env.NEXT_PUBLIC_BASE_URL!;
+    process.env.NEXT_PUBLIC_SOCKET_URL! +
+    (process.env.NEXT_PUBLIC_BASE_URL ?? 'api/v1');
 
   useEffect(() => {
     const getTeamList = async () => {
@@ -69,10 +73,13 @@ const CreateEventPage: NextPage = () => {
     const res = await createTeam({
       title: form.values.newTeamName,
       admin: userId,
+      description: form.values.newTeamDescription,
     });
     return await res;
   };
-  const createEventMethod = async (teamId: string) => {
+  const createEventMethod = async (
+    teamId: string,
+  ): Promise<EventResponseDTO> => {
     const startDate = new Date(form.values.dateRange[0]!);
     const endDate = new Date(form.values.dateRange[1]!);
     const startTime = form.values.timeRange[0];
@@ -106,7 +113,7 @@ const CreateEventPage: NextPage = () => {
     } else {
       teamId = teamList.find((o) => o.label == form.values.teamName)!.id;
     }
-    const response = await createEventMethod(teamId);
+    const response: EventResponseDTO = await createEventMethod(teamId);
     console.log(response);
     await router.push({
       pathname: '/availability/',
