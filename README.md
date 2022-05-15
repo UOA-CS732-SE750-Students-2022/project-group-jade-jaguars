@@ -97,7 +97,7 @@ If you have configured the backend environment correctly the backend should laun
 
 ### Frontend
 
-The frontend application is written using NextJS using Typescript
+This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
 #### Environment files
 
