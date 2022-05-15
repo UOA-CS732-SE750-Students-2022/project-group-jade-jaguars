@@ -168,6 +168,9 @@ const Availability: NextPage = () => {
     endTime.setHours(endTime.getHours() + 12);
     endTime.setMinutes(endTime.getMinutes() + 30);
 
+    console.log(startTime.toISOString());
+    console.log(endTime.toISOString());
+
     await createAvailability(eventId!.toString(), {
       startDate: startTime.toISOString(),
       endDate: endTime.toISOString(),
