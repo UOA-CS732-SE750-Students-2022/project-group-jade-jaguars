@@ -179,3 +179,8 @@ export const deleteTeam = async (teamId: string) => {
   const data = await deleteData(`/team/${teamId}`);
   return data;
 };
+
+export const deleteUserFromTeam = async (teamId: string, payload: User) => {
+  const data = await deleteData(`/team/${teamId}/member`, payload);
+  return data;
+};

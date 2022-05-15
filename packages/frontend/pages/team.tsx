@@ -6,6 +6,7 @@ import TeamCard from '../components/TeamCard/TeamCard';
 import TeamDetailsCard from '../components/TeamDetailsCard/TeamDetailsCard';
 import {
   deleteTeam,
+  deleteUserFromTeam,
   getAllUsers,
   getUser,
   getUserTeamsById,
@@ -153,8 +154,10 @@ const Team: NextPage = () => {
     }
   };
 
-  const handleDeleteUser = (user: User) => {
-    console.log(user);
+  const handleDeleteUser = async (user: User) => {
+    await deleteUserFromTeam(selectedTeam!._id!, user);
+    setEditTeamModalOpen(false);
+    refresh();
   };
 
   return (
