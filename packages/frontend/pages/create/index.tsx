@@ -99,7 +99,11 @@ const CreateEventPage: NextPage = () => {
         teamId = await data.id;
       }
     } else {
-      teamId = teamList.find((o) => o.label == form.values.teamName)!.id;
+      // Find team
+      if (form.values.teamName) {
+        teamId = teamList.find((o) => o.label == form.values.teamName)!.id;
+      }
+      // Otherwise team is left as undefined in event (has no associated team)
     }
     const response: EventResponseDTO = await createEventMethod(teamId);
     console.log(response);
