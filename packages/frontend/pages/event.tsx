@@ -25,7 +25,6 @@ export interface EventUser {
 
 const Event: NextPage = () => {
   const { userId, signedIn } = useAuth();
-  const router = useRouter();
 
   const [selectedEvent, setSelectedEvent] = useState<Event>();
   const [displayDetail, setDisplayDetail] = useState<boolean>(false);
