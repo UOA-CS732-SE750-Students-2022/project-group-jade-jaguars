@@ -15,7 +15,7 @@
 
 ## Features:
 
-CountMeIn is a application for managing when teams of people should meet. Manage multiple events with a dashboard to organise you life!
+CountMeIn is a application for managing when teams of people should meet. Manage multiple events with a dashboard to organise you life:
 
 - Create users through Google authentication
 - Create events that you can invite people to through a unique shareable URL
@@ -26,38 +26,82 @@ CountMeIn is a application for managing when teams of people should meet. Manage
 
 ## Setup
 
-In order to run the application the project must first be set up with a valid environment file in the root of the project in order for the application to be able to launch. This file will be provided on submission as a zip file containing all the files that are needed. If you have any problem with setting up the project please feel free to message our team on discord using any of our [team member handles](##Contributors)
+In order to run the application the project must first be set up with a valid environment files in each the frontend and the backend in order for the application to be able to launch. These files will be provided on submission as a zip file containing all the files that are needed. If you have any problem with setting up the project please feel free to message our team on discord using any of our [team member handles](#contributors)
 
-## Running
+## Running Project
 
 This project has been set up as a monorepo via [Lerna](https://github.com/lerna/lerna). Commands run in the root will apply to all packages (frontend and backend)
 
-1. [Setup environment files](##Setup)
-1. Install packages
+1. Setup environment files for both the frontend and the backend using the information in this README. You can find information on setting up the environment files in each of the Environment Files sections below for [Backend](#backend) and [Frontend](#frontend) respectively
+
+2. Install packages
 
 ```bash
 npm install
 ```
 
-3. Run application
+3. Build the application
 
-From the root of the project run
+```bash
+npm run build
+```
+
+This will create a `dist` output in the backend and a will compile to various parts of the `.next` folder within the frontend. For more information about nextjs compiling please see [this](https://nextjs.org/docs/deployment) 4. Run application
 
 ```bash
 npm run start
 ```
 
-This will start the frontend and backend together. By default the backend will start with production credentials, use `npm run start:dev` to run with development credentials
-
-### Project
-
 ### Backend
 
 The backend of the application is written with Express with MongoDB and a Mongoose database driver
 
+#### Environment files
+
+Environment files have been included as a zip in the submission. Take all files that are in the provided backend folder of the environment file submission zip and extract them to the root of `packages/backend/`
+
+Alternatively you can manually fill out the environment files with your own details by copying the template environment file
+
+```bash
+cd packages/backend/
+cp .env.template .env
+# Fill out with your own details
+```
+
+**Please ensure that `GOOGLE_APPLICATION_CREDENTIALS` is set the the absolute path of the file `prod.firebase.creds.json` on your local machine, this is the only field in the backend environment file that you have to manually set**
+
+#### Running
+
+In order to run the backend independently run these commands after navigating to the backend project (`packages/backend`). Please see the top of the file to run the entire project!
+
+1. Ensure that the environment files for backend are setup using the instructions above
+2. Install the dependencies
+
+```bash
+npm install
+```
+
+3. Create a production build
+
+```bash
+npm run build
+```
+
+4. Start the backend
+
+```bash
+npm run start
+```
+
+If you have configured the backend environment correctly the backend should launch at `http://localhost:3000/api/v1`
+
 ### Frontend
 
-Frontend requires a single environment file. You can skip manually setting each environment variable in the file by using the provided submission environment files.
+The frontend application is written using NextJS using Typescript
+
+#### Environment files
+
+Frontend requires a single environment file. You can skip manually setting each environment variable in the file by using the provided submission environment files. Otherwise to setup manually:
 
 ```bash
 cd packages/frontend/
@@ -65,16 +109,32 @@ cp .env.template .env.local
 # Fill .env.local with appropriate secrets
 ```
 
-## Running the frontend and backend together
+#### Running
 
-## Hosting
+In order to run the backend independently run these commands after navigating to the frontend project (`packages/frontend`). Please see the top of the file to run the entire project!
 
-When you have the project running the following endpoints will be available in order to use the project. To use the application follow the frontend link
+1. Ensure that the environment files for frontend are setup using the instructions above
+2. Install the dependencies
 
-- Frontend: http://localhost:3001
-- backend: http://localhost:3000
+```bash
+npm install
+```
 
-## Running unit tests
+3. Create a production build
+
+```bash
+npm run build
+```
+
+4. Start the frontend
+
+```bash
+npm run start
+```
+
+If you have configured the frontend environment correctly the backend should launch at `http://localhost:3001`, you should be able to visit this link in your web-browser of choice
+
+## Tests
 
 Run `npm test` in the project root to execute the unit tests via [Jest](https://jestjs.io).
 

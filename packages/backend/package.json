@@ -8,8 +8,8 @@
   "scripts": {
     "prebuild": "rimraf dist",
     "build": "tsc",
-    "start": "ts-node ./src/app.ts",
-    "start:dev": "nodemon",
+    "start": "node dist/src/app",
+    "start:dev": "ts-node ./src/app.ts",
     "start:prod": "node dist/app",
     "test": "jest --runInBand --verbose --force-exit",
     "test:dev": "jest --runInBand --verbose --watch",
