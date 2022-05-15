@@ -10,14 +10,11 @@
   </a>
   <a href="https://img.shields.io/badge/License-GPLv3-blue.svg">
     <img alt="Licence" src="https://img.shields.io/badge/License-GPLv3-blue.svg">
-  </a>
+  </a> </br>
+CountMeIn is a application for managing when teams of people should meet. Manage multiple events with a dashboard to organise you life!
 </p>
 
-## Overview
-
-CountMeIn is a application for managing when teams of people should meet.
-
-### Features:
+## Features:
 
 - Create users through Google authentication
 - Create events that you can invite people to through a unique shareable URL
@@ -28,43 +25,9 @@ CountMeIn is a application for managing when teams of people should meet.
 
 ## Setup
 
-In order to run the application the project must first be set up with a valid environment file in order for the application to be able to launch. This file will be provided on submission as a zip file containing all the files that are needed. If you have any problem with setting up the project please feel free to message our team on discord using any of our [team member handles](##Contributors)
+In order to run the application the project must first be set up with a valid environment file in the root of the project in order for the application to be able to launch. This file will be provided on submission as a zip file containing all the files that are needed. If you have any problem with setting up the project please feel free to message our team on discord using any of our [team member handles](##Contributors)
 
-### Backend Setup
-
-In order to setup the backend you must place the required environment and firebase files in the directory `packages/backend/`. A template has been provided if you want to fill out these files manually but this setup can be skipped by copying the environment files from the submission zip
-
-```bash
-cd packages/backend/
-cp .env.template .env.dev
-cp .env.template .env.prod
-cp .env.template .env.test
-# Fill .env.development and .env.production with appropriate secrets
-```
-
-Download the firebase credentials from firebase console or request them from a developer and add a reference to it in your environment variables. Ensure that when setting the `GOOGLE_APPLICATION_CREDENTIALS` that it is an absolute path to the location of the file.
-
-eg
-
-`export GOOGLE_APPLICATION_CREDENTIALS="<PATH TO REPO>/packages/backend/src/firebase/firebase.credentials.json"`
-
-<!--
-
-If you are a member of the development discord these firebase files can be found [here](https://discord.com/channels/948449593543245824/951328358954860584/971585518267682866). Additionally prefilled environment variables can be found [here](https://discord.com/channels/948449593543245824/951328358954860584/972786304272183336).
-
- -->
-
-### Frontend Setup
-
-Frontend requires a single environment file. You can skip manually setting each environment variable in the file by using the provided submission environment files.
-
-```bash
-cd packages/frontend/
-cp .env.template .env.local
-# Fill .env.local with appropriate secrets
-```
-
-## Running the frontend and backend together
+## Running
 
 This project has been set up as a monorepo via [Lerna](https://github.com/lerna/lerna). Commands run in the root will apply to all packages (frontend and backend)
 
@@ -84,6 +47,24 @@ npm run start
 ```
 
 This will start the frontend and backend together. By default the backend will start with production credentials, use `npm run start:dev` to run with development credentials
+
+### Project
+
+### Backend
+
+The backend of the application is written with Express with MongoDB and a Mongoose database driver
+
+### Frontend
+
+Frontend requires a single environment file. You can skip manually setting each environment variable in the file by using the provided submission environment files.
+
+```bash
+cd packages/frontend/
+cp .env.template .env.local
+# Fill .env.local with appropriate secrets
+```
+
+## Running the frontend and backend together
 
 ## Hosting
 
