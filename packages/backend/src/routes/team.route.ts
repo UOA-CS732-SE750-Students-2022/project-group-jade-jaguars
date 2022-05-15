@@ -5,6 +5,7 @@ import {
   deleteTeamById,
   getTeamById,
   patchTeamById,
+  removeMemberById,
 } from '../controllers/team.controller';
 export const teamRouter = express.Router();
 
@@ -17,3 +18,5 @@ teamRouter.patch('/team/:teamId', patchTeamById);
 teamRouter.delete('/team/:teamId', deleteTeamById);
 
 teamRouter.put('/team/:teamId/member', addMemberById);
+
+teamRouter.delete('/team/:teamId/member', removeMemberById);
