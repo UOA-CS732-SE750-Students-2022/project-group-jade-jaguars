@@ -91,4 +91,27 @@ describe('Team', () => {
     const teamDoc2 = await TeamModel.findById(teamId);
     expect(teamDoc2.members).toContain(userId);
   });
+
+  it('Remove member from team', async () => {
+    const memberDoc = await UserModel.create({
+      _id: 'y'.repeat(25),
+      firstName: 'firstName',
+      lastName: 'lastName',
+    });
+
+    const teamDoc = await TeamModel.create({
+      title: 'title',
+      admin: adminDoc._id,
+      members: [memberDoc._id],
+    });
+    const teamId = teamDoc._id.toString();
+
+    await request(server)
+      .delete(`/api/v1/team/${teamId}/member`)
+      .send({ userId: memberDoc._id })
+      .expect(StatusCodes.OK);
+
+    const teamDoc2 = await TeamModel.findById(teamId);
+    expect(teamDoc2.members).not.toContain(memberDoc._id);
+  });
 });
