@@ -1,6 +1,5 @@
 import { NextPage } from 'next';
 import { useRouter } from 'next/router';
-import { ShareLinkButton } from '../../components/ShareLinkButton/ShareLinkButton';
 import { Row, Col } from '@nextui-org/react';
 import { useState, useEffect } from 'react';
 import { AttendeeStatus } from '../../types/Availability';
@@ -45,28 +44,29 @@ const TimeFinalisation: NextPage = () => {
     query: { eventId },
   } = router;
 
+  const io = socketio(BASE_URL!);
+
   async function fetchData() {
     let startDate = timeOptions.startDate;
     let endDate = timeOptions.endDate;
     let allAvailabilities: AttendeeAvailability[] = [];
     let eventTitle = 'Event Title';
     let potentialTimes: TimeBracket[] = [];
-    await getEvent(eventId!.toString()).then((val: Event) => {
-      eventTitle = val.title;
-      startDate = getTZDate(val.startDate);
-      endDate = getTZDate(val.endDate);
+    const val = await getEvent(eventId!.toString());
+    eventTitle = val.title;
+    startDate = getTZDate(val.startDate);
+    endDate = getTZDate(val.endDate);
 
-      setNumPages(
-        Math.ceil(
-          (endDate.getTime() - startDate.getTime()) / (1000 * 3600 * 24 * 7),
-        ),
-      );
+    setNumPages(
+      Math.ceil(
+        (endDate.getTime() - startDate.getTime()) / (1000 * 3600 * 24 * 7),
+      ),
+    );
 
-      allAvailabilities = val ? val!.availability!.attendeeAvailability! : [];
-      potentialTimes = val!.availability!.potentialTimes
-        ? val!.availability!.potentialTimes!
-        : [];
-    });
+    allAvailabilities = val ? val!.availability!.attendeeAvailability! : [];
+    potentialTimes = val!.availability!.potentialTimes
+      ? val!.availability!.potentialTimes!
+      : [];
     setEventTitle(eventTitle);
     setTimeOptions({
       startDate: startDate,
@@ -78,11 +78,6 @@ const TimeFinalisation: NextPage = () => {
 
   useEffect(() => {
     fetchData().catch(console.error);
-
-    const io = socketio(BASE_URL!);
-    io.on(`event:${eventId}`, (args: Event) => {
-      setAllAvailabilities(args!.availability!.attendeeAvailability!);
-    });
   }, [eventId]);
 
   const [info, setInfo] = useState<JSX.Element[]>([]);
@@ -120,6 +115,7 @@ const TimeFinalisation: NextPage = () => {
 
   const confirmSelection = async () => {
     await finaliseEventTime(eventId!.toString(), selectedTimes!);
+    io.disconnect();
     router.push({
       pathname: `/finalised`,
       query: { eventId: eventId },

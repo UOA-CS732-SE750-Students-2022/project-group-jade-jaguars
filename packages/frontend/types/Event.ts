@@ -1,6 +1,8 @@
 import { AvailabilityBlock } from './Availability';
+import Member from './Member';
 
 export default interface Event {
+  id?: string;
   title: string;
   description?: string;
   status?: EventStatus;
@@ -11,6 +13,8 @@ export default interface Event {
   location?: string;
   team?: string; // id
   admin?: string; // id
+  date?: Date;
+  participants?: Member[];
 }
 
 export enum EventStatus {
@@ -39,4 +43,32 @@ export interface AttendeeAvailability {
 
 export interface SearchEventPayload {
   titleSubStr: string;
+}
+
+export interface EventResponseDTO {
+  id: string;
+  title: string;
+  description?: string;
+  status: EventStatus;
+  startDate: Date;
+  endDate: Date;
+  availability: EventAvailability;
+  location?: string;
+  team: string;
+  admin: string;
+}
+export interface EventPayload {
+  id?: string;
+  title?: string;
+  description?: string;
+  status?: EventStatus;
+  startDate?: Date;
+  endDate?: Date;
+  availability?: EventAvailability;
+  attendees?: [];
+  location?: string;
+  team?: string; // id
+  admin?: string; // id
+  date?: Date;
+  participants?: Member[];
 }

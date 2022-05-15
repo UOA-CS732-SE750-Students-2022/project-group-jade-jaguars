@@ -11,7 +11,7 @@ import {
   AvailabilityBlock,
   AvailabilityStatusStrings,
 } from '../../types/Availability';
-import Event from '../../types/Event';
+import Event, { EventResponseDTO } from '../../types/Event';
 import { TimeBracket, AttendeeAvailability } from '../../types/Event';
 import socketio from 'socket.io-client';
 import {
@@ -39,7 +39,7 @@ const Availability: NextPage = () => {
   const [pageNum, setPageNum] = useState<number>(1);
   const [numPages, setNumPages] = useState<number>(1);
 
-  const { userId } = useAuth();
+  const { userId, authToken } = useAuth();
   const [isAdmin, setIsAdmin] = useState<Boolean>(false);
 
   const router = useRouter();
@@ -47,37 +47,44 @@ const Availability: NextPage = () => {
     query: { eventId },
   } = router;
 
+  const io = socketio(SOCKET_URL, {
+    extraHeaders: {
+      Authorization: 'Bearer ' + authToken,
+    },
+  });
+
   async function fetchData() {
     let startDate = timeOptions.startDate;
     let endDate = timeOptions.endDate;
     let myAvailability: AvailabilityBlock[] = [];
     let allAvailabilities: AttendeeAvailability[] = [];
     let eventTitle = 'Event Title';
-    await getEvent(eventId!.toString()).then((val: Event) => {
-      eventTitle = val.title;
-      if (val.admin === userId) {
-        setIsAdmin(true);
-      }
-      startDate = getTZDate(val.startDate);
-      endDate = getTZDate(val.endDate);
+    let newFinalisedTime;
+    const val: EventResponseDTO = await getEvent(eventId!.toString());
+    eventTitle = val.title;
+    if (val.admin === userId) {
+      setIsAdmin(true);
+    }
+    startDate = getTZDate(val.startDate);
+    endDate = getTZDate(val.endDate);
+    newFinalisedTime = val.availability!.finalisedTime;
 
-      setNumPages(
-        Math.ceil(
-          (endDate.getTime() - startDate.getTime()) / (1000 * 3600 * 24 * 7),
-        ),
-      );
+    setNumPages(
+      Math.ceil(
+        (endDate.getTime() - startDate.getTime()) / (1000 * 3600 * 24 * 7),
+      ),
+    );
 
-      allAvailabilities = val ? val!.availability!.attendeeAvailability! : [];
-      if (
-        allAvailabilities.find((attendee) => {
-          return attendee.attendee === userId;
-        })
-      ) {
-        myAvailability = allAvailabilities.find((attendee) => {
-          return attendee.attendee === userId;
-        })!.availability;
-      }
-    });
+    allAvailabilities = val ? val!.availability!.attendeeAvailability! : [];
+    if (
+      allAvailabilities.find((attendee) => {
+        return attendee.attendee === userId;
+      })
+    ) {
+      myAvailability = allAvailabilities.find((attendee) => {
+        return attendee.attendee === userId;
+      })!.availability;
+    }
     setEventTitle(eventTitle);
     setTimeOptions({
       startDate: startDate,
@@ -85,12 +92,21 @@ const Availability: NextPage = () => {
     });
     setMyAvailability(myAvailability);
     setAllAvailabilities(allAvailabilities);
+    return newFinalisedTime;
   }
 
   useEffect(() => {
-    fetchData().catch(console.error);
+    fetchData()
+      .then((newFinalisedTime) => {
+        if (newFinalisedTime) {
+          router.push({
+            pathname: '/finalised/',
+            query: { eventId: eventId },
+          });
+        }
+      })
+      .catch(console.error);
 
-    const io = socketio(SOCKET_URL!);
     io.on(`event:${eventId}`, (args: Event) => {
       setAllAvailabilities(args!.availability!.attendeeAvailability!);
     });
@@ -102,6 +118,7 @@ const Availability: NextPage = () => {
   const [info, setInfo] = useState<JSX.Element[]>([]);
 
   function finaliseTimes() {
+    io.disconnect();
     router.push({
       pathname: '/timeFinalisation/',
       query: { eventId: eventId },
@@ -176,6 +193,15 @@ const Availability: NextPage = () => {
   const handlePageChange = (pageNum: number) => {
     fetchData().catch(console.error);
     setPageNum(pageNum);
+  };
+
+  const isAvailabilityEmpty = () => {
+    return (
+      allAvailabilities.length == 0 ||
+      !allAvailabilities.every((attendee) => {
+        return attendee.availability.length;
+      })
+    );
   };
 
   return (
@@ -256,7 +282,9 @@ const Availability: NextPage = () => {
               <h2 className="mb-[35px]">Group Availability</h2>
             </Col>
             <Col>
-              <h2 className="ml-[50px]">{allAvailabilities.length}</h2>
+              <h2 className="ml-[50px]">
+                {isAvailabilityEmpty() ? '0' : allAvailabilities.length}
+              </h2>
             </Col>
           </Row>
           <Row>
@@ -278,7 +306,7 @@ const Availability: NextPage = () => {
             <button
               className={
                 'bg-secondary text-black w-[100px] cursor-pointer rounded-md px-2 py-1 font-semibold hover:bg-secondarylight absolute right-0 ' +
-                (isAdmin ? 'block' : 'hidden')
+                (isAdmin && !isAvailabilityEmpty() ? 'block' : 'hidden')
               }
               onClick={() => finaliseTimes()}
             >
