@@ -1,14 +1,16 @@
 import { NextPage } from 'next';
 import { useRouter } from 'next/router';
-import { Row, Col } from '@nextui-org/react';
+import { Row, Col, Text } from '@nextui-org/react';
 import { useState, useEffect } from 'react';
 import { AttendeeStatus } from '../../types/Availability';
 import GroupAvailability from '../../components/GroupAvailability';
 import { useAuth } from '../../src/context/AuthContext';
 import { AvailabilityStatusStrings } from '../../types/Availability';
-import Event from '../../types/Event';
-import { TimeBracket, AttendeeAvailability } from '../../types/Event';
-import socketio from 'socket.io-client';
+import {
+  TimeBracket,
+  AttendeeAvailability,
+  EventResponseDTO,
+} from '../../types/Event';
 import {
   getEvent,
   getUser,
@@ -16,6 +18,10 @@ import {
 } from '../../helpers/apiCalls/apiCalls';
 import { TimeOptionsList } from '../../components/TimeOptionsList/TimeOptionsList';
 import { getTZDate } from '../../helpers/timeFormatter';
+import { DatePicker } from '@mantine/dates';
+import { Grid, InputWrapper } from '@mantine/core';
+import { TimePicker } from 'antd';
+import moment from 'moment';
 
 const BASE_URL = process.env.NEXT_PUBLIC_SOCKET_URL;
 
@@ -36,6 +42,10 @@ const TimeFinalisation: NextPage = () => {
   const [numPages, setNumPages] = useState<number>(1);
 
   const [selectedTimes, setSelectedTimes] = useState<TimeBracket>();
+  const [date, setDateChange] = useState<Date | null>(new Date());
+  const [timeRange, setTimeRange] = useState<Date[] | undefined>();
+  const [customEvent, setCustomEvent] = useState<boolean>(false);
+  const [dtError, setDtError] = useState<boolean>(false);
 
   const { userId } = useAuth();
 
@@ -44,15 +54,13 @@ const TimeFinalisation: NextPage = () => {
     query: { eventId },
   } = router;
 
-  const io = socketio(BASE_URL!);
-
   async function fetchData() {
     let startDate = timeOptions.startDate;
     let endDate = timeOptions.endDate;
     let allAvailabilities: AttendeeAvailability[] = [];
     let eventTitle = 'Event Title';
     let potentialTimes: TimeBracket[] = [];
-    const val = await getEvent(eventId!.toString());
+    const val: EventResponseDTO = await getEvent(eventId!.toString());
     eventTitle = val.title;
     startDate = getTZDate(val.startDate);
     endDate = getTZDate(val.endDate);
@@ -114,12 +122,39 @@ const TimeFinalisation: NextPage = () => {
   };
 
   const confirmSelection = async () => {
-    await finaliseEventTime(eventId!.toString(), selectedTimes!);
-    io.disconnect();
-    router.push({
-      pathname: `/finalised`,
-      query: { eventId: eventId },
-    });
+    let dtError = false;
+    if (customEvent) {
+      if (
+        date == null ||
+        timeRange == undefined ||
+        timeRange[0] == null ||
+        timeRange[1] == null
+      ) {
+        dtError = true;
+        setDtError(dtError);
+      } else {
+        const startDate = new Date(date);
+        const endDate = new Date(date);
+        const startTime = timeRange[0];
+        const endTime = timeRange[1];
+        startDate.setHours(startTime.getHours(), startTime.getMinutes());
+        endDate.setHours(endTime.getHours(), endTime.getMinutes());
+        const startDateText = startDate.toISOString();
+        const endDateText = endDate.toISOString();
+        await finaliseEventTime(eventId!.toString(), {
+          startDate: getTZDate(new Date(startDateText)),
+          endDate: getTZDate(new Date(endDateText)),
+        });
+      }
+    } else {
+      await finaliseEventTime(eventId!.toString(), selectedTimes!);
+    }
+    if (!dtError) {
+      router.push({
+        pathname: `/finalised`,
+        query: { eventId: eventId },
+      });
+    }
   };
 
   return (
@@ -179,12 +214,70 @@ const TimeFinalisation: NextPage = () => {
           </Row>
         </Col>
         <Col>
-          <Row>Options</Row>
+          Options
           <Row>
             <TimeOptionsList
               options={potentialTimes}
               setCheckedTime={setSelectedTimes}
             />
+          </Row>
+          <Row className="mt-[15px]">
+            <button
+              className={
+                'bg-secondary text-black w-[180px] cursor-pointer rounded-md px-2 py-1 font-semibold hover:bg-secondarylight absolute'
+              }
+              onClick={() => setCustomEvent(!customEvent)}
+            >
+              Custom Event Time
+            </button>
+          </Row>
+          <Row className="max-w-[400px] mt-[30px]">
+            <Col>
+              <DatePicker
+                classNames={{
+                  input: 'py-[20.5px] text-[16px]',
+                }}
+                className={customEvent ? 'block' : 'hidden'}
+                required
+                label="Event date"
+                placeholder="Pick event date"
+                value={date}
+                onChange={(e) => setDateChange(e)}
+                minDate={new Date()}
+              />
+            </Col>
+            <Col>
+              <InputWrapper
+                label="Time Range"
+                required
+                className={customEvent ? 'block' : 'hidden'}
+              >
+                <div className="border-[#C3CAD1] border rounded">
+                  <TimePicker.RangePicker
+                    clearIcon
+                    bordered={false}
+                    defaultValue={[
+                      moment('09:00', 'HH:mm'),
+                      moment('17:00', 'HH:mm'),
+                    ]}
+                    format="HH:mm"
+                    showSecond={false}
+                    minuteStep={30}
+                    size={'large'}
+                    onCalendarChange={(values) => {
+                      const startHour = values?.[0]?.toDate();
+                      const endHour = values?.[1]?.toDate();
+                      setTimeRange([startHour!, endHour!]);
+                    }}
+                  ></TimePicker.RangePicker>
+                </div>
+              </InputWrapper>
+            </Col>
+          </Row>
+          <Row>
+            <Text color="warning" className={dtError ? 'block' : 'hidden'}>
+              Please specify a date and time range for your event
+            </Text>
           </Row>
           <Row>
             <button
