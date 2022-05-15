@@ -20,11 +20,11 @@ const FinalisedEventPage: NextPage = () => {
   const { user } = useAuth();
 
   // XXX:  Download the .ical file, manually create a DOM element and click it
-  const onClickAddToCalender = async () => {
+  const onClickAddToCalendar = async () => {
     const element = document.createElement('a');
     const userId = user?.uid as string;
-    const calender = await exportCalender(userId);
-    const file = new Blob([calender], {
+    const calendar = await exportCalender(userId);
+    const file = new Blob([calendar], {
       type: 'ical',
     });
     element.href = URL.createObjectURL(file);
@@ -81,7 +81,7 @@ const FinalisedEventPage: NextPage = () => {
                     filled: 'bg-[#FFDF74] hover:bg-[#FFDF74]',
                     label: 'text-black',
                   }}
-                  onClick={onClickAddToCalender}
+                  onClick={onClickAddToCalendar}
                 >
                   Export all events to calendar
                 </Button>
