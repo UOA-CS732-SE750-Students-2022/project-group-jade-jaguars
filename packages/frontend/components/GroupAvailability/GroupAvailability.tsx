@@ -235,14 +235,14 @@ function GroupAvailability(props: {
   return (
     <div className="m-[30px]">
       <div
-        className="grid h-[20px] ml-[30px]"
+        className="mb-3 grid h-[20px] ml-[45px]"
         style={{ gridTemplateColumns: 'repeat(' + numCols + ', 60px)' }}
       >
         {timeList.map((timeBracket, index) => {
           const startDate = new Date(timeBracket.startDate);
           return (
             <div
-              className="w-[60px] h-[20px] text-[12px] z-1 block text-black text-center"
+              className="w-[60px] h-[20px] text-[15px] z-1 block text-black text-center"
               key={index}
             >
               {startDate.getDate()}/{startDate.getMonth() + 1}
@@ -257,7 +257,7 @@ function GroupAvailability(props: {
         >
           {hourList.map((hour, index) => (
             <div
-              className="w-[30px] h-[20px] text-[12px] z-1 block text-black text-center"
+              className="w-[30px] h-[20px] text-[15px] z-1 block text-black text-center"
               key={index}
             >
               {hour}
@@ -265,13 +265,13 @@ function GroupAvailability(props: {
           ))}
         </div>
         <div
-          className="grid m-0"
+          className="grid ml-4"
           style={{ gridTemplateColumns: 'repeat(' + numCols + ', 60px)' }}
         >
           {timeSlots.map((timeSlot, index) => (
             <div
               className={
-                'w-px-60 h-px-20 block border border-solid border-black z-1 ' +
+                'w-[61px] h-[28px] block border border-dotted border-darkgrey z-1 ' +
                 (() => {
                   if (timeSlot.percentAvailable === 0) {
                     return 'bg-white';
