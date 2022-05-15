@@ -19,7 +19,7 @@ import {
 import { TimeOptionsList } from '../../components/TimeOptionsList/TimeOptionsList';
 import { getTZDate } from '../../helpers/timeFormatter';
 import { DatePicker } from '@mantine/dates';
-import { Grid, InputWrapper } from '@mantine/core';
+import { Container, Grid, InputWrapper } from '@mantine/core';
 import { TimePicker } from 'antd';
 import moment from 'moment';
 
@@ -158,141 +158,145 @@ const TimeFinalisation: NextPage = () => {
   };
 
   return (
-    <div>
-      <Row>
-        <h1 className="mr-[30px] my-0 leading-none">
-          Finalise your event time!
-        </h1>
-      </Row>
-      <Row align="baseline" className="mb-[10px]">
-        <h1 className="mr-[30px] my-0 leading-none mt-[10px]">{eventTitle}</h1>
-      </Row>
-      <Row gap={1}>
-        <Col>
-          <Row>
-            <Col>
-              <h2>Group Availability</h2>
-            </Col>
-            <Col>
+    <Container>
+      <div className="flex flex-col w-full justify-center py-28 items-center">
+        <Row>
+          <h1 className="mr-[30px] my-0 leading-none">
+            Finalise your event time!
+          </h1>
+        </Row>
+        <Row align="baseline" className="mb-[30px]">
+          <p className="mr-[30px] text-[28px] my-0 font-medium leading-none mt-[40px]">
+            <span className="text-lg font-normal">Event name: </span>
+            {eventTitle}
+          </p>
+        </Row>
+        <Row gap={1}>
+          <Col>
+            <div className="flex flex-row justify-between w-[68%]">
+              <h2 className="text-xl ml-16">Group Availability</h2>
+
               <h2 className="ml-[50px]">{allAvailabilities.length}</h2>
-            </Col>
-          </Row>
-          <Row>
-            <Col>
-              <GroupAvailability
-                timeOptions={timeOptions}
-                availabilities={allAvailabilities}
-                pageNum={pageNum}
-                onHover={handleHover}
-              />
-            </Col>
-            <Col>
-              {info.flatMap((val) => {
-                return val;
-              })}
-            </Col>
-          </Row>
-          <Row>
-            <button
-              className={
-                'bg-secondary text-black w-[30px] cursor-pointer rounded-md px-2 py-1 font-semibold hover:bg-secondarylight absolute right-[70px] ' +
-                (pageNum > 1 ? 'block' : 'hidden')
-              }
-              onClick={() => handlePageChange(pageNum - 1)}
-            >
-              {'<'}
-            </button>
-            <button
-              className={
-                'bg-secondary text-black w-[30px] cursor-pointer rounded-md px-2 py-1 font-semibold hover:bg-secondarylight absolute right-0 mr-[30px] ' +
-                (pageNum < numPages ? 'block' : 'hidden')
-              }
-              onClick={() => handlePageChange(pageNum + 1)}
-            >
-              {'>'}
-            </button>
-          </Row>
-        </Col>
-        <Col>
-          Options
-          <Row>
-            <TimeOptionsList
-              options={potentialTimes}
-              setCheckedTime={setSelectedTimes}
-            />
-          </Row>
-          <Row className="mt-[15px]">
-            <button
-              className={
-                'bg-secondary text-black w-[180px] cursor-pointer rounded-md px-2 py-1 font-semibold hover:bg-secondarylight absolute'
-              }
-              onClick={() => setCustomEvent(!customEvent)}
-            >
-              Custom Event Time
-            </button>
-          </Row>
-          <Row className="max-w-[400px] mt-[30px]">
-            <Col>
-              <DatePicker
-                classNames={{
-                  input: 'py-[20.5px] text-[16px]',
-                }}
-                className={customEvent ? 'block' : 'hidden'}
-                required
-                label="Event date"
-                placeholder="Pick event date"
-                value={date}
-                onChange={(e) => setDateChange(e)}
-                minDate={new Date()}
-              />
-            </Col>
-            <Col>
-              <InputWrapper
-                label="Time Range"
-                required
-                className={customEvent ? 'block' : 'hidden'}
-              >
-                <div className="border-[#C3CAD1] border rounded">
-                  <TimePicker.RangePicker
-                    clearIcon
-                    bordered={false}
-                    defaultValue={[
-                      moment('09:00', 'HH:mm'),
-                      moment('17:00', 'HH:mm'),
-                    ]}
-                    format="HH:mm"
-                    showSecond={false}
-                    minuteStep={30}
-                    size={'large'}
-                    onCalendarChange={(values) => {
-                      const startHour = values?.[0]?.toDate();
-                      const endHour = values?.[1]?.toDate();
-                      setTimeRange([startHour!, endHour!]);
-                    }}
-                  ></TimePicker.RangePicker>
+            </div>
+            <Row>
+              <Col>
+                <GroupAvailability
+                  timeOptions={timeOptions}
+                  availabilities={allAvailabilities}
+                  pageNum={pageNum}
+                  onHover={handleHover}
+                />
+              </Col>
+              <Col>
+                <div className="w-[200px]">
+                  {info.flatMap((val) => {
+                    return val;
+                  })}
                 </div>
-              </InputWrapper>
-            </Col>
-          </Row>
-          <Row>
-            <Text color="warning" className={dtError ? 'block' : 'hidden'}>
-              Please specify a date and time range for your event
-            </Text>
-          </Row>
-          <Row>
-            <button
-              className={
-                'bg-secondary text-black w-[100px] cursor-pointer rounded-md px-2 py-1 font-semibold hover:bg-secondarylight absolute right-0 mr-[120px] mt-[55px] ' +
-                (selectedTimes ? 'block' : 'hidden')
-              }
-              onClick={() => confirmSelection()}
-            >
-              Confirm {'>'}
-            </button>
-          </Row>
-        </Col>
-      </Row>
-    </div>
+              </Col>
+            </Row>
+            <Row>
+              <button
+                className={
+                  'bg-secondary text-black w-[30px] cursor-pointer rounded-md px-2 py-1 font-semibold hover:bg-secondarylight absolute right-[80px] ' +
+                  (pageNum > 1 ? 'block' : 'hidden')
+                }
+                onClick={() => handlePageChange(pageNum - 1)}
+              >
+                {'<'}
+              </button>
+              <button
+                className={
+                  'bg-secondary text-black w-[30px] cursor-pointer rounded-md px-2 py-1 font-semibold hover:bg-secondarylight absolute right-0 mr-[30px] ' +
+                  (pageNum < numPages ? 'block' : 'hidden')
+                }
+                onClick={() => handlePageChange(pageNum + 1)}
+              >
+                {'>'}
+              </button>
+            </Row>
+          </Col>
+          <Col>
+            <p className="font-medium text-xl">Options</p>
+            <Row>
+              <TimeOptionsList
+                options={potentialTimes}
+                setCheckedTime={setSelectedTimes}
+              />
+            </Row>
+            <Row className="mt-[15px]">
+              <button
+                className={
+                  'bg-secondary text-black w-[180px] cursor-pointer rounded-md mt-2 px-2 py-2 font-base hover:bg-secondarylight absolute'
+                }
+                onClick={() => setCustomEvent(!customEvent)}
+              >
+                <p>Custom Event Time</p>
+              </button>
+            </Row>
+            <Row className="max-w-[400px] mt-[30px]">
+              <Col>
+                <DatePicker
+                  classNames={{
+                    input: 'py-[20.5px] text-[16px]',
+                  }}
+                  className={customEvent ? 'block' : 'hidden'}
+                  required
+                  label="Event date"
+                  placeholder="Pick event date"
+                  value={date}
+                  onChange={(e) => setDateChange(e)}
+                  minDate={new Date()}
+                />
+              </Col>
+              <Col>
+                <InputWrapper
+                  label="Time Range"
+                  required
+                  className={customEvent ? 'block' : 'hidden'}
+                >
+                  <div className="border-[#C3CAD1] border rounded">
+                    <TimePicker.RangePicker
+                      clearIcon
+                      bordered={false}
+                      defaultValue={[
+                        moment('09:00', 'HH:mm'),
+                        moment('17:00', 'HH:mm'),
+                      ]}
+                      format="HH:mm"
+                      showSecond={false}
+                      minuteStep={30}
+                      size={'large'}
+                      onCalendarChange={(values) => {
+                        const startHour = values?.[0]?.toDate();
+                        const endHour = values?.[1]?.toDate();
+                        setTimeRange([startHour!, endHour!]);
+                      }}
+                    ></TimePicker.RangePicker>
+                  </div>
+                </InputWrapper>
+              </Col>
+            </Row>
+            <Row>
+              <Text color="warning" className={dtError ? 'block' : 'hidden'}>
+                Please specify a date and time range for your event
+              </Text>
+            </Row>
+            <Row>
+              <button
+                className={
+                  'bg-secondary text-black w-[100px] cursor-pointer rounded-md px-2 py-3 font-medium hover:bg-secondarylight mr-[120px] mt-[55px] ' +
+                  (selectedTimes ? 'block' : 'hidden')
+                }
+                onClick={() => confirmSelection()}
+              >
+                <p>Confirm</p>
+              </button>
+            </Row>
+          </Col>
+        </Row>
+      </div>
+    </Container>
   );
 };
 
