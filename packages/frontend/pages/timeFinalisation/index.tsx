@@ -3,7 +3,7 @@ import { useRouter } from 'next/router';
 import { Row, Col, Text } from '@nextui-org/react';
 import { useState, useEffect } from 'react';
 import { AttendeeStatus } from '../../types/Availability';
-import GroupAvailability from '../../components/GroupAvailability';
+import GroupAvailability from '../../components/GroupAvailability/GroupAvailability';
 import { useAuth } from '../../src/context/AuthContext';
 import { AvailabilityStatusStrings } from '../../types/Availability';
 import {
