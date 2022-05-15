@@ -220,10 +220,7 @@ const Availability: NextPage = () => {
             <span className="font-normal text-[25px]">Event name: </span>
             {eventTitle}
           </h1>
-          <ShareLinkButton
-            eventLink={window.location.href}
-            text={window.location.href}
-          />
+          <ShareLinkButton eventLink={eventId} text={window.location.href} />
         </div>
 
         <div className="flex flex-row gap-20 ml-[150px] justify-center items-start">
