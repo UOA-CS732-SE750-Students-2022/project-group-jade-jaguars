@@ -62,101 +62,102 @@ const EventForm = ({
             />
           </Grid.Col>
           {!isEdit && teamData && (
-          <Grid.Col sm={4} mt={30} xs={12}>
-            <label
-              htmlFor="default-toggle"
-              className="inline-flex relative items-center cursor-pointer"
-            >
-              <input
-                type="checkbox"
-                value=""
-                id="default-toggle"
-                className="sr-only peer"
-                checked={form.values.newTeam}
-                onChange={(event) =>
-                  form.setFieldValue('newTeam', event.currentTarget.checked)
-                }
-              />
-              <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-0   rounded-full peer dark:bg-gray-300 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-primary"></div>
-              <span className="ml-3 text-sm font-medium text-black ">
-                New Team
-              </span>
-            </label>
-          </Grid.Col>)}
+            <Grid.Col sm={4} mt={30} xs={12}>
+              <label
+                htmlFor="default-toggle"
+                className="inline-flex relative items-center cursor-pointer"
+              >
+                <input
+                  type="checkbox"
+                  value=""
+                  id="default-toggle"
+                  className="sr-only peer"
+                  checked={form.values.newTeam}
+                  onChange={(event) =>
+                    form.setFieldValue('newTeam', event.currentTarget.checked)
+                  }
+                />
+                <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-0   rounded-full peer dark:bg-gray-300 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-primary"></div>
+                <span className="ml-3 text-sm font-medium text-black ">
+                  New Team
+                </span>
+              </label>
+            </Grid.Col>
+          )}
           {!isEdit && teamData && (
-          <Grid.Col sm={8} xs={12}>
-            {form.values.newTeam ? (
-              <div>
-                <TextInput
-                  required
-                  label="New Team Name"
-                  value={form.values.newTeamName}
-                  onChange={(e) =>
-                    form.setFieldValue('newTeamName', e.currentTarget.value)
-                  }
+            <Grid.Col sm={8} xs={12}>
+              {form.values.newTeam ? (
+                <div>
+                  <TextInput
+                    required
+                    label="New Team Name"
+                    value={form.values.newTeamName}
+                    onChange={(e) =>
+                      form.setFieldValue('newTeamName', e.currentTarget.value)
+                    }
+                  />
+                  <TextInput
+                    required
+                    label="New Team Description"
+                    value={form.values.newTeamDescription}
+                    onChange={(e) =>
+                      form.setFieldValue(
+                        'newTeamDescription',
+                        e.currentTarget.value,
+                      )
+                    }
+                  />
+                </div>
+              ) : (
+                <Select
+                  data={teamData.map((team) => team.label)}
+                  label="Select a Team"
+                  value={form.values.teamName}
+                  onChange={(e) => form.setFieldValue('teamName', e!)}
                 />
-                <TextInput
-                  required
-                  label="New Team Description"
-                  value={form.values.newTeamDescription}
-                  onChange={(e) =>
-                    form.setFieldValue(
-                      'newTeamDescription',
-                      e.currentTarget.value,
-                    )
-                  }
-                />
-              </div>
-            ) : (
-              <Select
-              data={teamData.map((team) => team.label)}
-                label="Select a Team"
-                value={form.values.teamName}
-                onChange={(e) => form.setFieldValue('teamName', e!)}
+              )}
+            </Grid.Col>
+          )}
+          {!isEdit && teamData && (
+            <Grid.Col sm={8} xs={12}>
+              <DateRangePicker
+                classNames={{
+                  input: 'py-[20.5px] text-[16px]',
+                }}
+                required
+                label="Date Range"
+                placeholder="Pick dates range"
+                value={form.values.dateRange}
+                onChange={(e) => form.setFieldValue('dateRange', [e[0], e[1]])}
+                minDate={new Date()}
               />
-            )}
-          </Grid.Col>
-           )}
-           {!isEdit && teamData && (
-          <Grid.Col sm={8} xs={12}>
-            <DateRangePicker
-              classNames={{
-                input: 'py-[20.5px] text-[16px]',
-              }}
-              required
-              label="Date Range"
-              placeholder="Pick dates range"
-              value={form.values.dateRange}
-              onChange={(e) => form.setFieldValue('dateRange', [e[0], e[1]])}
-              minDate={new Date()}
-            />
-          </Grid.Col>
-           )}
-           {!isEdit && teamData && (
-          <Grid.Col sm={4} xs={12}>
-            <InputWrapper label="Time Range" required>
-              <div className="border-[#C3CAD1] border rounded">
-                <TimePicker.RangePicker
-                  clearIcon
-                  bordered={false}
-                  defaultValue={[
-                    moment('09:00', 'HH:mm'),
-                    moment('17:00', 'HH:mm'),
-                  ]}
-                  format="HH:mm"
-                  showSecond={false}
-                  minuteStep={30}
-                  size={'large'}
-                  onCalendarChange={(values) => {
-                    const startHour = values?.[0]?.toDate();
-                    const endHour = values?.[1]?.toDate();
-                    form.setFieldValue('timeRange', [startHour!, endHour!]);
-                  }}
-                ></TimePicker.RangePicker>
-              </div>
-            </InputWrapper>
-          </Grid.Col>
-            )}
+            </Grid.Col>
+          )}
+          {!isEdit && teamData && (
+            <Grid.Col sm={4} xs={12}>
+              <InputWrapper label="Time Range" required>
+                <div className="border-[#C3CAD1] border rounded">
+                  <TimePicker.RangePicker
+                    clearIcon
+                    bordered={false}
+                    defaultValue={[
+                      moment('09:00', 'HH:mm'),
+                      moment('17:00', 'HH:mm'),
+                    ]}
+                    format="HH:mm"
+                    showSecond={false}
+                    minuteStep={30}
+                    size={'large'}
+                    onCalendarChange={(values) => {
+                      const startHour = values?.[0]?.toDate();
+                      const endHour = values?.[1]?.toDate();
+                      form.setFieldValue('timeRange', [startHour!, endHour!]);
+                    }}
+                  ></TimePicker.RangePicker>
+                </div>
+              </InputWrapper>
+            </Grid.Col>
+          )}
           <Grid.Col>
             <Textarea
               required
