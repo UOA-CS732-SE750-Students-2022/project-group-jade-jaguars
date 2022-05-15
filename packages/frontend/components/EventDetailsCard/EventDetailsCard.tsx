@@ -109,24 +109,28 @@ const EventDetailsCard = (props: EventDetailsCardInterface) => {
       <div id="participants" className="flex flex-col gap-3 mt-5">
         <p className="font-medium text-[18px]">Participants</p>
         <div className="flex flex-col w-56 overflow-scroll rounded-md h-52 ">
-          {participants.map((participant, index) => {
-            return (
-              <div
-                key={index}
-                onClick={() => onParticipantClick(participant)}
-                className="flex flex-row items-center gap-2 px-4 py-2 transition-colors rounded-lg cursor-pointer w-52 hover:bg-primary hover:text-white"
-              >
-                <Avatar
-                  pointer
-                  src={participant.profilePic}
-                  text={participant.name}
-                  bordered
-                  borderWeight="light"
-                />
-                <p>{participant.name}</p>
-              </div>
-            );
-          })}
+          {participants.length > 0 ? (
+            participants.map((participant, index) => {
+              return (
+                <div
+                  key={index}
+                  onClick={() => onParticipantClick(participant)}
+                  className="flex flex-row items-center gap-2 px-4 py-2 transition-colors rounded-lg cursor-pointer w-52 hover:bg-primary hover:text-white"
+                >
+                  <Avatar
+                    pointer
+                    src={participant.profilePic}
+                    text={participant.name}
+                    bordered
+                    borderWeight="light"
+                  />
+                  <p>{participant.name}</p>
+                </div>
+              );
+            })
+          ) : (
+            <div>No participants</div>
+          )}
         </div>
       </div>
     </div>

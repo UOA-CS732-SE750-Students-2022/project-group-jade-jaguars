@@ -29,6 +29,13 @@
   --font-black: 900;
 }
 
+html,
+body,
+p,
+span {
+  font-family: Poppins, 'sans-serif';
+}
+
 ::selection {
   background: var(--primary) !important;
 }

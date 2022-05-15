@@ -35,6 +35,25 @@ export const getData = async (url: string, payload?: any) => {
   return data;
 };
 
+export const getResponseStatus = async (url: string, payload?: any) => {
+  const status = await axios
+    .get(`${BASE_URL}${url}`, {
+      headers: await getHeaders(),
+      ...(payload && { params: payload }),
+    })
+    .then((response) => {
+      return response.status;
+    })
+    .catch((error) => {
+      if (!error?.response) {
+        throw new Error(
+          'The server is down at the moment, please try again later',
+        );
+      }
+    });
+  return status;
+};
+
 export const postData = async (url: string, payload?: any) => {
   const data = await axios
     .post(`${BASE_URL}${url}`, payload, {

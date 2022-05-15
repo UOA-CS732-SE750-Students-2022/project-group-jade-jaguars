@@ -10,6 +10,12 @@ interface EventCardInterface {
   description: string | undefined;
   onClick?: (props?: any) => void;
   onHover?: (props?: any) => void;
+  size: Sizes;
+}
+
+export enum Sizes {
+  small = 'sm',
+  large = 'lg',
 }
 
 /**
@@ -33,6 +39,7 @@ const EventCard = (props: EventCardInterface) => {
     timeRange,
     participants,
     description,
+    size,
     onClick,
     onHover,
   } = props;
@@ -41,15 +48,25 @@ const EventCard = (props: EventCardInterface) => {
     <div
       onClick={onClick}
       onMouseOver={onHover}
-      className="flex flex-col h-56 gap-1 px-10 py-8 transition-colors bg-white cursor-pointer select-none w-218 rounded-2xl hover:bg-primary hover:text-white"
+      className={`flex flex-col ${
+        size == Sizes.large
+          ? 'h-56 w-218 px-10 py-8 rounded-2xl bg-white'
+          : 'px-6 py-4 h-32 rounded-xl w-auto min-w-[100px] bg-cardgrey'
+      } justify-center gap-1 transition-colors cursor-pointer select-none hover:bg-primary hover:text-white`}
     >
       <div
         id="header"
         className="flex flex-row items-center justify-between mb-1 font-medium"
       >
-        <p className="text-[25px] flex-1 truncate ... mr-5">{title}</p>
+        <p
+          className={`${
+            size == Sizes.large ? 'text-[25px]' : 'text-xl'
+          }  flex-1 truncate ... mr-5`}
+        >
+          {title}
+        </p>
         <div>
-          {participants && (
+          {participants ? (
             <Avatar.Group
               count={
                 participants.length - 4 > 0
@@ -61,7 +78,7 @@ const EventCard = (props: EventCardInterface) => {
               {participants.slice(0, 4).map((participant, index) => (
                 <Avatar
                   key={index}
-                  size="md"
+                  size={`${size == Sizes.large ? 'md' : 'sm'}`}
                   pointer
                   text={participant.name}
                   src={participant.profilePic}
@@ -71,18 +88,36 @@ const EventCard = (props: EventCardInterface) => {
                 />
               ))}
             </Avatar.Group>
+          ) : (
+            <div>No participants yet</div>
           )}
         </div>
       </div>
-      <div id="date-time" className="text-lg font-normal">
-        <p>
-          {date?.toLocaleDateString()},{' '}
-          {`${timeRange[0].getHours()}:${timeRange[0].getMinutes()}`} -{' '}
-          {`${timeRange[1].getHours()}:${timeRange[1].getMinutes()}`} NZDT
-        </p>
+      <div
+        id="date-time"
+        className={`${
+          size == Sizes.large ? 'text-lg' : 'text-base'
+        } font-normal`}
+      >
+        <div>
+          {date ? (
+            <p>
+              {date.toLocaleDateString()},{' '}
+              {`${timeRange[0].getHours()}:${timeRange[0].getMinutes()}`} -{' '}
+              {`${timeRange[1].getHours()}:${timeRange[1].getMinutes()}`} NZDT
+            </p>
+          ) : (
+            <p>Date not available yet</p>
+          )}
+        </div>
       </div>
-      <div id="description" className="mt-3 text-base">
-        <p className="line-clamp-3">{description}</p>
+      <div
+        id="description"
+        className={`${size == Sizes.large ? 'mt-3' : ''} text-base`}
+      >
+        <p className="line-clamp-3">
+          {description ? description : 'No description'}
+        </p>
       </div>
     </div>
   );

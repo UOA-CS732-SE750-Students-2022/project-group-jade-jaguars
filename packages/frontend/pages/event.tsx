@@ -2,7 +2,7 @@ import { useForm } from '@mantine/hooks';
 import { Modal } from '@mantine/core';
 import type { NextPage } from 'next';
 import { useEffect, useState } from 'react';
-import EventCard from '../components/EventCard/EventCard';
+import EventCard, { Sizes } from '../components/EventCard/EventCard';
 import EventDetailsCard from '../components/EventDetailsCard/EventDetailsCard';
 import EventForm, { FormValues } from '../components/EventForm/EventForm';
 import {
@@ -154,6 +154,7 @@ const Event: NextPage = () => {
                   onClick={() => {
                     handleCardOnClick(event);
                   }}
+                  size={Sizes.large}
                 />
               );
             })

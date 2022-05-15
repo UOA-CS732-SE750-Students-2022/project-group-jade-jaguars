@@ -14,7 +14,7 @@ const CheckBoxList = () => {
     'Board Game Club',
     'Board Game Club',
   ];
-  const handleClick = (checked: boolean, label: string) => {
+  const handleClick = (checked: boolean, label: string, teamId: string) => {
     let temp;
     if (checked) {
       temp = [...checkedTeamList];
@@ -34,6 +34,7 @@ const CheckBoxList = () => {
             order={index}
             key={index}
             handleClick={handleClick}
+            teamId={''}
           />
         );
       })}
