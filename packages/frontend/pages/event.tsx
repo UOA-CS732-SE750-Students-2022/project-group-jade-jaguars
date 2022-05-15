@@ -4,7 +4,7 @@ import type { NextPage } from 'next';
 import { useEffect, useState } from 'react';
 import EventCard from '../components/EventCard/EventCard';
 import EventDetailsCard from '../components/EventDetailsCard/EventDetailsCard';
-import EventForm from '../components/EventForm';
+import EventForm from '../components/EventForm/EventForm';
 import {
   deleteEvent,
   getEventParticipants,
