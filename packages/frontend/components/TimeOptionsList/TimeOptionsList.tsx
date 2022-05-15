@@ -1,8 +1,8 @@
 import { ScrollArea } from '@mantine/core';
 import React, { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import { TimeOptionCheckBox } from './TimeOptionCheckBox';
-import { TimeBracket } from '../types/Event';
-import { formatTimeBracket, getTZDate } from '../helpers/timeFormatter';
+import { TimeBracket } from '../../types/Event';
+import { formatTimeBracket, getTZDate } from '../../helpers/timeFormatter';
 
 interface TimeOptionsListProp {
   options: TimeBracket[];

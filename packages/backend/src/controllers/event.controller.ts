@@ -19,6 +19,8 @@ import server from '../app';
 import { UserResponseDTO } from './user.controller';
 import { splitDays } from '../service/event.service';
 
+// DTO objects
+
 export interface CreateEventDTO {
   _id: string;
   title: string;
@@ -33,7 +35,7 @@ export interface CreateEventDTO {
   repeat?: boolean;
 }
 
-// Can change everything but the id
+// Hvae the ability to change everything but the id when updating an event
 export interface PatchEventDTO extends Partial<Omit<IEvent, '_id'>> {}
 
 export interface SearchEventDTO {
@@ -94,6 +96,7 @@ function eventDocToResponseDTO(eventDoc: any): EventResponseDTO {
   };
 }
 
+// Find an event by a eventId
 export async function getEventById(
   req: Request,
   res: Response<EventResponseDTO | string>,
@@ -120,6 +123,7 @@ export async function getEventById(
   }
 }
 
+// Create an event
 export async function createEvent(
   req: TypedRequestBody<CreateEventDTO>,
   res: Response<EventResponseDTO>,
@@ -176,6 +180,7 @@ export async function createEvent(
   }
 }
 
+// Chnage certain properties of an event
 export async function patchEventById(
   req: TypedRequestBody<PatchEventDTO>,
   res: Response<EventResponseDTO | string>,
@@ -229,6 +234,7 @@ export async function patchEventById(
   }
 }
 
+// Remove an event
 export async function deleteEventById(req: Request, res: Response) {
   try {
     const eventId = req.params.eventId;
@@ -251,6 +257,7 @@ export async function deleteEventById(req: Request, res: Response) {
   }
 }
 
+// Search for an event
 export async function searchEvent(
   req: TypedRequestBody<SearchEventDTO>,
   res: Response<EventResponseDTO[] | string>,
@@ -397,6 +404,7 @@ export async function searchEvent(
   }
 }
 
+// Add a users availability to an event
 export async function addUserAvailabilityById(
   req: TypedRequestBody<AddUserAvailabilityDTO>,
   res: Response<EventResponseDTO | string>,
@@ -444,11 +452,8 @@ export async function addUserAvailabilityById(
       }
     }
 
-    console.log('formData');
-    console.log(formData);
+    // Split the times into individual days
     const timeList = splitDays(formData.startDate, formData.endDate);
-    console.log('after splitdays');
-    console.log(timeList);
 
     const userEventAvailabilityIndex =
       eventDoc.availability.attendeeAvailability.findIndex(
@@ -492,6 +497,7 @@ export async function addUserAvailabilityById(
   }
 }
 
+// Remove the users availability between two different dates (inclusive)
 export async function removeUserAvailabilityById(
   req: Request,
   res: Response<EventResponseDTO | string>,
@@ -627,6 +633,7 @@ export async function removeUserAvailabilityById(
   }
 }
 
+// Fetch a particular users availability
 export async function getEventUsersById(
   req: Request,
   res: Response<UserResponseDTO[] | string>,
@@ -677,6 +684,7 @@ export async function getEventUsersById(
   }
 }
 
+// FInalize the final time that the event will take place at
 export async function finalizeEventDate(req: Request, res: Response) {
   try {
     const eventId = req.params.eventId;

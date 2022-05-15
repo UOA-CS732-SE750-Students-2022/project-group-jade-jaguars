@@ -1,6 +1,6 @@
 export interface AvailabilityBlock {
-  startDate: number;
-  endDate: number;
+  startDate: Date | string;
+  endDate: Date | string;
   status: AvailabilityStatusStrings;
 }
 
