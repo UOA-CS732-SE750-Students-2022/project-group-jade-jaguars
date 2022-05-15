@@ -34,6 +34,11 @@ export const deleteUser = async (userId: string) => {
   return data;
 };
 
+export const getUserTeamsById = async (userId: string) => {
+  const data = await getData(`/user/${userId}/team`);
+  return data;
+};
+
 // event api calls
 
 export const getEvent = async (eventId: string) => {

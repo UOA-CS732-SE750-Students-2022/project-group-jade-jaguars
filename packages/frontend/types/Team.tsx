@@ -1,4 +1,7 @@
+import Member from './Member';
+
 export default interface Team {
+  _id?: string;
   title: string;
   description?: string;
 
@@ -6,4 +9,6 @@ export default interface Team {
   admin: string; // uuid
   members?: string[]; // uuid
   events?: string[]; // uuid
+
+  membersList?: Member[];
 }
