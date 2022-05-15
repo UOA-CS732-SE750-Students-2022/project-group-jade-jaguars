@@ -11,7 +11,6 @@ import {
   getUserResponseStatus,
   updateUser,
 } from '../helpers/apiCalls/apiCalls';
-import { getHeaders } from '../helpers/apiCalls/helpers';
 const Login: NextPage = () => {
   const { user, userId, authToken, login, signedIn, anonymousLogin } =
     useAuth();
