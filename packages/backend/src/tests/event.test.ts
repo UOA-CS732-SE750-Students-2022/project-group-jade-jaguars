@@ -54,13 +54,15 @@ describe('Events', () => {
         })
         .expect(StatusCodes.CREATED);
 
-      expect(
-        await EventModel.exists({ _id: createResponse.body.id }),
-      ).toBeTruthy();
+      const eventDoc = await EventModel.findById(createResponse.body.id);
+      expect(eventDoc).toBeTruthy();
 
       const userDoc = await UserModel.findById(userId);
       expect(userDoc.events).toHaveLength(1);
       expect(userDoc.events[0]).toBe(createResponse.body.id);
+
+      // Expect event to not repeat by default
+      expect(eventDoc.repeat).toBe(false);
     });
 
     it('Create event with team', async () => {
@@ -86,12 +88,12 @@ describe('Events', () => {
           startDate: new Date('1900'),
           endDate: new Date('2000'),
           team: teamDoc._id,
+          repeat: true,
         })
         .expect(StatusCodes.CREATED);
 
-      expect(
-        await EventModel.exists({ _id: createResponse.body.id }),
-      ).toBeTruthy();
+      const eventDoc = await EventModel.findById(createResponse.body.id);
+      expect(eventDoc).toBeTruthy();
 
       const userDoc = await UserModel.findById(userId);
       expect(userDoc.events).toHaveLength(1);
@@ -105,6 +107,9 @@ describe('Events', () => {
       teamDoc = await TeamModel.findById(teamDoc._id);
       expect(teamDoc.events).toHaveLength(1);
       expect(teamDoc.events[0]).toBe(createResponse.body.id);
+
+      // Event should be set to repeating
+      expect(eventDoc.repeat).toBe(true);
     });
 
     it('Patch', async () => {

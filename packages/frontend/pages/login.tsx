@@ -22,12 +22,14 @@ const Login: NextPage = () => {
       });
 
       if (response.status == 404) {
-        const nameArray = user!.displayName!.split(' ');
+        const nameArray = user?.displayName
+          ? user.displayName!.split(' ')
+          : ['Anonymous', 'User'];
         // Incase firstname or lastname isn't defined we set a default
         // TODO: Validation rules from backend require a length of atleast
         // ...for firstname and lastname, either backend changes these rules or frontend follow them
-        const firstName = nameArray[0] ?? 'Firstname';
-        const lastName = nameArray[1] ?? 'Lastname';
+        const firstName = nameArray[0];
+        const lastName = nameArray[1];
         const createUserResponse = await fetch(BASE_URL + '/user', {
           method: 'POST',
           headers: {

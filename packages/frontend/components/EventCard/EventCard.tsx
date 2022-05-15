@@ -1,15 +1,13 @@
 import React from 'react';
 import { Avatar } from '@nextui-org/react';
+import Member from '../../types/Member';
 
 interface EventCardInterface {
   title: string;
-  date: Date;
+  date: Date | undefined;
   timeRange: [Date, Date];
-  participants: {
-    name: string;
-    profilePic?: string;
-  }[];
-  description: string;
+  participants: Member[] | undefined;
+  description: string | undefined;
   onClick?: (props?: any) => void;
   onHover?: (props?: any) => void;
 }
@@ -49,32 +47,36 @@ const EventCard = (props: EventCardInterface) => {
         id="header"
         className="flex flex-row items-center justify-between mb-1 font-medium"
       >
-        <h1 className="text-2.5xl flex-1 truncate ... mr-5">{title}</h1>
+        <p className="text-[25px] flex-1 truncate ... mr-5">{title}</p>
         <div>
-          <Avatar.Group
-            count={
-              participants.length - 4 > 0 ? participants.length - 4 : undefined
-            }
-            animated={false}
-          >
-            {participants.slice(0, 4).map((participant, index) => (
-              <Avatar
-                key={index}
-                size="md"
-                pointer
-                text={participant.name}
-                src={participant.profilePic}
-                stacked
-                bordered
-                borderWeight={'light'}
-              />
-            ))}
-          </Avatar.Group>
+          {participants && (
+            <Avatar.Group
+              count={
+                participants.length - 4 > 0
+                  ? participants.length - 4
+                  : undefined
+              }
+              animated={false}
+            >
+              {participants.slice(0, 4).map((participant, index) => (
+                <Avatar
+                  key={index}
+                  size="md"
+                  pointer
+                  text={participant.name}
+                  src={participant.profilePic}
+                  stacked
+                  bordered
+                  borderWeight={'light'}
+                />
+              ))}
+            </Avatar.Group>
+          )}
         </div>
       </div>
       <div id="date-time" className="text-lg font-normal">
         <p>
-          {date.toLocaleDateString()},{' '}
+          {date?.toLocaleDateString()},{' '}
           {`${timeRange[0].getHours()}:${timeRange[0].getMinutes()}`} -{' '}
           {`${timeRange[1].getHours()}:${timeRange[1].getMinutes()}`} NZDT
         </p>

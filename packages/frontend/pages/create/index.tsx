@@ -6,7 +6,7 @@ import EventForm from '../../components/EventForm';
 import { useAuth } from '../../src/context/AuthContext';
 import { createTeam, createEvent } from '../../helpers/apiCalls/apiCalls';
 
-interface FormValues {
+export interface FormValues {
   title: string;
   dateRange: [Date | null, Date | null];
   timeRange: [Date, Date];
@@ -44,17 +44,16 @@ const CreateEventPage: NextPage = () => {
       recurring: false,
     },
   });
+  const BASE_URL =
+    process.env.NEXT_PUBLIC_SOCKET_URL! + process.env.NEXT_PUBLIC_BASE_URL!;
 
   useEffect(() => {
     const getTeamList = async () => {
-      const response = await fetch(
-        `http://149.28.170.219/api/v1/user/${userId}/team`,
-        {
-          headers: new Headers({
-            Authorization: 'Bearer ' + authToken,
-          }),
-        },
-      );
+      const response = await fetch(BASE_URL + `/user/${userId}/team`, {
+        headers: new Headers({
+          Authorization: 'Bearer ' + authToken,
+        }),
+      });
       const data = await response.json();
       const team = await data.teams.map((team: any) => {
         return { id: team._id, label: team.title };
@@ -88,6 +87,7 @@ const CreateEventPage: NextPage = () => {
       admin: userId,
       location: form.values.location,
       team: teamId ? teamId : undefined,
+      repeat: form.values.recurring,
     };
 
     const res = await createEvent(data);
@@ -111,11 +111,7 @@ const CreateEventPage: NextPage = () => {
       <h1>Create Event</h1>
       <Grid>
         <Grid.Col>
-          <EventForm
-            teamData={teamList}
-            form={form}
-            onCreateEvent={onCreateEvent}
-          />
+          <EventForm teamData={teamList} form={form} onSubmit={onCreateEvent} />
         </Grid.Col>
       </Grid>
     </Container>
