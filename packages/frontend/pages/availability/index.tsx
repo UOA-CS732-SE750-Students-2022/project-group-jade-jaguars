@@ -4,8 +4,8 @@ import { ShareLinkButton } from '../../components/ShareLinkButton';
 import { Row, Col } from '@nextui-org/react';
 import { useState, useEffect } from 'react';
 import { AttendeeStatus } from '../../types/Availability';
-import AvailabilitySelector from '../../components/AvailabilitySelector';
-import GroupAvailability from '../../components/GroupAvailability';
+import AvailabilitySelector from '../../components/AvailabilitySelector/AvailabilitySelector';
+import GroupAvailability from '../../components/GroupAvailability/GroupAvailability';
 import { useAuth } from '../../src/context/AuthContext';
 import {
   AvailabilityBlock,

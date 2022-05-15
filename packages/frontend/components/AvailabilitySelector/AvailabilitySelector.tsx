@@ -1,10 +1,9 @@
-import axios from 'axios';
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import {
   AvailabilityBlock,
   AvailabilityStatusStrings,
-} from '../types/Availability';
-import { TimeBracket } from '../types/Event';
+} from '../../types/Availability';
+import { TimeBracket } from '../../types/Event';
 
 /*
  *  Assumption: no more than 7 days sent through as timeOptions.
