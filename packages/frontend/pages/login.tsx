@@ -23,8 +23,6 @@ const Login: NextPage = () => {
 
   useEffect(() => {
     const checkUserOnMongo = async () => {
-      console.log('display name: ', user!.displayName);
-
       const userNameArray = user?.displayName
         ? user.displayName!.split(' ')
         : ['Anonymous', 'User'];
@@ -32,29 +30,28 @@ const Login: NextPage = () => {
       const lastName = userNameArray[1];
 
       const status = await getUserResponseStatus(userId);
-      console.log(status);
 
       if (status != 404) {
         const dbUser = await getUser(userId);
-        if (dbUser.firstName != firstName || dbUser.lastName != lastName) {
-          const res = await updateUser(userId, {
+        if (
+          (dbUser && dbUser.firstName != firstName) ||
+          (dbUser && dbUser.lastName != lastName)
+        ) {
+          await updateUser(userId, {
             firstName: firstName,
             lastName: lastName,
           });
-          console.log(res);
+        } else {
+          await createUser({
+            firstName: firstName,
+            lastName: lastName,
+          });
         }
       } else {
-        const res = await createUser({
-          // const nameArray = user!.displayName!.split(' ');
-          // // Incase firstname or lastname isn't defined we set a default
-          // // TODO: Validation rules from backend require a length of atleast
-          // // ...for firstname and lastname, either backend changes these rules or frontend follow them
-          // const firstName = nameArray[0] ?? 'Firstname';
-          // const lastName = nameArray[1] ?? 'Lastname';
+        await createUser({
           firstName: firstName,
           lastName: lastName,
         });
-        console.log(res);
       }
     };
     userId && checkUserOnMongo();
