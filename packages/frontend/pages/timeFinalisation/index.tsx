@@ -16,7 +16,7 @@ import {
   getUser,
   finaliseEventTime,
 } from '../../helpers/apiCalls/apiCalls';
-import { TimeOptionsList } from '../../components/TimeOptionsList';
+import { TimeOptionsList } from '../../components/TimeOptionsList/TimeOptionsList';
 import { getTZDate } from '../../helpers/timeFormatter';
 import { DatePicker } from '@mantine/dates';
 import { Grid, InputWrapper } from '@mantine/core';
