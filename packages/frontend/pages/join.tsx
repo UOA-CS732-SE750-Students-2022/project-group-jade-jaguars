@@ -1,25 +1,62 @@
-import { TextInput } from '@mantine/core';
+import {
+  Button,
+  Container,
+  Paper,
+  TextInput,
+  Grid,
+  Group,
+} from '@mantine/core';
+import { useForm } from '@mantine/hooks';
 import { NextPage } from 'next';
 import Router, { useRouter } from 'next/router';
 import React, { useState } from 'react';
 
 const JoinPage: NextPage = () => {
-  const [code, setCode] = useState('');
+  const form = useForm({
+    initialValues: {
+      code: '',
+    },
+  });
   const router = useRouter();
   const onClick = () => {
-    console.log(code);
     router.push({
       pathname: '/availability',
       query: {
-        eventId: code,
+        eventId: form.values.code,
       },
     });
   };
   return (
     <>
-      <h1>Enter your code</h1>
-      <input value={code} onChange={(e) => setCode(e.target.value)} />
-      <button onClick={onClick}>submit</button>
+      <Container mt={200}>
+        <h1>Enter your invitation code</h1>
+        <Paper p="xl" radius="md" withBorder>
+          <Grid>
+            <Grid.Col>
+              <TextInput
+                value={form.values.code}
+                placeholder="enter your code"
+                onChange={(e) =>
+                  form.setFieldValue('code', e.currentTarget.value)
+                }
+              />
+            </Grid.Col>
+            <Grid.Col>
+              <Group position="right" mt="lg">
+                <Button
+                  classNames={{
+                    filled: 'bg-[#FFDF74] hover:bg-[#FFDF74]',
+                    label: 'text-black',
+                  }}
+                  onClick={onClick}
+                >
+                  submit
+                </Button>
+              </Group>
+            </Grid.Col>
+          </Grid>
+        </Paper>
+      </Container>
     </>
   );
 };

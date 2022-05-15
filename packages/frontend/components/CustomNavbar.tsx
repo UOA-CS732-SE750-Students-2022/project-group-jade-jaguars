@@ -1,7 +1,12 @@
 import { Affix, Avatar, Button, Group, Image, Navbar } from '@mantine/core';
 import { useViewportSize } from '@mantine/hooks';
 import React, { useEffect, useState } from 'react';
-import { CalendarEvent, LayoutDashboard, Users } from 'tabler-icons-react';
+import {
+  CalendarEvent,
+  LayoutDashboard,
+  Users,
+  ArrowsJoin,
+} from 'tabler-icons-react';
 import { useAuth } from '../src/context/AuthContext';
 import { NavbarLink } from './NavbarLink';
 import { getAuth } from 'firebase/auth';
@@ -12,7 +17,7 @@ const linkData = [
   { icon: LayoutDashboard, label: 'Dashboard', address: '/dashboard' },
   { icon: CalendarEvent, label: 'Events', address: '/event' },
   { icon: Users, label: 'Teams', address: '/team' },
-  { icon: Users, label: 'Teams', address: '/join' },
+  { icon: ArrowsJoin, label: 'Join', address: '/join' },
 ];
 export const CustomNavbar = () => {
   const { height, width } = useViewportSize();

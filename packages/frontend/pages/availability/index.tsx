@@ -215,7 +215,7 @@ const Availability: NextPage = () => {
     <div>
       <Row align="baseline" className="mb-[10px]">
         <h1 className="mr-[30px] my-0 leading-none">{eventTitle}</h1>
-        <ShareLinkButton eventLink={'https://www.google.com/'} />
+        <ShareLinkButton eventLink={eventId} />
       </Row>
       <Row>
         <Col>
