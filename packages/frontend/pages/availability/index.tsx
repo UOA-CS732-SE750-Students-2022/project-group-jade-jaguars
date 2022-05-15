@@ -124,7 +124,7 @@ const Availability: NextPage = () => {
   const [info, setInfo] = useState<JSX.Element[]>([]);
 
   function finaliseTimes() {
-    io.disconnect();
+    io?.disconnect();
     router.push({
       pathname: '/timeFinalisation/',
       query: { eventId: eventId },
