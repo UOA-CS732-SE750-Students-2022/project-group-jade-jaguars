@@ -2,7 +2,7 @@ import { Button, Modal, Select, SelectItem, TextInput } from '@mantine/core';
 import { useForm } from '@mantine/hooks';
 import type { NextPage } from 'next';
 import { useEffect, useState } from 'react';
-import TeamCard from '../components/TeamCard';
+import TeamCard from '../components/TeamCard/TeamCard';
 import TeamDetailsCard from '../components/TeamDetailsCard/TeamDetailsCard';
 import {
   deleteTeam,
