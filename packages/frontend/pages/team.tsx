@@ -7,6 +7,7 @@ import TeamCard from '../components/TeamCard/TeamCard';
 import TeamDetailsCard from '../components/TeamDetailsCard/TeamDetailsCard';
 import {
   deleteTeam,
+  deleteUserFromTeam,
   getAllUsers,
   getUser,
   getUserTeamsById,
@@ -159,6 +160,12 @@ const Team: NextPage = () => {
     }
   };
 
+  const handleDeleteUser = async (user: User) => {
+    await deleteUserFromTeam(selectedTeam!._id!, user);
+    setEditTeamModalOpen(false);
+    refresh();
+  };
+
   return (
     <div className="flex flex-row gap-[2vw] w-full h-full p-10 bg-backgroundgrey">
       <section className="w-[50vw] max-w-[840px]">
@@ -192,8 +199,8 @@ const Team: NextPage = () => {
               }}
               deleteTeam={() => handleDeleteTeam(selectedTeam)}
               addUser={() => setAddMemberModalOpen(true)}
-              deleteUser={() => {
-                console.log('delete');
+              deleteUser={(user) => {
+                handleDeleteUser(user);
               }}
             />
           )}
