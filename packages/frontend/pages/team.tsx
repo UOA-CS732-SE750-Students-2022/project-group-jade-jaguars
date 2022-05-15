@@ -3,7 +3,7 @@ import { useForm } from '@mantine/hooks';
 import type { NextPage } from 'next';
 import { useEffect, useState } from 'react';
 import TeamCard from '../components/TeamCard';
-import TeamDetailsCard from '../components/TeamDetailsCard';
+import TeamDetailsCard from '../components/TeamDetailsCard/TeamDetailsCard';
 import {
   deleteTeam,
   getAllUsers,

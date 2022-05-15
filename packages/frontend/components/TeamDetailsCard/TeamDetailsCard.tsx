@@ -5,9 +5,9 @@ import { UserPlus, Edit, Trash } from 'tabler-icons-react';
 import { ActionIcon } from '@mantine/core';
 import styles from './TeamDetailsCard.module.css';
 import { MouseEventHandler } from 'react';
-import Team from '../types/Team';
-import DeleteIcon from '../assets/Delete.svg';
-import EditIcon from '../assets/Edit.svg';
+import DeleteIcon from '../../assets/Delete.svg';
+import EditIcon from '../../assets/Edit.svg';
+import Team from '../../types/Team';
 
 function TeamDetailsCard(props: {
   team: Team;
