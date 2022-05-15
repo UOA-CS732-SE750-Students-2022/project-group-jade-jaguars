@@ -2,7 +2,7 @@ import { Container, Grid } from '@mantine/core';
 import { useForm } from '@mantine/hooks';
 import { NextPage } from 'next';
 import React, { useEffect, useState } from 'react';
-import EventForm, { FormValues } from '../../components/EventForm';
+import EventForm from '../../components/EventForm';
 import { useAuth } from '../../src/context/AuthContext';
 import { createTeam, createEvent } from '../../helpers/apiCalls/apiCalls';
 import { EventResponseDTO } from '../../types/Event';
