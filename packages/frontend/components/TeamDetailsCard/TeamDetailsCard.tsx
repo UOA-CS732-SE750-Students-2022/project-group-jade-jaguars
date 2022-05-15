@@ -1,6 +1,6 @@
-import TeamDetails from '../types/TeamDetails';
+import TeamDetails from '../../types/TeamDetails';
 import { Card, Text, Row } from '@nextui-org/react';
-import MemberCard from './MemberCard';
+import MemberCard from '../MemberCard';
 import { UserPlus, Edit, Trash } from 'tabler-icons-react';
 import { ActionIcon } from '@mantine/core';
 import styles from './TeamDetailsCard.module.css';
