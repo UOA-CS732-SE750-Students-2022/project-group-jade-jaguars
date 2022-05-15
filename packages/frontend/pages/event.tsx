@@ -138,13 +138,6 @@ const Event: NextPage = () => {
     window.location.reload();
   };
 
-  const handleEventCardViewAvailability = (event: Event) => {
-    router.push({
-      pathname: '/availability/',
-      query: { eventId: event.id },
-    });
-  };
-
   return (
     <Container className="ml-[100px]">
       <div className="flex flex-row gap-[3vw] w-full h-full p-10 bg-backgroundgrey">

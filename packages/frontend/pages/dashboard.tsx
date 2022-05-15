@@ -224,13 +224,6 @@ const Dashboard: NextPage = () => {
     }
   };
 
-  const handleEventCardViewAvailability = (event: EventInterface) => {
-    router.push({
-      pathname: '/availability/',
-      query: { eventId: event.id },
-    });
-  };
-
   return (
     <Container className="ml-[100px] w-screen">
       <div className="w-[90vw] flex flex-row justify-start my-5">
