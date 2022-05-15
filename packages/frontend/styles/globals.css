@@ -6,9 +6,13 @@
 :root {
   /* colours */
   --primary: #99c08b;
+  --primary-tint: #b8d6ad;
+
   --primary-light: #eff5ed;
   --primary-dark: #768f6d;
   --secondary: #ffe074;
+  --secondary-tint: #ffeeb0;
+
   --secondary-light: #fff6d7;
   --highlight: #faf1e6;
   --backgroundgrey: #f9f9f9;
@@ -27,6 +31,11 @@
   --font-bold: 700;
   --font-extrabold: 800;
   --font-black: 900;
+}
+
+* {
+  transition: 100ms ease;
+  user-select: none;
 }
 
 html,
@@ -83,8 +92,7 @@ p {
 }
 
 .rbc-toolbar button:hover {
-  color: var(--dark) !important;
-  background-color: var(--secondary) !important;
+  background-color: var(--primary-tint) !important;
 }
 
 .rbc-toolbar button:focus {
@@ -97,7 +105,7 @@ p {
 .rbc-toolbar button.rbc-active:hover,
 .rbc-toolbar button.rbc-active:focus {
   color: var(--dark) !important;
-  background-color: var(--secondary) !important;
+  background-color: var(--secondary-tint) !important;
 }
 
 .rbc-toolbar button:active,
@@ -172,4 +180,25 @@ p {
 
 .rbc-show-more {
   color: var(--primary) !important;
+}
+
+div.cont {
+  position: relative;
+  width: 100%;
+}
+
+.swipe-in {
+  position: absolute;
+  top: 0;
+  right: 0;
+  height: 100%;
+  min-width: 0px;
+  background-color: var(--primary);
+  z-index: -1;
+  border-radius: 10px 0 0 10px;
+  transition: 400ms ease;
+}
+
+div.cont:hover .swipe-in {
+  min-width: 100%;
 }
