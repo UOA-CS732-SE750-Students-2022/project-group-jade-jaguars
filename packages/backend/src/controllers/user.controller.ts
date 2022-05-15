@@ -1,3 +1,4 @@
+import { IEvent } from './../schemas/event.schema';
 import { getFirebaseUser } from '../libs/middleware.lib';
 import { IUser, UserModel } from '../schemas/user.schema';
 import { Request, Response } from 'express';
@@ -221,31 +222,35 @@ export async function getUserCalendar(req: Request, res: Response) {
     const userId = req.params.userId;
 
     const userDoc = await UserModel.findOne({ _id: userId });
-    if (!userDoc) {
-      return returnError(Error('User Not Found'), res);
-    }
+    if (!userDoc) return returnError(Error('User Not Found'), res);
 
-    const events = userDoc.events;
-
+    // find all events for the user
     const eventDocs = await EventModel.find({
-      _id: { $in: events },
+      _id: { $in: userDoc.events },
     });
 
-    if (!eventDocs) return returnError(Error('Cannot Find User Events'), res);
+    // find all teams a user is part of
+    const teamDocs = await TeamModel.find({
+      $or: [{ admin: userId }, { members: userId }],
+    });
+
+    // find all events for all teams
+    const teamEventDocs = await EventModel.find({
+      _id: {
+        $in: teamDocs.reduce((acc, team) => {
+          return acc.concat(team.events);
+        }, []),
+      },
+    });
+
+    const allEvent: IEvent[] = eventDocs.concat(teamEventDocs);
 
     // convert to ical
-
     const calendar = ical({ name: 'Count Me In Calendar' });
-    const startTime = new Date();
-    const endTime = new Date();
-    endTime.setHours(startTime.getHours() + 1);
-
-    eventDocs.forEach((event) => {
-      console.log(event);
-
+    allEvent.forEach((event) => {
       calendar.createEvent({
-        start: startTime,
-        end: endTime,
+        start: new Date(event.startDate),
+        end: new Date(event.endDate),
         summary: event.title,
         description: event.description,
         location: event.location,

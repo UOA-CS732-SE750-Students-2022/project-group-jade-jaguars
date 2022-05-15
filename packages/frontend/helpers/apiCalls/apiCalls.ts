@@ -1,5 +1,9 @@
 import { deleteData, getData, patchData, postData, putData } from './helpers';
-import Event, { SearchEventPayload, TimeBracket } from '../../types/Event';
+import Event, {
+  EventPayload,
+  SearchEventPayload,
+  TimeBracket,
+} from '../../types/Event';
 import User from '../../types/User';
 import {
   AvailabilityConfirmation,
@@ -41,7 +45,7 @@ export const createEvent = async (payload: Event) => {
   return data;
 };
 
-export const updateEvent = async (eventId: string, payload: Event) => {
+export const updateEvent = async (eventId: string, payload: EventPayload) => {
   const data = await patchData(`/event/${eventId}`, payload);
   return data;
 };
@@ -56,6 +60,19 @@ export const searchEvent = async (payload: string) => {
     titleSubStr: payload,
   };
   const data = await postData(`/event/search`, dataPayload);
+  return data;
+};
+
+export const getEventsByUserId = async (payload: string) => {
+  const dataPayload = {
+    userId: payload,
+  };
+  const data = await postData(`/event/search`, dataPayload);
+  return data;
+};
+
+export const getEventParticipants = async (eventId: string | undefined) => {
+  const data = await getData(`/event/${eventId}/users`);
   return data;
 };
 

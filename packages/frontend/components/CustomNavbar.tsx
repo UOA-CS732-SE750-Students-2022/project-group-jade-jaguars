@@ -9,8 +9,8 @@ import { useRouter } from 'next/router';
 import { Logout, Plus } from 'tabler-icons-react';
 
 const linkData = [
-  { icon: LayoutDashboard, label: 'Dashboard', address: '/demo' },
-  { icon: CalendarEvent, label: 'Events', address: '/create' },
+  { icon: LayoutDashboard, label: 'Dashboard', address: '/' },
+  { icon: CalendarEvent, label: 'Events', address: '/event' },
   { icon: Users, label: 'Teams', address: '/finalised' },
 ];
 export const CustomNavbar = () => {

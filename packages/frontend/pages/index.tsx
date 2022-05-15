@@ -14,7 +14,7 @@ const Home: NextPage = () => {
   function eventAvailability() {
     router.push({
       pathname: '/availability/',
-      query: { eventId: 'c9200a22-a19e-43da-b03c-9e5e89bf3eda' },
+      query: { eventId: 'cfac6bcd-9411-406b-a8ea-7aa00e00439a' },
     });
   }
 

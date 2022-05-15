@@ -39,7 +39,7 @@ const Availability: NextPage = () => {
   const [pageNum, setPageNum] = useState<number>(1);
   const [numPages, setNumPages] = useState<number>(1);
 
-  const { userId } = useAuth();
+  const { userId, authToken } = useAuth();
   const [isAdmin, setIsAdmin] = useState<Boolean>(false);
 
   const router = useRouter();
@@ -47,7 +47,11 @@ const Availability: NextPage = () => {
     query: { eventId },
   } = router;
 
-  const io = socketio(SOCKET_URL!);
+  const io = socketio(SOCKET_URL, {
+    extraHeaders: {
+      Authorization: 'Bearer ' + authToken,
+    },
+  });
 
   async function fetchData() {
     let startDate = timeOptions.startDate;

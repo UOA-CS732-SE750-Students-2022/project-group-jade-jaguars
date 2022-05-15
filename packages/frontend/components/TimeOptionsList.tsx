@@ -32,7 +32,7 @@ export const TimeOptionsList = ({
 
   return (
     <div className="mt-[50px]">
-      <ScrollArea style={{ height: 300, width: 400 }}>
+      <ScrollArea style={{ maxHeight: 300, width: 400 }}>
         {stringOptions.map((option, index) => (
           <TimeOptionCheckBox
             onClick={() => {

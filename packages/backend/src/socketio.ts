@@ -1,5 +1,6 @@
 import http from 'http';
 import { Socket, Server } from 'socket.io';
+import { isSocketAuth } from './libs/middleware.lib';
 
 const corsOptions = {
   origin: '*',
@@ -11,6 +12,8 @@ class WebSocket {
 
   constructor(server: http.Server) {
     this.io = new Server(server, { cors: corsOptions });
+
+    this.io.use(isSocketAuth);
 
     this.io.on('connection', (socket: Socket) => {
       console.log('socketIO client connected');
