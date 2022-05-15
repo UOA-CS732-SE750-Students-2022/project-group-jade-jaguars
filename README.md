@@ -24,6 +24,12 @@ CountMeIn is a application for managing when teams of people should meet. Manage
 - Finalise your event with one of the potential times, the event is then added to your dashboard
 - Alternatively export the event using a .ical file and manually add it to a calendar of your choice
 
+## Live Version
+If you would like to visit a live version of the application please visit
+- Frontend: **https://countmein750.netlify.app/**
+- Backend: **https://countmein.etinaude.dev/**
+
+
 ## Setup
 
 In order to run the application the project must first be set up with valid environment files in each the frontend and the backend in order for the application to be able to launch. These files will be provided on submission as a zip file containing all the files that are needed. If you have any problem with setting up the project please feel free to message our team on discord using any of our [team member handles](#contributors)
