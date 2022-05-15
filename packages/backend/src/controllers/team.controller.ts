@@ -221,7 +221,7 @@ export async function removeMemberById(req: Request, res: Response) {
   try {
     const teamId = req.params.teamId;
     const userId = req.body.userId;
-    const rules = Joi.object<AddMemberDTO & { teamId: string }>({
+    const rules = Joi.object<RemoveMemberDTO & { teamId: string }>({
       teamId: validators.id().required(),
       userId: validators.id().required(),
     });
