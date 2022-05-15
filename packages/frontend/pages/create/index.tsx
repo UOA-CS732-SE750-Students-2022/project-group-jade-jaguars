@@ -113,13 +113,11 @@ const CreateEventPage: NextPage = () => {
     });
   };
   return (
-    <Container>
-      <h1>Create Event</h1>
-      <Grid>
-        <Grid.Col>
-          <EventForm teamData={teamList} form={form} onSubmit={onCreateEvent} />
-        </Grid.Col>
-      </Grid>
+    <Container className="flex flex-col w-screen h-screen">
+      <div className="flex flex-col h-full w-full items-center justify-center">
+        <h1 className="mb-6">Create an event</h1>
+        <EventForm teamData={teamList} form={form} onSubmit={onCreateEvent} />
+      </div>
     </Container>
   );
 };

@@ -23,8 +23,6 @@ const Login: NextPage = () => {
 
   useEffect(() => {
     const checkUserOnMongo = async () => {
-      console.log('display name: ', user!.displayName);
-
       const userNameArray = user?.displayName
         ? user.displayName!.split(' ')
         : ['Anonymous', 'User'];
@@ -32,29 +30,28 @@ const Login: NextPage = () => {
       const lastName = userNameArray[1];
 
       const status = await getUserResponseStatus(userId);
-      console.log(status);
 
       if (status != 404) {
         const dbUser = await getUser(userId);
-        if (dbUser.firstName != firstName || dbUser.lastName != lastName) {
-          const res = await updateUser(userId, {
+        if (
+          (dbUser && dbUser.firstName != firstName) ||
+          (dbUser && dbUser.lastName != lastName)
+        ) {
+          await updateUser(userId, {
             firstName: firstName,
             lastName: lastName,
           });
-          console.log(res);
+        } else {
+          await createUser({
+            firstName: firstName,
+            lastName: lastName,
+          });
         }
       } else {
-        const res = await createUser({
-          // const nameArray = user!.displayName!.split(' ');
-          // // Incase firstname or lastname isn't defined we set a default
-          // // TODO: Validation rules from backend require a length of atleast
-          // // ...for firstname and lastname, either backend changes these rules or frontend follow them
-          // const firstName = nameArray[0] ?? 'Firstname';
-          // const lastName = nameArray[1] ?? 'Lastname';
+        await createUser({
           firstName: firstName,
           lastName: lastName,
         });
-        console.log(res);
       }
     };
     userId && checkUserOnMongo();
@@ -63,48 +60,45 @@ const Login: NextPage = () => {
 
   return (
     <Container>
-      <nav className=" p-5">
-        <Group direction="row" align="center">
+      <div className="flex flex-col mt-[12vh] justify-center items-center">
+        <nav className="flex flex-row items-center h-20 mr-6 -mb-3 justify-center">
           <Image src="/logo.svg" width={70} height={70} />
-          <h1 className="mb-[-10px]">CountMeIn</h1>
-        </Group>
-      </nav>
-      <Grid align="center">
-        <Grid.Col md={12} lg={6}>
-          <span>
-            <Group direction="column" align={'center'}>
-              <Image
-                src="/landing-banner.svg"
-                alt="banner"
-                width={600}
-                height={400}
-              />
-              <a className="text-secondary" href="https://storyset.com/">
-                Illustrations by Storyset
-              </a>
-            </Group>
-          </span>
-        </Grid.Col>
-        <Grid.Col md={12} lg={6}>
-          <Group direction="column" align="center">
-            <h1>All events in one place.</h1>
-            <h1>Schedule events for teams.</h1>
+          <h1 className="mt-5 font-semibold">
+            Count<span className="text-primary">Me</span>In
+          </h1>
+        </nav>
+        <div className="flex flex-col items-center">
+          <Image
+            src="/landing-banner.svg"
+            alt="banner"
+            width={600}
+            height={400}
+          />
+          <div className="flex flex-col gap-2 items-center">
+            <p className="text-[30px] tracking-wide font-medium">Welcome!</p>
+            <p className="text-[20px] tracking-wide font-base">
+              Schedule events efficiently with CountMeIn!
+            </p>
+          </div>
+          <div className="mt-10 flex flex-col gap-4 items-center">
             <button
               onClick={login}
-              className="bg-primary px-20 py-2 rounded-md cursor-pointer text-white"
+              className="bg-primary px-3 py-3 w-[250px] rounded-lg cursor-pointer text-white"
             >
-              Login
+              <p className="text-md tracking-wider font-medium">Login</p>
             </button>
 
             <button
               onClick={anonymousLogin}
-              className="bg-primary px-10 py-2 rounded-md cursor-pointer text-white"
+              className="bg-primary px-5 py-3 w-[250px] rounded-lg cursor-pointer text-white"
             >
-              Continue without Login
+              <p className="text-md tracking-normal font-medium">
+                Continue without Login
+              </p>
             </button>
-          </Group>
-        </Grid.Col>
-      </Grid>
+          </div>
+        </div>
+      </div>
     </Container>
   );
 };

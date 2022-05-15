@@ -53,43 +53,44 @@ const FinalisedEventPage: NextPage = () => {
   }, []);
   return (
     <Container>
-      <h1>Your event is finalised!</h1>
-      <Box sx={{ maxWidth: 700 }} mx="auto">
-        <Paper p="xl" radius="md" withBorder>
-          <Grid className="m-[50px] text-center">
-            <Grid.Col>
-              <h2 className="text-7xl">{title}</h2>
-            </Grid.Col>
-            <Grid.Col>
-              <h3 className="text-bold text-2xl">{time}</h3>
-            </Grid.Col>
-            <Grid.Col>
-              <h4 className="italic text-md">{description}</h4>
-            </Grid.Col>
-            <Grid.Col>
-              {location != '' && (
-                <>
-                  <p className="mb-[-5px]">See you at</p>
-                  <h3 className="text-xl">{location}</h3>
-                </>
-              )}
-            </Grid.Col>
-            <Grid.Col>
-              <Group position="right" mt="lg">
-                <Button
-                  classNames={{
-                    filled: 'bg-[#FFDF74] hover:bg-[#FFDF74]',
-                    label: 'text-black',
-                  }}
-                  onClick={onClickAddToCalendar}
-                >
-                  Export all events to calendar
-                </Button>
-              </Group>
-            </Grid.Col>
-          </Grid>
-        </Paper>
-      </Box>
+      <div className="flex flex-col w-full justify-center py-28 items-center">
+        <h1>Your event is finalised!</h1>
+        <Box sx={{ maxWidth: 700 }} mx="auto">
+          <Paper p="xl" radius="md" withBorder>
+            <Grid className="m-[50px] text-center">
+              <Grid.Col>
+                <h2 className="text-[35px]">{title}</h2>
+              </Grid.Col>
+              <Grid.Col>
+                <h3 className="text-bold text-2xl">{time}</h3>
+              </Grid.Col>
+              <Grid.Col>
+                <h4 className="text-md">{description}</h4>
+              </Grid.Col>
+              <Grid.Col>
+                {location != '' && (
+                  <>
+                    <p className="mb-[-5px]">See you at</p>
+                    <h3 className="text-xl mt-2">{location}</h3>
+                  </>
+                )}
+              </Grid.Col>
+              <Grid.Col>
+                <Group position="center" mt="lg">
+                  <Button
+                    classNames={{
+                      filled: 'bg-[#FFDF74] hover:bg-[#FFDF74]',
+                      label: 'text-black',
+                    }}
+                  >
+                    <p className="font-medium text-md">Add to calendar</p>
+                  </Button>
+                </Group>
+              </Grid.Col>
+            </Grid>
+          </Paper>
+        </Box>
+      </div>
     </Container>
   );
 };

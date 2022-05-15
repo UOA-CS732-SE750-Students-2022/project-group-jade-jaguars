@@ -21,6 +21,7 @@ import {
   getUser,
 } from '../../helpers/apiCalls/apiCalls';
 import { getTZDate } from '../../helpers/timeFormatter';
+import { Container } from '@mantine/core';
 
 const SOCKET_URL = process.env.NEXT_PUBLIC_SOCKET_URL!;
 
@@ -212,117 +213,124 @@ const Availability: NextPage = () => {
   };
 
   return (
-    <div>
-      <Row align="baseline" className="mb-[10px]">
-        <h1 className="mr-[30px] my-0 leading-none">{eventTitle}</h1>
-        <ShareLinkButton eventLink={eventId} />
-      </Row>
-      <Row>
-        <Col>
-          <Row>
-            <Col>
-              <h2>Your Availability</h2>
-            </Col>
-            <Col>
-              <Row>
-                <button
-                  className={
-                    'bg-primary text-black border-2 w-[100px] cursor-pointer rounded-md px-2 py-1 font-semibold hover:bg-primarylight ' +
-                    (status === AvailabilityStatusStrings.Available
-                      ? 'border-black'
-                      : '')
-                  }
-                  onClick={() => setStatus(AvailabilityStatusStrings.Available)}
-                >
-                  Available
-                </button>
-              </Row>
-              <Row>
-                <button
-                  className={
-                    'bg-secondary text-black border-2 w-[100px] cursor-pointer rounded-md px-2 py-1 font-semibold hover:bg-secondarylight ' +
-                    (status === AvailabilityStatusStrings.Tentative
-                      ? 'border-black'
-                      : '')
-                  }
-                  onClick={() => setStatus(AvailabilityStatusStrings.Tentative)}
-                >
-                  Maybe
-                </button>
-              </Row>
-            </Col>
-          </Row>
-          <Row>
-            <AvailabilitySelector
-              timeOptions={timeOptions}
-              availability={myAvailability}
-              status={status}
-              pageNum={pageNum}
-              selectionHandler={handleSelection}
-              deletionHandler={handleDeletion}
-            />
-          </Row>
-          <Row>
-            <button
-              className={
-                'bg-secondary text-black w-[30px] cursor-pointer rounded-md px-2 py-1 font-semibold hover:bg-secondarylight absolute right-[70px] ' +
-                (pageNum > 1 ? 'block' : 'hidden')
-              }
-              onClick={() => handlePageChange(pageNum - 1)}
-            >
-              {'<'}
-            </button>
-            <button
-              className={
-                'bg-secondary text-black w-[30px] cursor-pointer rounded-md px-2 py-1 font-semibold hover:bg-secondarylight absolute right-0 mr-[30px] ' +
-                (pageNum < numPages ? 'block' : 'hidden')
-              }
-              onClick={() => handlePageChange(pageNum + 1)}
-            >
-              {'>'}
-            </button>
-          </Row>
-        </Col>
-        <Col>
-          <Row>
-            <Col>
-              <h2 className="mb-[35px]">Group Availability</h2>
-            </Col>
-            <Col>
-              <h2 className="ml-[50px]">
-                {isAvailabilityEmpty() ? '0' : allAvailabilities.length}
-              </h2>
-            </Col>
-          </Row>
-          <Row>
-            <Col>
+    <Container>
+      <div className="flex flex-col w-full gap-20 justify-center py-28 items-center">
+        <div className="mb-[10px] flex flex-row gap-10 w-full justify-start mr-52">
+          <h1 className="mr-[30px] my-0 leading-none">
+            <span className="font-normal text-[25px]">Event name: </span>
+            {eventTitle}
+          </h1>
+          <ShareLinkButton
+            eventLink={window.location.href}
+            text={window.location.href}
+          />
+        </div>
+
+        <div className="flex flex-row gap-20 ml-[150px] justify-center items-start">
+          <section className="w-[500px]">
+            <div>
+              <div className="flex flex-row items-center ml-14 w-[84%] justify-between">
+                <p className="font-medium text-xl">Your Availability</p>
+                <div className="flex flex-row gap-2">
+                  <button
+                    className={
+                      'bg-primary text-black w-[100px] cursor-pointer text-sm rounded-lg px-2 py-2 font-medium hover:bg-primarylight ' +
+                      (status === AvailabilityStatusStrings.Available
+                        ? 'border-black'
+                        : '')
+                    }
+                    onClick={() =>
+                      setStatus(AvailabilityStatusStrings.Available)
+                    }
+                  >
+                    <p>Available</p>
+                  </button>
+                  <button
+                    className={
+                      'bg-secondary text-black w-[100px] cursor-pointer text-sm rounded-lg px-2 py-2 font-medium hover:bg-secondarylight ' +
+                      (status === AvailabilityStatusStrings.Tentative
+                        ? 'border-black'
+                        : '')
+                    }
+                    onClick={() =>
+                      setStatus(AvailabilityStatusStrings.Tentative)
+                    }
+                  >
+                    <p>Maybe</p>
+                  </button>
+                </div>
+              </div>
+              <div className="flex flex-col items-center w-[500px]">
+                <AvailabilitySelector
+                  timeOptions={timeOptions}
+                  availability={myAvailability}
+                  status={status}
+                  pageNum={pageNum}
+                  selectionHandler={handleSelection}
+                  deletionHandler={handleDeletion}
+                />
+                <div className="flex flex-row ml-5 w-[84%] justify-between">
+                  <button
+                    className={
+                      'bg-secondary text-black w-[30px] cursor-pointer rounded-md px-2 py-1 font-semibold hover:bg-secondarylight' +
+                      (pageNum > 1 ? 'block' : 'hidden')
+                    }
+                    onClick={() => handlePageChange(pageNum - 1)}
+                  >
+                    {'<'}
+                  </button>
+                  <button
+                    className={
+                      'bg-secondary text-black w-[30px] cursor-pointer rounded-md px-2 py-1 font-semibold hover:bg-secondarylight' +
+                      (pageNum < numPages ? 'block' : 'hidden')
+                    }
+                    onClick={() => handlePageChange(pageNum + 1)}
+                  >
+                    {'>'}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section className="flex flex-row gap-5">
+            <div>
+              <div className="flex flex-row ml-14 w-[84%] justify-between">
+                <h2 className="font-medium text-xl">Group Availability</h2>
+                <h2 className="ml-[50px]">
+                  {isAvailabilityEmpty() ? '0' : allAvailabilities.length}
+                </h2>
+              </div>
+
               <GroupAvailability
                 timeOptions={timeOptions}
                 availabilities={allAvailabilities}
                 pageNum={pageNum}
                 onHover={handleHover}
               />
-            </Col>
-            <Col>
+
+              <div className="flex flex-col items-end justify-end mr-7">
+                <button
+                  className={
+                    'bg-secondary text-black w-[100px] cursor-pointer rounded-md px-2 py-3 font-medium hover:bg-secondarylight' +
+                    (isAdmin && !isAvailabilityEmpty() ? 'block' : 'hidden')
+                  }
+                  onClick={() => finaliseTimes()}
+                >
+                  <p>Finalise</p>
+                </button>
+              </div>
+            </div>
+
+            <div className="w-[200px] h-fit max-h-[500px] overflow-scroll">
               {info.flatMap((val) => {
                 return val;
               })}
-            </Col>
-          </Row>
-          <Row className="max-w-[400px]">
-            <button
-              className={
-                'bg-secondary text-black w-[100px] cursor-pointer rounded-md px-2 py-1 font-semibold hover:bg-secondarylight absolute right-0 ' +
-                (isAdmin && !isAvailabilityEmpty() ? 'block' : 'hidden')
-              }
-              onClick={() => finaliseTimes()}
-            >
-              Finalise {'>'}
-            </button>
-          </Row>
-        </Col>
-      </Row>
-    </div>
+            </div>
+          </section>
+        </div>
+      </div>
+    </Container>
   );
 };
 

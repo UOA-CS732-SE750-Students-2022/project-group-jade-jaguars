@@ -57,6 +57,10 @@ p {
   margin-bottom: 0 !important;
 }
 
+.rbc-calendar {
+  width: 100vw;
+}
+
 .rbc-day-slot .rbc-time-slot {
   border: unset;
 }
@@ -64,6 +68,7 @@ p {
 .rbc-month-view,
 .rbc-time-view {
   border-radius: 10px;
+  background-color: white;
 }
 
 .rbc-btn-group {

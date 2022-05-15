@@ -328,14 +328,14 @@ function AvailabilitySelector(props: {
   return (
     <div className="m-[30px]">
       <div
-        className="grid h-[20px] ml-[30px]"
+        className="grid h-[20px] ml-[44px] mb-3"
         style={{ gridTemplateColumns: 'repeat(' + numCols + ', 60px)' }}
       >
         {timeList.map((timeBracket, index) => {
           const startDate = new Date(timeBracket.startDate);
           return (
             <div
-              className="w-[60px] h-[20px] text-[12px] z-1 block text-black text-center"
+              className="w-[60px] h-[20px] text-[15px] z-1 block text-black text-center"
               key={index}
             >
               {startDate.getDate()}/{startDate.getMonth() + 1}
@@ -350,7 +350,7 @@ function AvailabilitySelector(props: {
         >
           {hourList.map((hour, index) => (
             <div
-              className="w-[30px] h-[20px] text-[12px] z-1 block text-black text-center"
+              className="w-[30px] h-[20px] text-[15px] z-1 block text-black text-center"
               key={index}
             >
               {hour}
@@ -358,19 +358,19 @@ function AvailabilitySelector(props: {
           ))}
         </div>
         <div
-          className="grid m-0"
+          className="grid m-0 ml-3"
           style={{ gridTemplateColumns: 'repeat(' + numCols + ', 60px)' }}
         >
           {timeSlots.map((timeSlot, index) => (
             <div
               className={
-                'w-px-60 h-px-20 block border border-solid border-black z-1 ' +
+                'w-[61px] h-[28px] block border border-dotted border-darkgrey z-1 ' +
                 (() => {
                   if (
                     selection[index].status ===
                     AvailabilityStatusStrings.Available
                   ) {
-                    return 'bg-primary';
+                    return 'bg-primary border-cardgrey';
                   } else if (
                     selection[index].status ===
                     AvailabilityStatusStrings.Tentative

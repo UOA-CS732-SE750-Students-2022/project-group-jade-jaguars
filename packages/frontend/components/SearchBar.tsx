@@ -10,14 +10,14 @@ interface SearchBarProp {
 
 export const SearchBar = ({ value, setValue, getValue }: SearchBarProp) => {
   return (
-    <div className="border-2 w-fit rounded-lg pr-4 py-1">
+    <div className="w-fit rounded-lg bg-white pr-4 py-1">
       <Group>
         <input
           value={value}
           onChange={(e) => setValue(e.currentTarget.value)}
           type="search"
           placeholder="Search"
-          className="h-full w-[300px] border-1 pl-4 py-2 focus:outline-none "
+          className="h-full w-[300px] border-1 pl-5 py-3 rounded-lg focus:outline-none "
         />
         <button onClick={() => getValue(value)}>
           <Search strokeWidth={1} size={20} />
