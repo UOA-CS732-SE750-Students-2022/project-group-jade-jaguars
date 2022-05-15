@@ -439,19 +439,6 @@ export async function addUserAvailabilityById(
       return returnError(Error('Event Not Found'), res, StatusCodes.NOT_FOUND);
     }
 
-    // If the event has a team then only users belonging to that team can add availability
-    if (eventDoc.team) {
-      // All members of the team including the admin
-      const members = eventDoc.team.members + eventDoc.team.admin;
-      if (!members.includes(formData.userId)) {
-        return returnError(
-          Error('User Must Be Part Of Team To Add Availability'),
-          res,
-          StatusCodes.BAD_REQUEST,
-        );
-      }
-    }
-
     // Split the times into individual days
     const timeList = splitDays(formData.startDate, formData.endDate);
 
