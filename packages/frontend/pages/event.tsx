@@ -4,7 +4,7 @@ import type { NextPage } from 'next';
 import { useEffect, useState } from 'react';
 import EventCard from '../components/EventCard/EventCard';
 import EventDetailsCard from '../components/EventDetailsCard/EventDetailsCard';
-import EventForm from '../components/EventForm/EventForm';
+import EventForm, { FormValues } from '../components/EventForm/EventForm';
 import {
   deleteEvent,
   getEventParticipants,
@@ -14,7 +14,6 @@ import {
 import { useAuth } from '../src/context/AuthContext';
 import Event from '../types/Event';
 import Member from '../types/Member';
-import { FormValues } from './create';
 
 export interface EventUser {
   firstName: string;
@@ -46,6 +45,7 @@ const Event: NextPage = () => {
       newTeam: false,
       teamName: '',
       newTeamName: '',
+      newTeamDescription: '',
       recurring: false,
     },
   });

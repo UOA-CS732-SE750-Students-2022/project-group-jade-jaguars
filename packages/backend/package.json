@@ -7,13 +7,13 @@
   "main": "src/app.ts",
   "scripts": {
     "prebuild": "rimraf dist",
-    "build": "cross-env ENV_PATH=prod tsc",
-    "start": "cross-env ENV_PATH=dev ts-node ./src/app.ts",
+    "build": "tsc",
+    "start": "ts-node ./src/app.ts",
     "start:dev": "nodemon",
     "start:prod": "node dist/app",
-    "test": "cross-env ENV_PATH=test jest --runInBand --verbose --force-exit",
-    "test:dev": "cross-env ENV_PATH=test jest --runInBand --verbose --watch",
-    "coverage": "cross-env ENV_PATH=test nyc npm run test"
+    "test": "jest --runInBand --verbose --force-exit",
+    "test:dev": "jest --runInBand --verbose --watch",
+    "coverage": "nyc npm run test"
   },
   "dependencies": {
     "cors": "^2.8.5",

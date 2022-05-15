@@ -1,6 +1,7 @@
 import { deleteData, getData, patchData, postData, putData } from './helpers';
 import Event, {
   EventPayload,
+  EventResponseDTO,
   SearchEventPayload,
   TimeBracket,
 } from '../../types/Event';
@@ -9,7 +10,7 @@ import {
   AvailabilityConfirmation,
   AvailabilityPayload,
 } from '../../types/Availability';
-import Team from '../../types/Team';
+import Team, { UpdateTeamPayload } from '../../types/Team';
 
 // user api calls
 
@@ -33,6 +34,18 @@ export const deleteUser = async (userId: string) => {
   return data;
 };
 
+export const getUserTeamsById = async (userId: string) => {
+  if (userId) {
+    const data = await getData(`/user/${userId}/team`);
+    return data;
+  }
+};
+
+export const getAllUsers = async () => {
+  const data = await getData(`/users`);
+  return data;
+};
+
 // event api calls
 
 export const getEvent = async (eventId: string) => {
@@ -40,7 +53,9 @@ export const getEvent = async (eventId: string) => {
   return data;
 };
 
-export const createEvent = async (payload: Event) => {
+export const createEvent = async (
+  payload: Event,
+): Promise<EventResponseDTO> => {
   const data = await postData(`/event`, payload);
   return data;
 };
@@ -133,7 +148,10 @@ export const createTeam = async (payload: Team) => {
   return data;
 };
 
-export const updateTeam = async (teamId: string, payload: Team) => {
+export const updateTeam = async (
+  teamId: string,
+  payload: UpdateTeamPayload,
+) => {
   const data = await patchData(`/team/${teamId}`, payload);
   return data;
 };

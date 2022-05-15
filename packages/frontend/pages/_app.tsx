@@ -13,6 +13,7 @@ export default function App(props: AppProps) {
     <div className="bg-backgroundgrey">
       <Head>
         <title>Count Me In</title>
+        <link rel="icon" type="image/x-icon" href="/logo.svg" />
         <meta
           name="viewport"
           content="minimum-scale=1, initial-scale=1, width=device-width"
