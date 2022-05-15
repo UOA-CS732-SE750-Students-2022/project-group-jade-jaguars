@@ -213,14 +213,17 @@ const Availability: NextPage = () => {
   };
 
   return (
-    <Container className="">
+    <Container>
       <div className="flex flex-col w-full gap-20 justify-center py-28 items-center">
-        <div className="mb-[10px] flex flex-row gap-10 w-full ml-36 justify-center">
+        <div className="mb-[10px] flex flex-row gap-10 w-full justify-start mr-52">
           <h1 className="mr-[30px] my-0 leading-none">
             <span className="font-normal text-[25px]">Event name: </span>
             {eventTitle}
           </h1>
-          <ShareLinkButton eventLink={window.location.href} />
+          <ShareLinkButton
+            eventLink={window.location.href}
+            text={window.location.href}
+          />
         </div>
 
         <div className="flex flex-row gap-20 ml-[150px] justify-center items-start">
@@ -319,7 +322,7 @@ const Availability: NextPage = () => {
               </div>
             </div>
 
-            <div className="w-[200px]">
+            <div className="w-[200px] h-fit max-h-[500px] overflow-scroll">
               {info.flatMap((val) => {
                 return val;
               })}
