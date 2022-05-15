@@ -14,7 +14,7 @@ import {
 import { TimePicker } from 'antd';
 import moment from 'moment';
 import { UseForm } from '@mantine/hooks/lib/use-form/use-form';
-import Event from '../types/Event';
+import Event from '../../types/Event';
 interface FormValues {
   title: string;
   dateRange: [Date | null, Date | null];
