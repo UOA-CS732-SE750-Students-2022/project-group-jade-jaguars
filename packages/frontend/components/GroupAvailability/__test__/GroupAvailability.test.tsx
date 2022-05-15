@@ -1,42 +1,45 @@
 import { render, screen } from '@testing-library/react';
-import AvailabilitySelector from '../AvailabilitySelector';
+import GroupAvailability from '../GroupAvailability';
 import {
+  AttendeeStatus,
   AvailabilityBlock,
   AvailabilityStatusStrings,
 } from '../../../types/Availability';
-import { TimeBracket } from '../../../types/Event';
+import { TimeBracket, AttendeeAvailability } from '../../../types/Event';
 
-it('AvailabilitySelector details render and display correctly', async () => {
+it('GroupAvailability details render and display correctly', () => {
   // setup
   const timeOptions: TimeBracket = {
     startDate: new Date('2022-05-02T09:00:00.000+00:00'),
     endDate: new Date('2022-05-06T17:00:00.000+00:00'),
   };
 
-  const myAvailability: AvailabilityBlock[] = [
+  const allAvailabilities: AttendeeAvailability[] = [
     {
-      startDate: new Date('2022-05-02T09:30:00.000+00:00'),
-      endDate: new Date('2022-05-02T11:00:00.000+00:00'),
-      status: AvailabilityStatusStrings.Available,
+      attendee: '12345',
+      availability: [
+        {
+          startDate: new Date('2022-05-02T09:30:00.000+00:00'),
+          endDate: new Date('2022-05-02T11:00:00.000+00:00'),
+          status: AvailabilityStatusStrings.Available,
+        },
+      ],
+      confirmed: true,
     },
   ];
 
-  const handleFunctions = async (selection: {
-    startDate: Date;
-    endDate: Date;
-  }) => {
-    return true;
-  };
+  const handleHover = (info: {
+    people: AttendeeStatus[];
+    numPeople: number;
+  }) => {};
 
   // create a component with example props
   render(
-    <AvailabilitySelector
+    <GroupAvailability
       timeOptions={timeOptions}
-      availability={myAvailability}
-      status={AvailabilityStatusStrings.Available}
+      availabilities={allAvailabilities}
       pageNum={1}
-      selectionHandler={handleFunctions}
-      deletionHandler={handleFunctions}
+      onHover={handleHover}
     />,
   );
 

@@ -1,9 +1,9 @@
 import { useState, useEffect, useRef, MouseEventHandler } from 'react';
-import { AttendeeAvailability, TimeBracket } from '../types/Event';
+import { AttendeeAvailability, TimeBracket } from '../../types/Event';
 import {
   AttendeeStatus,
   AvailabilityStatusStrings,
-} from '../types/Availability';
+} from '../../types/Availability';
 
 /*
  *  Assumption: no more than 7 days sent through as timeOptions.
