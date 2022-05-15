@@ -14,6 +14,7 @@ import {
 import { useAuth } from '../src/context/AuthContext';
 import Event from '../types/Event';
 import Member from '../types/Member';
+import { useRouter } from 'next/router';
 
 export interface EventUser {
   firstName: string;
@@ -24,6 +25,7 @@ export interface EventUser {
 
 const Event: NextPage = () => {
   const { userId, signedIn } = useAuth();
+  const router = useRouter();
 
   const [selectedEvent, setSelectedEvent] = useState<Event>();
   const [displayDetail, setDisplayDetail] = useState<boolean>(false);
@@ -133,6 +135,13 @@ const Event: NextPage = () => {
     window.location.reload();
   };
 
+  const handleEventCardViewAvailability = (event: EventInterface) => {
+    router.push({
+      pathname: '/availability/',
+      query: { eventId: event.id },
+    });
+  };
+
   return (
     <div className="flex flex-row gap-[3vw] w-full h-full p-10 bg-backgroundgrey">
       <section className="w-fit">
@@ -153,6 +162,9 @@ const Event: NextPage = () => {
                   description={event.description}
                   onClick={() => {
                     handleCardOnClick(event);
+                  }}
+                  onViewAvailability={() => {
+                    handleEventCardViewAvailability(event);
                   }}
                   size={Sizes.large}
                 />
