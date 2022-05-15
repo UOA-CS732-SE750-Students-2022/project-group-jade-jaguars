@@ -1,10 +1,12 @@
+import Link from 'next/link';
 import { Paper, Grid, Box, Container, Group, Button } from '@mantine/core';
 import { NextPage } from 'next';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
-import { getEvent } from '../../helpers/apiCalls/apiCalls';
+import { exportCalender, getEvent } from '../../helpers/apiCalls/apiCalls';
 import Event from '../../types/Event';
 import { formatTimeBracket, getTZDate } from '../../helpers/timeFormatter';
+import { useAuth } from '../../src/context/AuthContext';
 
 const FinalisedEventPage: NextPage = () => {
   const router = useRouter();
@@ -15,6 +17,22 @@ const FinalisedEventPage: NextPage = () => {
   const [time, setTime] = useState<String>('');
   const [description, setDescription] = useState('');
   const [location, setLocation] = useState('');
+  const { user } = useAuth();
+
+  // XXX:  Download the .ical file, manually create a DOM element and click it
+  const onClickAddToCalendar = async () => {
+    const element = document.createElement('a');
+    const userId = user?.uid as string;
+    const calendar = await exportCalender(userId);
+    const file = new Blob([calendar], {
+      type: 'ical',
+    });
+    element.href = URL.createObjectURL(file);
+    element.download = 'Event.ical';
+    document.body.appendChild(element);
+    element.click();
+  };
+
   useEffect(() => {
     const getEventMethod = async () => {
       const data: Event = await getEvent(eventId!.toString());
@@ -63,8 +81,9 @@ const FinalisedEventPage: NextPage = () => {
                     filled: 'bg-[#FFDF74] hover:bg-[#FFDF74]',
                     label: 'text-black',
                   }}
+                  onClick={onClickAddToCalendar}
                 >
-                  Add to calendar
+                  Export all events to calendar
                 </Button>
               </Group>
             </Grid.Col>

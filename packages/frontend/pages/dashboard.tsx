@@ -224,6 +224,13 @@ const Dashboard: NextPage = () => {
     }
   };
 
+  const handleEventCardViewAvailability = (event: EventInterface) => {
+    router.push({
+      pathname: '/availability/',
+      query: { eventId: event.id },
+    });
+  };
+
   return (
     <div className="w-full h-screen overflow-hidden flex flex-row my-10">
       <section className="w-1/2 h-full flex flex-col justify-center p-10">
@@ -268,6 +275,9 @@ const Dashboard: NextPage = () => {
                       participants={event.participants}
                       description={event.description}
                       onClick={() => handleEventCardOnclick(event)}
+                      onViewAvailability={() =>
+                        handleEventCardViewAvailability(event)
+                      }
                     />
                   );
                 })
