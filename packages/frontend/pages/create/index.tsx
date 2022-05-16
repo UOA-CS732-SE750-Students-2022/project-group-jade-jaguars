@@ -24,10 +24,13 @@ const CreateEventPage: NextPage = () => {
   defaultStartTime.setHours(9, 0, 0, 0);
   defaultEndTime.setHours(17, 0, 0, 0);
 
+  const newDate = new Date();
+  newDate.setSeconds(0);
+
   const form = useForm<FormValues>({
     initialValues: {
       title: '',
-      dateRange: [new Date(), new Date()],
+      dateRange: [newDate, newDate],
       timeRange: [defaultStartTime, defaultEndTime],
       description: '',
       location: '',

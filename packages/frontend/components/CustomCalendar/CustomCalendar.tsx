@@ -52,7 +52,6 @@ const CustomCalendar = (props: CustomCalendarInterface) => {
   const [eventSelected, setEventSelected] = useState<EventInterface>();
 
   const onSelectEvent = (event: EventInterface) => {
-    console.log(event);
     setEventSelected(event);
     setModalOpen(true);
   };
