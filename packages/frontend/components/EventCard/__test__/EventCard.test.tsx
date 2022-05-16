@@ -1,5 +1,5 @@
 import { render, screen } from '@testing-library/react';
-import EventCard from '../EventCard';
+import EventCard, { Sizes } from '../EventCard';
 
 it('EventCard details render and display correctly', () => {
   // setup
@@ -20,6 +20,7 @@ it('EventCard details render and display correctly', () => {
       timeRange={[new Date('01/01/2022 13:30'), new Date('01/01/2022 15:30')]}
       participants={participants}
       description={'This is a description'}
+      size={Sizes.large}
     />,
   );
 
