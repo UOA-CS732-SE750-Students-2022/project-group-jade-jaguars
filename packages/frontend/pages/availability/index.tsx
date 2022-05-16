@@ -1,7 +1,6 @@
 import { NextPage } from 'next';
 import { useRouter } from 'next/router';
 import { ShareLinkButton } from '../../components/ShareLinkButton/ShareLinkButton';
-import { Row, Col } from '@nextui-org/react';
 import { useState, useEffect } from 'react';
 import { AttendeeStatus } from '../../types/Availability';
 import AvailabilitySelector from '../../components/AvailabilitySelector/AvailabilitySelector';
@@ -22,6 +21,8 @@ import {
 } from '../../helpers/apiCalls/apiCalls';
 import { getTZDate } from '../../helpers/timeFormatter';
 import { Container } from '@mantine/core';
+import LeftArrow from '../../assets/Left.svg';
+import RightArrow from '../../assets/Right.svg';
 
 const SOCKET_URL = process.env.NEXT_PUBLIC_SOCKET_URL!;
 
@@ -225,7 +226,7 @@ const Availability: NextPage = () => {
 
         <div className="flex flex-row gap-20 ml-[150px] justify-center items-start">
           <section className="w-[500px]">
-            <div>
+            <div className="w-full">
               <div className="flex flex-row items-center ml-14 w-[84%] justify-between">
                 <p className="font-medium text-xl">Your Availability</p>
                 <div className="flex flex-row gap-2">
@@ -267,30 +268,32 @@ const Availability: NextPage = () => {
                   deletionHandler={handleDeletion}
                 />
                 <div className="flex flex-row ml-5 w-[84%] justify-between">
-                  <button
-                    className={
-                      'bg-secondary text-black w-[30px] cursor-pointer rounded-md px-2 py-1 font-semibold hover:bg-secondarylight' +
-                      (pageNum > 1 ? 'block' : 'hidden')
-                    }
-                    onClick={() => handlePageChange(pageNum - 1)}
-                  >
-                    {'<'}
-                  </button>
-                  <button
-                    className={
-                      'bg-secondary text-black w-[30px] cursor-pointer rounded-md px-2 py-1 font-semibold hover:bg-secondarylight' +
-                      (pageNum < numPages ? 'block' : 'hidden')
-                    }
-                    onClick={() => handlePageChange(pageNum + 1)}
-                  >
-                    {'>'}
-                  </button>
+                  {pageNum > 1 && (
+                    <button
+                      className={
+                        'bg-secondary text-black w-[30px] cursor-pointer rounded-md flex items-center justify-center py-1 font-semibold hover:bg-secondarylight'
+                      }
+                      onClick={() => handlePageChange(pageNum - 1)}
+                    >
+                      <LeftArrow />
+                    </button>
+                  )}
+                  {pageNum < numPages && (
+                    <button
+                      className={
+                        'bg-secondary text-black w-[30px] cursor-pointer rounded-md pl-1 flex items-center justify-center py-1 font-semibold hover:bg-secondarylight'
+                      }
+                      onClick={() => handlePageChange(pageNum + 1)}
+                    >
+                      <RightArrow />
+                    </button>
+                  )}
                 </div>
               </div>
             </div>
           </section>
 
-          <section className="flex flex-row gap-5">
+          <section className="flex flex-row gap-5 justify-center w-[500px]">
             <div>
               <div className="flex flex-row ml-14 w-[84%] justify-between">
                 <h2 className="font-medium text-xl">Group Availability</h2>
