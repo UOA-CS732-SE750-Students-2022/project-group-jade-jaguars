@@ -11,6 +11,9 @@
   <a href="https://img.shields.io/badge/License-GPLv3-blue.svg">
     <img alt="Licence" src="https://img.shields.io/badge/License-GPLv3-blue.svg">
   </a>
+  <a href="https://lerna.js.org/">
+    <img alt="Lerna" src="https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg">
+  </a>
 </p>
 
 ## Features:
