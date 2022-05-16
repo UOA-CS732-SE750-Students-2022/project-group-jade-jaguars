@@ -1,4 +1,11 @@
-import { Button, Modal, Select, SelectItem, TextInput } from '@mantine/core';
+import {
+  Button,
+  Container,
+  Modal,
+  Select,
+  SelectItem,
+  TextInput,
+} from '@mantine/core';
 import { useForm } from '@mantine/hooks';
 import type { NextPage } from 'next';
 import { useRouter } from 'next/router';
@@ -167,144 +174,148 @@ const Team: NextPage = () => {
   };
 
   return (
-    <div className="flex flex-row gap-[2vw] w-full h-full p-10 bg-backgroundgrey">
-      <section className="w-[50vw] max-w-[840px]">
-        <h1>Teams</h1>
-        <div className="flex flex-row flex-wrap gap-8">
-          {!loading && teamsList != undefined ? (
-            Object.values(teamsList).map((team, index) => {
-              console.log(team.membersList);
-              return (
-                <TeamCard
-                  key={index}
-                  title={team.title}
-                  description={team.description}
-                  members={team.membersList}
-                  onClick={() => handleCardOnClick(team)}
+    <Container className="ml-[100px]">
+      <div className="flex flex-row gap-[2vw] w-screen h-full p-10 bg-backgroundgrey">
+        <section className="w-[50vw] max-w-[840px]">
+          <h1>Teams</h1>
+          <div className="flex flex-row flex-wrap gap-8">
+            {!loading && teamsList != undefined ? (
+              Object.values(teamsList).map((team, index) => {
+                console.log(team.membersList);
+                return (
+                  <TeamCard
+                    key={index}
+                    title={team.title}
+                    description={team.description}
+                    members={team.membersList}
+                    onClick={() => handleCardOnClick(team)}
+                  />
+                );
+              })
+            ) : (
+              <div>Loading ...</div>
+            )}
+          </div>
+        </section>
+        <section className="flex flex-auto w-fit">
+          <div className="fixed mt-16">
+            {!loading && selectedTeam && (
+              <TeamDetailsCard
+                team={selectedTeam}
+                editTeam={() => {
+                  setEditTeamModalOpen(true);
+                }}
+                deleteTeam={() => handleDeleteTeam(selectedTeam)}
+                addUser={() => setAddMemberModalOpen(true)}
+                deleteUser={() => {
+                  console.log('delete');
+                }}
+              />
+            )}
+          </div>
+        </section>
+        <section>
+          <Modal
+            centered
+            opened={editTeamModalOpen}
+            onClose={() => setEditTeamModalOpen(false)}
+            title={'Edit Team'}
+          >
+            <div className="my-3">
+              <div className="flex flex-col gap-3 mx-4">
+                <TextInput
+                  label="Team name"
+                  placeholder="Enter a team name"
+                  value={teamForm.values.title}
+                  onChange={(e) =>
+                    teamForm.setFieldValue('title', e.currentTarget.value)
+                  }
                 />
-              );
-            })
-          ) : (
-            <div>Loading ...</div>
-          )}
-        </div>
-      </section>
-      <section className="flex flex-auto w-fit">
-        <div className="fixed mt-16">
-          {!loading && selectedTeam && (
-            <TeamDetailsCard
-              team={selectedTeam}
-              editTeam={() => {
-                setEditTeamModalOpen(true);
-              }}
-              deleteTeam={() => handleDeleteTeam(selectedTeam)}
-              addUser={() => setAddMemberModalOpen(true)}
-              deleteUser={(user) => {
-                handleDeleteUser(user);
-              }}
-            />
-          )}
-        </div>
-      </section>
-      <section>
-        <Modal
-          centered
-          opened={editTeamModalOpen}
-          onClose={() => setEditTeamModalOpen(false)}
-          title={'Edit Team'}
-        >
-          <div className="my-3">
-            <div className="flex flex-col gap-3 mx-4">
-              <TextInput
-                label="Team name"
-                placeholder="Enter a team name"
-                value={teamForm.values.title}
-                onChange={(e) =>
-                  teamForm.setFieldValue('title', e.currentTarget.value)
-                }
-              />
-              <TextInput
-                label="Team description"
-                placeholder="Enter a team descriptoin"
-                value={teamForm.values.description}
-                onChange={(e) =>
-                  teamForm.setFieldValue('description', e.currentTarget.value)
-                }
-              />
-            </div>
-            <div className="mt-5 flex-1 flex flex-row justify-end mx-4">
-              <Button
-                classNames={{
-                  filled: 'bg-[#FFDF74] hover:bg-[#FFDF74]',
-                  label: 'text-black',
-                }}
-                onClick={() => handleEditSubmit(teamForm.values, selectedTeam)}
-              >
-                Done
-              </Button>
-            </div>
-          </div>
-        </Modal>
-
-        <Modal
-          opened={deleteTeamModalOpen}
-          onClose={() => setDeleteTeamModalOpen(false)}
-          centered
-          size={'sm'}
-        >
-          <div>
-            <p className=" text-xl font-medium text-center mx-8">
-              Are you sure to delete this team?
-            </p>
-            <div className="flex flex-row my-8 justify-center gap-5">
-              <button
-                className="py-2 px-3 rounded-md bg-secondary hover:bg-secondarylight"
-                onClick={() => {
-                  setDeleteTeamModalOpen(false);
-                }}
-              >
-                <span>Cancel</span>
-              </button>
-              <button
-                className="py-2 px-3 rounded-md bg-secondary hover:bg-secondarylight"
-                onClick={() => handleDeleteConfirm(selectedTeam!)}
-              >
-                <span>Confirm</span>
-              </button>
-            </div>
-          </div>
-        </Modal>
-
-        <Modal
-          centered
-          opened={addMemberModalOpen}
-          onClose={() => setAddMemberModalOpen(false)}
-          title={'Add Member'}
-        >
-          <div className="my-3">
-            <div className="flex flex-col gap-3 mx-4">
-              <Select
-                data={usersList!}
-                label="Select a user"
-                value={memberForm.values.userId}
-                onChange={(e) => memberForm.setFieldValue('userId', e!)}
-              />
-              <div className="mt-5 flex-1 flex flex-row justify-end">
+                <TextInput
+                  label="Team description"
+                  placeholder="Enter a team descriptoin"
+                  value={teamForm.values.description}
+                  onChange={(e) =>
+                    teamForm.setFieldValue('description', e.currentTarget.value)
+                  }
+                />
+              </div>
+              <div className="mt-5 flex-1 flex flex-row justify-end mx-4">
                 <Button
                   classNames={{
                     filled: 'bg-[#FFDF74] hover:bg-[#FFDF74]',
                     label: 'text-black',
                   }}
-                  onClick={() => handleAddMemberSubmit(memberForm.values)}
+                  onClick={() =>
+                    handleEditSubmit(teamForm.values, selectedTeam)
+                  }
                 >
                   Done
                 </Button>
               </div>
             </div>
-          </div>
-        </Modal>
-      </section>
-    </div>
+          </Modal>
+
+          <Modal
+            opened={deleteTeamModalOpen}
+            onClose={() => setDeleteTeamModalOpen(false)}
+            centered
+            size={'sm'}
+          >
+            <div>
+              <p className=" text-xl font-medium text-center mx-8">
+                Are you sure to delete this team?
+              </p>
+              <div className="flex flex-row my-8 justify-center gap-5">
+                <button
+                  className="py-2 px-3 rounded-md bg-secondary hover:bg-secondarylight"
+                  onClick={() => {
+                    setDeleteTeamModalOpen(false);
+                  }}
+                >
+                  <span>Cancel</span>
+                </button>
+                <button
+                  className="py-2 px-3 rounded-md bg-secondary hover:bg-secondarylight"
+                  onClick={() => handleDeleteConfirm(selectedTeam!)}
+                >
+                  <span>Confirm</span>
+                </button>
+              </div>
+            </div>
+          </Modal>
+
+          <Modal
+            centered
+            opened={addMemberModalOpen}
+            onClose={() => setAddMemberModalOpen(false)}
+            title={'Add Member'}
+          >
+            <div className="my-3">
+              <div className="flex flex-col gap-3 mx-4">
+                <Select
+                  data={usersList!}
+                  label="Select a user"
+                  value={memberForm.values.userId}
+                  onChange={(e) => memberForm.setFieldValue('userId', e!)}
+                />
+                <div className="mt-5 flex-1 flex flex-row justify-end">
+                  <Button
+                    classNames={{
+                      filled: 'bg-[#FFDF74] hover:bg-[#FFDF74]',
+                      label: 'text-black',
+                    }}
+                    onClick={() => handleAddMemberSubmit(memberForm.values)}
+                  >
+                    Done
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </Modal>
+        </section>
+      </div>
+    </Container>
   );
 };
 

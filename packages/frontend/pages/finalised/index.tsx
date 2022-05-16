@@ -53,12 +53,12 @@ const FinalisedEventPage: NextPage = () => {
   }, []);
   return (
     <Container>
-      <h1>Your event is finalised!</h1>
+      <h1 className="mt-20">Your event is finalised!</h1>
       <Box sx={{ maxWidth: 700 }} mx="auto">
         <Paper p="xl" radius="md" withBorder>
           <Grid className="m-[50px] text-center">
             <Grid.Col>
-              <h2 className="text-7xl">{title}</h2>
+              <h2 className="text-[35px]">{title}</h2>
             </Grid.Col>
             <Grid.Col>
               <h3 className="text-bold text-2xl">{time}</h3>

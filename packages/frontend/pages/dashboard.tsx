@@ -1,4 +1,4 @@
-import { Modal } from '@mantine/core';
+import { Container, Modal } from '@mantine/core';
 import type { NextPage } from 'next';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
@@ -224,160 +224,163 @@ const Dashboard: NextPage = () => {
     }
   };
 
-  const handleEventCardViewAvailability = (event: EventInterface) => {
-    router.push({
-      pathname: '/availability/',
-      query: { eventId: event.id },
-    });
-  };
-
   return (
-    <div className="w-full h-screen overflow-hidden flex flex-row my-10">
-      <section className="w-1/2 h-full flex flex-col justify-center p-10">
-        <div>
-          <SearchBar
-            value={searchValue}
-            setValue={setSearchValue}
-            getValue={(value) => {
-              handleSearch(value);
-            }}
-          />
-        </div>
-        <div className="h-[80vh] min-h-[500px] mt-10">
-          <CustomCalendar
-            events={eventsList ? eventsList : []}
-            onParticipantClick={() => console.log('clicked')}
-          />
-        </div>
-      </section>
-      <section className="w-1/2 h-full pr-10 py-10">
-        <div className="bg-white w-auto h-[52vh] min-w-[450px] min-h-[300px] rounded-xl p-10">
-          <div className="flex flex-row items-center justify-between">
-            <p className="font-medium text-[25px]">Upcomings</p>
-            <CustomButton
-              text="View All"
-              onClick={() => {
-                router.push('/event');
+    <Container className="ml-[100px] w-screen">
+      <div className="w-[90vw] flex flex-row justify-start my-5">
+        <section className="w-[50vw] min-w-[500px] h-full flex flex-col justify-start p-10">
+          <div>
+            <SearchBar
+              value={searchValue}
+              setValue={setSearchValue}
+              getValue={(value) => {
+                handleSearch(value);
               }}
             />
           </div>
-          <div className="my-6 flex flex-col gap-2 h-4/5 overflow-scroll">
-            {!loading ? (
-              eventsList && eventsList.length > 0 ? (
-                eventsList.slice(0, 10).map((event: EventInterface, index) => {
+          <div className="h-[79vh] min-h-[500px] w-full mt-10">
+            <CustomCalendar
+              events={eventsList ? eventsList : []}
+              onParticipantClick={() => console.log('clicked')}
+            />
+          </div>
+        </section>
+        <section className="w-[40vw] h-full pr-10 py-10">
+          <div className="bg-white w-auto h-[52vh] min-w-[450px] min-h-[300px] rounded-xl p-10">
+            <div className="flex flex-row items-center justify-between">
+              <p className="font-medium text-[25px]">Upcomings</p>
+              <CustomButton
+                text="View All"
+                onClick={() => {
+                  router.push('/event');
+                }}
+              />
+            </div>
+            <div className="my-6 flex flex-col gap-2 h-4/5 overflow-scroll">
+              {!loading ? (
+                eventsList && eventsList.length > 0 ? (
+                  eventsList
+                    .slice(0, 10)
+                    .map((event: EventInterface, index) => {
+                      return (
+                        <EventCard
+                          key={index}
+                          size={Sizes.small}
+                          title={event.title}
+                          date={event.date ? event.date : event.start}
+                          timeRange={[event.start, event.end]}
+                          participants={event.participants}
+                          description={event.description}
+                          onClick={() => handleEventCardOnclick(event)}
+                        />
+                      );
+                    })
+                ) : (
+                  <div>No events found, create one now!</div>
+                )
+              ) : (
+                <div>Loading ...</div>
+              )}
+            </div>
+          </div>
+          <div className="bg-white w-auto h-[30vh] mt-8 min-w-[450px] min-h-[320px] rounded-xl p-10">
+            <div className="flex flex-row items-center justify-between">
+              <p className="font-medium text-[25px]">Filter by teams</p>
+              <CustomButton
+                text="View All"
+                onClick={() => {
+                  router.push('/team');
+                }}
+              />
+            </div>
+            <div className="my-6 flex flex-col gap-2 h-3/4 overflow-scroll">
+              {teamsList &&
+                teamsList.map((team, index) => {
                   return (
-                    <EventCard
+                    <TeamCheckBox
                       key={index}
-                      size={Sizes.small}
-                      title={event.title}
-                      date={event.date ? event.date : event.start}
-                      timeRange={[event.start, event.end]}
-                      participants={event.participants}
-                      description={event.description}
-                      onClick={() => handleEventCardOnclick(event)}
-                      onViewAvailability={() =>
-                        handleEventCardViewAvailability(event)
-                      }
+                      initialChecked={initialChecked}
+                      handleClick={(checked, label, teamId) => {
+                        handleTeamEvent(checked, label, teamId);
+                        setInitialChecked(false);
+                      }}
+                      label={team.title}
+                      order={index}
+                      teamId={team._id!}
                     />
                   );
-                })
-              ) : (
-                <div>No events found, create one now!</div>
-              )
-            ) : (
-              <div>Loading ...</div>
-            )}
+                })}
+            </div>
           </div>
+        </section>
+        <div>
+          {eventSelected && (
+            <Modal
+              centered
+              opened={modalOpen}
+              onClose={() => setModalOpen(false)}
+              radius={'lg'}
+              size={'10'}
+            >
+              <div>
+                <EventDetailsCard
+                  isModal={true}
+                  title={eventSelected.title}
+                  date={
+                    eventSelected.date
+                      ? eventSelected.date
+                      : eventSelected.start
+                  }
+                  timeRange={[eventSelected.start, eventSelected.end]}
+                  description={
+                    eventSelected.description
+                      ? eventSelected.description
+                      : 'No description'
+                  }
+                  location={
+                    eventSelected.location
+                      ? eventSelected.location
+                      : 'No location'
+                  }
+                  participants={eventSelected.participants}
+                  onParticipantClick={() => {}}
+                />
+              </div>
+            </Modal>
+          )}
         </div>
-        <div className="bg-white w-auto h-[30vh] mt-8 min-w-[450px] min-h-[320px] rounded-xl p-10">
-          <div className="flex flex-row items-center justify-between">
-            <p className="font-medium text-[25px]">Filter by teams</p>
-            <CustomButton
-              text="View All"
-              onClick={() => {
-                router.push('/team');
-              }}
-            />
-          </div>
-          <div className="my-6 flex flex-col gap-2 h-3/4 overflow-scroll">
-            {teamsList &&
-              teamsList.map((team, index) => {
+        <Modal
+          centered
+          opened={searchPopUp}
+          onClose={() => setSearchPopUp(false)}
+          size={'800px'}
+          radius={'lg'}
+        >
+          <div className="flex flex-col gap-2 h-[80%] overflow-scroll">
+            <span className="text-xl font-medium mb-3 ml-2">
+              Search Results:{' '}
+            </span>
+            {searchEvents &&
+              searchEvents.map((event, index) => {
                 return (
-                  <TeamCheckBox
+                  <EventCard
                     key={index}
-                    initialChecked={initialChecked}
-                    handleClick={(checked, label, teamId) => {
-                      handleTeamEvent(checked, label, teamId);
-                      setInitialChecked(false);
+                    size={Sizes.small}
+                    title={event.title}
+                    date={event.date ? event.date : event.start}
+                    timeRange={[event.start, event.end]}
+                    participants={event.participants}
+                    description={event.description}
+                    onClick={() => {
+                      setModalOpen(true);
+                      setEventSelected(event);
                     }}
-                    label={team.title}
-                    order={index}
-                    teamId={team._id!}
                   />
                 );
               })}
           </div>
-        </div>
-      </section>
-      <div>
-        {eventSelected && (
-          <Modal
-            centered
-            opened={modalOpen}
-            onClose={() => setModalOpen(false)}
-            radius={'lg'}
-            size={'10'}
-          >
-            <div>
-              <EventDetailsCard
-                isModal={true}
-                title={eventSelected.title}
-                date={
-                  eventSelected.date ? eventSelected.date : eventSelected.start
-                }
-                timeRange={[eventSelected.start, eventSelected.end]}
-                description={
-                  eventSelected.description
-                    ? eventSelected.description
-                    : 'No description'
-                }
-                location={
-                  eventSelected.location
-                    ? eventSelected.location
-                    : 'No location'
-                }
-                participants={eventSelected.participants}
-                onParticipantClick={() => {}}
-              />
-            </div>
-          </Modal>
-        )}
+        </Modal>
       </div>
-      <Modal
-        centered
-        opened={searchPopUp}
-        onClose={() => setSearchPopUp(false)}
-        size={'800px'}
-      >
-        <div className="flex flex-col gap-2 h-[80%] overflow-scroll">
-          {searchEvents &&
-            searchEvents.map((event, index) => {
-              return (
-                <EventCard
-                  key={index}
-                  size={Sizes.small}
-                  title={event.title}
-                  date={event.date ? event.date : event.start}
-                  timeRange={[event.start, event.end]}
-                  participants={event.participants}
-                  description={event.description}
-                  onClick={() => {}}
-                />
-              );
-            })}
-        </div>
-      </Modal>
-    </div>
+    </Container>
   );
 };
 

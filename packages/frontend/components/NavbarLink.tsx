@@ -14,13 +14,16 @@ export const NavbarLink = ({
   onClick,
 }: NavbarLinkProps) => {
   return (
-    <div
-      onClick={onClick}
-      className={`w-full cursor-pointer flex items-center justify-center h-[80px] rounded-md hover:bg-[#99C08B] hover:text-white ${
-        active ? 'border-r-8 border-[#99C08B] text-[#99C08B]' : ''
-      }`}
-    >
-      <Icon />
+    <div className="cont">
+      <div
+        onClick={onClick}
+        className={`w-full cursor-pointer flex items-center justify-center h-[80px] rounded-md  hover:text-white ${
+          active ? 'border-r-8 border-[#99C08B] text-[#99C08B]' : ''
+        }`}
+      >
+        <Icon />
+      </div>
+      <div className="swipe-in"></div>
     </div>
   );
 };
