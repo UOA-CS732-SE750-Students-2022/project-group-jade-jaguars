@@ -11,6 +11,9 @@
   <a href="https://img.shields.io/badge/License-GPLv3-blue.svg">
     <img alt="Licence" src="https://img.shields.io/badge/License-GPLv3-blue.svg">
   </a>
+  <a href="https://lerna.js.org/">
+    <img alt="Lerna" src="https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg">
+  </a>
 </p>
 
 ## Features:
@@ -18,7 +21,7 @@
 CountMeIn is a application for managing when teams of people should meet. Manage multiple events with a dashboard to organise you life:
 
 - Create users through Google authentication
-- Create events that you can invite people to through a unique shareable URL
+- Create events that you can invite people to through a unique shareable code
 - Add your availability to an event, view other peoples availability in real time
 - Generate a list of potential times during which team members can go to the event
 - Finalise your event with one of the potential times, the event is then added to your dashboard
@@ -148,7 +151,7 @@ Run `npm test` in the project root to execute the unit tests via [Jest](https://
 
 ## Wiki
 
-The wiki can contains all meeting notes and major design decisions, rationale and project management information. The wiki can be found [here.](https://github.com/UOA-CS732-SE750-Students-2022/project-group-jade-jaguars/wiki).
+The wiki can contains all meeting notes and major design decisions, rationale and project management information. The wiki can be found [here](https://github.com/UOA-CS732-SE750-Students-2022/project-group-jade-jaguars/wiki).
 
 ## Contributors
 
