@@ -83,6 +83,12 @@ const Event: NextPage = () => {
     }
   }, [signedIn]);
 
+  // useEffect(() => {
+  //   if (userId) {
+  //     getEvents();
+  //   }
+  // },[editModalOpen])
+
   const handleCardOnClick = (event: Event) => {
     setSelectedEvent(event);
     setDisplayDetail(true);
@@ -101,7 +107,8 @@ const Event: NextPage = () => {
       await deleteEvent(selectedEvent.id);
     }
     setDeleteModalOpen(false);
-    refresh();
+    setDisplayDetail(false);
+    getEvents();
   };
 
   const handleEditSubmit = async (value: any) => {
@@ -128,14 +135,12 @@ const Event: NextPage = () => {
       delete payload.location;
     }
 
-    const res = await updateEvent(eventId, payload);
+    await updateEvent(eventId, payload);
     form.reset();
 
-    refresh();
-  };
+    setDisplayDetail(false);
 
-  const refresh = () => {
-    window.location.reload();
+    getEvents();
   };
 
   return (
@@ -145,25 +150,31 @@ const Event: NextPage = () => {
           <h1>Events</h1>
           <div className="flex flex-col gap-8">
             {!loading && events != undefined ? (
-              events.map((event, index) => {
-                return (
-                  <EventCard
-                    key={index}
-                    title={event.title}
-                    date={event.date ? event.date : new Date(event.startDate)}
-                    timeRange={[
-                      new Date(event.startDate),
-                      new Date(event.endDate),
-                    ]}
-                    participants={event.participants ? event.participants : []}
-                    description={event.description}
-                    onClick={() => {
-                      handleCardOnClick(event);
-                    }}
-                    size={Sizes.large}
-                  />
-                );
-              })
+              events.length > 0 ? (
+                events.map((event, index) => {
+                  return (
+                    <EventCard
+                      key={index}
+                      title={event.title}
+                      date={event.date ? event.date : new Date(event.startDate)}
+                      timeRange={[
+                        new Date(event.startDate),
+                        new Date(event.endDate),
+                      ]}
+                      participants={
+                        event.participants ? event.participants : []
+                      }
+                      description={event.description}
+                      onClick={() => {
+                        handleCardOnClick(event);
+                      }}
+                      size={Sizes.large}
+                    />
+                  );
+                })
+              ) : (
+                <div>No events found, create one now!</div>
+              )
             ) : (
               <div>Loading...</div>
             )}
@@ -199,6 +210,7 @@ const Event: NextPage = () => {
         </section>
         <section>
           <Modal
+            centered
             opened={editModalOpen}
             onClose={() => setEditModalOpen(false)}
             size={'800px'}
