@@ -77,6 +77,8 @@ export const AuthProvider: React.FC<{}> = ({ children }) => {
   const anonymousLogin = () => {
     signInAnonymously(auth).then((user) => {
       // * logs in and sets user in firebase
+      user.user && router.push('/dashboard');
+      setUser(user.user);
     });
   };
 
