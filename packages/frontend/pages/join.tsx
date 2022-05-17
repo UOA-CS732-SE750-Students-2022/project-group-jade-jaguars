@@ -47,10 +47,11 @@ const JoinPage: NextPage = () => {
                   classNames={{
                     filled: 'bg-[#FFDF74] hover:bg-[#FFDF74]',
                     label: 'text-black',
+                    root: 'hover:bg-[#ffeeb0]',
                   }}
                   onClick={onClick}
                 >
-                  submit
+                  <p className="font-medium">Submit</p>
                 </Button>
               </Group>
             </Grid.Col>

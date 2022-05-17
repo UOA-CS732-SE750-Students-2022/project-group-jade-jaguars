@@ -7,6 +7,7 @@ import {
   TextInput,
 } from '@mantine/core';
 import { useForm } from '@mantine/hooks';
+import { Loading } from '@nextui-org/react';
 import type { NextPage } from 'next';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
@@ -39,11 +40,6 @@ const Team: NextPage = () => {
   const [deleteTeamModalOpen, setDeleteTeamModalOpen] = useState(false);
   const [addMemberModalOpen, setAddMemberModalOpen] = useState(false);
   const [detailModalOpen, setDetailModalOpen] = useState(false);
-
-  const router = useRouter();
-  // useEffect(() => {
-  //   !signedIn && router.push('/login');
-  // }, [signedIn]);
 
   const teamForm = useForm({
     initialValues: {
@@ -80,7 +76,6 @@ const Team: NextPage = () => {
           }
         }),
       );
-      console.log(teams);
       setTeamsList(teams);
       setLoading(false);
     }
@@ -95,7 +90,6 @@ const Team: NextPage = () => {
           label: user.firstName + ' ' + user.lastName,
         };
       });
-      console.log(usersList);
       setUsersList(usersList);
     }
   };
@@ -195,7 +189,10 @@ const Team: NextPage = () => {
                 <div>No teams found, create one now!</div>
               )
             ) : (
-              <div>Loading ...</div>
+              <div className="flex flex-row gap-2">
+                <Loading color={'warning'} type="points" />
+                Loading ...
+              </div>
             )}
           </div>
         </section>

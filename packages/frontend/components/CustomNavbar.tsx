@@ -1,4 +1,4 @@
-import { Affix, Avatar, Button, Group, Image, Navbar } from '@mantine/core';
+import { Affix, Group, Navbar } from '@mantine/core';
 import { useViewportSize } from '@mantine/hooks';
 import React, { useEffect, useState } from 'react';
 import {
@@ -9,7 +9,6 @@ import {
 } from 'tabler-icons-react';
 import { useAuth } from '../src/context/AuthContext';
 import { NavbarLink } from './NavbarLink';
-import { getAuth } from 'firebase/auth';
 import { useRouter } from 'next/router';
 import { Logout, Plus } from 'tabler-icons-react';
 
@@ -33,7 +32,7 @@ export const CustomNavbar = () => {
   return isLogin ? (
     <Navbar height={height} width={{ base: 100 }} className="border-1">
       <Navbar.Section>
-        <div className="w-[100px]">
+        <div className="w-[100px] mt-10">
           <Group direction="column" align="center" mt={10}>
             <img src="/logo.svg" width={50} />
           </Group>

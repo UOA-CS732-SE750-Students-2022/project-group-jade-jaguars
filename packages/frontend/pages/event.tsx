@@ -15,6 +15,7 @@ import { useAuth } from '../src/context/AuthContext';
 import Event from '../types/Event';
 import Member from '../types/Member';
 import { useRouter } from 'next/router';
+import { Loading } from '@nextui-org/react';
 
 export interface EventUser {
   firstName: string;
@@ -176,7 +177,10 @@ const Event: NextPage = () => {
                 <div>No events found, create one now!</div>
               )
             ) : (
-              <div>Loading...</div>
+              <div className="flex flex-row gap-2">
+                <Loading color={'warning'} type="points" />
+                Loading...
+              </div>
             )}
           </div>
         </section>

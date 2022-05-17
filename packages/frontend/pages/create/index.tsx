@@ -7,13 +7,9 @@ import EventForm, { FormValues } from '../../components/EventForm/EventForm';
 import { useAuth } from '../../src/context/AuthContext';
 import { createTeam, createEvent } from '../../helpers/apiCalls/apiCalls';
 import { EventResponseDTO } from '../../types/Event';
-
 import { useRouter } from 'next/router';
 import { getTZDate } from '../../helpers/timeFormatter';
-import { AlertCircle, Bold } from 'tabler-icons-react';
-import { toast, ToastContainer } from 'react-toastify';
-import { LoadingOutlined, RedoOutlined } from '@ant-design/icons';
-import { Spin } from 'antd';
+import { AlertCircle } from 'tabler-icons-react';
 
 interface Team {
   id: string;

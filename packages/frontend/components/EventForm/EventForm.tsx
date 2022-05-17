@@ -55,7 +55,7 @@ const EventForm = ({
             <TextInput
               required
               label="Event Title"
-              placeholder="add event title"
+              placeholder="Add event title"
               value={form.values.title}
               onChange={(e) =>
                 form.setFieldValue('title', e.currentTarget.value)
@@ -92,6 +92,7 @@ const EventForm = ({
                   <TextInput
                     required
                     label="New Team Name"
+                    placeholder="Add team name"
                     value={form.values.newTeamName}
                     onChange={(e) =>
                       form.setFieldValue('newTeamName', e.currentTarget.value)
@@ -100,6 +101,7 @@ const EventForm = ({
                   <TextInput
                     required
                     label="New Team Description"
+                    placeholder="Add team description"
                     value={form.values.newTeamDescription}
                     onChange={(e) =>
                       form.setFieldValue(
@@ -113,6 +115,7 @@ const EventForm = ({
                 <Select
                   data={teamData.map((team) => team.label)}
                   label="Select a Team"
+                  placeholder="Select a Team"
                   value={form.values.teamName}
                   onChange={(e) => form.setFieldValue('teamName', e!)}
                 />
@@ -163,7 +166,7 @@ const EventForm = ({
             <Textarea
               required
               label="Description"
-              placeholder="event details"
+              placeholder="Add event details"
               autosize
               minRows={2}
               maxRows={4}
@@ -177,7 +180,7 @@ const EventForm = ({
             <TextInput
               required
               label="Location"
-              placeholder="location or meeting link"
+              placeholder="Add location or meeting link"
               value={form.values.location}
               onChange={(e) =>
                 form.setFieldValue('location', e.currentTarget.value)
@@ -215,12 +218,13 @@ const EventForm = ({
                 classNames={{
                   filled: 'bg-[#FFDF74] hover:bg-[#FFDF74]',
                   label: 'text-black',
+                  root: 'hover:bg-[#ffeeb0]',
                 }}
                 onClick={() =>
                   onSubmit({ form: form.values, eventId: eventId })
                 }
               >
-                Done
+                <p className="font-medium">Done</p>
               </Button>
             </Group>
           </Grid.Col>
