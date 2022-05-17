@@ -45,7 +45,7 @@ export const CustomNavbar = () => {
     user ? setIsLogin(true) : setIsLogin(false);
   }, [user]);
 
-  return isLogin ? (
+  return isLogin && !router.pathname.includes('/login') ? (
     <Navbar height={height} width={{ base: 100 }} className="border-1">
       <Navbar.Section>
         <div className="w-[100px] mt-10">
