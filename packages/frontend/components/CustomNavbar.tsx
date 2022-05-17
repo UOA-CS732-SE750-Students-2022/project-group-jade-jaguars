@@ -26,7 +26,7 @@ const linkData = [
 export const CustomNavbar = () => {
   const { height } = useViewportSize();
   const [active, setActive] = useState(0);
-  const { user, logout } = useAuth();
+  const { user, logout, setAuthToken, authToken } = useAuth();
 
   const router = useRouter();
   const [currentRoute, setCurrentRoute] = useState(router.pathname);
@@ -42,8 +42,8 @@ export const CustomNavbar = () => {
   }, []);
 
   useEffect(() => {
-    user ? setIsLogin(true) : setIsLogin(false);
-  }, [user]);
+    authToken ? setIsLogin(true) : setIsLogin(false);
+  }, [authToken]);
 
   return isLogin ? (
     <Navbar height={height} width={{ base: 100 }} className="border-1">
@@ -75,7 +75,11 @@ export const CustomNavbar = () => {
         <Group direction="column" align="center" spacing="xs" mb={40}>
           <div
             className="w-[70px] cursor-pointer flex items-center justify-center h-[70px] rounded-xl  hover:bg-secondary"
-            onClick={logout}
+            onClick={() => {
+              logout;
+              setAuthToken('');
+              router.push('/login');
+            }}
           >
             <Logout />
           </div>

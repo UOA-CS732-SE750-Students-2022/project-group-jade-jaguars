@@ -50,8 +50,8 @@ const Login: NextPage = () => {
       }
     };
     userId && checkUserOnMongo();
-    signedIn && router.push('/dashboard');
-  }, [signedIn]);
+    authToken && router.push('/dashboard');
+  }, [signedIn, authToken]);
 
   return (
     <Container>
