@@ -41,6 +41,8 @@ const Team: NextPage = () => {
   const [addMemberModalOpen, setAddMemberModalOpen] = useState(false);
   const [detailModalOpen, setDetailModalOpen] = useState(false);
 
+  const router = useRouter();
+
   const teamForm = useForm({
     initialValues: {
       title: '',

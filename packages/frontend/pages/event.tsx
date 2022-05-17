@@ -36,10 +36,6 @@ const Event: NextPage = () => {
 
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
-  const router = useRouter();
-  // useEffect(() => {
-  //   !signedIn && router.push('/login');
-  // }, [signedIn]);
 
   let form = useForm<FormValues>({
     initialValues: {
@@ -83,12 +79,6 @@ const Event: NextPage = () => {
       getEvents();
     }
   }, [signedIn]);
-
-  // useEffect(() => {
-  //   if (userId) {
-  //     getEvents();
-  //   }
-  // },[editModalOpen])
 
   const handleCardOnClick = (event: Event) => {
     setSelectedEvent(event);

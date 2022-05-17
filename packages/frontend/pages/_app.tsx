@@ -9,7 +9,6 @@ import { CustomNavbar } from '../components/CustomNavbar';
 export default function App(props: AppProps) {
   const { Component, pageProps } = props;
   const { signedIn } = useAuth();
-  console.log(signedIn);
 
   return (
     <div className="bg-backgroundgrey m-0">

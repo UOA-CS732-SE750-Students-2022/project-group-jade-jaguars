@@ -9,7 +9,7 @@ import {
 import { useForm } from '@mantine/hooks';
 import { NextPage } from 'next';
 import Router, { useRouter } from 'next/router';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 const JoinPage: NextPage = () => {
   const form = useForm({
@@ -26,6 +26,7 @@ const JoinPage: NextPage = () => {
       },
     });
   };
+
   return (
     <>
       <Container mt={200}>

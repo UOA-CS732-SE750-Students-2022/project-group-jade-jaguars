@@ -13,20 +13,36 @@ import { useRouter } from 'next/router';
 import { Logout, Plus } from 'tabler-icons-react';
 
 const linkData = [
-  { icon: LayoutDashboard, label: 'Dashboard', address: '/dashboard' },
-  { icon: CalendarEvent, label: 'Events', address: '/event' },
-  { icon: Users, label: 'Teams', address: '/team' },
-  { icon: ArrowsJoin, label: 'Join', address: '/join' },
+  {
+    icon: LayoutDashboard,
+    label: 'Dashboard',
+    address: '/dashboard',
+    active: true,
+  },
+  { icon: CalendarEvent, label: 'Events', address: '/event', active: false },
+  { icon: Users, label: 'Teams', address: '/team', active: false },
+  { icon: ArrowsJoin, label: 'Join', address: '/join', active: false },
 ];
 export const CustomNavbar = () => {
-  const { height, width } = useViewportSize();
+  const { height } = useViewportSize();
   const [active, setActive] = useState(0);
-  const { user, setUser, logout } = useAuth();
+  const { user, logout } = useAuth();
+
   const router = useRouter();
+  const [currentRoute, setCurrentRoute] = useState(router.pathname);
+
   const [isLogin, setIsLogin] = useState(false);
+
+  useEffect(() => {
+    linkData.map((data, index) => {
+      if (data.address === currentRoute) {
+        setActive(index);
+      }
+    });
+  }, []);
+
   useEffect(() => {
     user ? setIsLogin(true) : setIsLogin(false);
-    !user && router.push('/login');
   }, [user]);
 
   return isLogin ? (

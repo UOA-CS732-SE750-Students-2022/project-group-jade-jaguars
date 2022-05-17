@@ -34,33 +34,23 @@ interface TeamCheckedList {
 
 const Dashboard: NextPage = () => {
   const router = useRouter();
-
-  const [eventsList, setEventsList] = useState<EventInterface[]>();
-
   const { userId, signedIn } = useAuth();
 
+  const [eventsList, setEventsList] = useState<EventInterface[]>();
   const [teamsList, setTeamsList] = useState<Team[]>();
-
+  const [teamCheckedList, setTeamCheckedList] = useState<TeamCheckedList>({});
+  const [initialChecked, setInitialChecked] = useState(true);
   const [teamCalendar, setTeamCalendar] = useState<EventInterface[]>([]);
 
   const [loading, setLoading] = useState(true);
 
   const [searchPopUp, setSearchPopUp] = useState(false);
-
-  const [eventSelected, setEventSelected] = useState<EventInterface>();
-  const [modalOpen, setModalOpen] = useState(false);
-
+  const [searchEvents, setSearchEvents] = useState<EventInterface[]>();
   const [searchValue, setSearchValue] = useState<string>('');
 
-  const [teamCheckedList, setTeamCheckedList] = useState<TeamCheckedList>({});
+  const [modalOpen, setModalOpen] = useState(false);
 
-  const [initialChecked, setInitialChecked] = useState(true);
-
-  const [searchEvents, setSearchEvents] = useState<EventInterface[]>();
-
-  // useEffect(() => {
-  //   !signedIn && router.push('/login');
-  // }, [signedIn]);
+  const [eventSelected, setEventSelected] = useState<EventInterface>();
 
   const handleEventCardOnclick = (event: EventInterface) => {
     setEventSelected(event);

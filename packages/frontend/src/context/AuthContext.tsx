@@ -71,7 +71,6 @@ export const AuthProvider: React.FC<{}> = ({ children }) => {
   const logout = () => {
     auth.signOut();
     router.push('/login');
-    console.log('logout');
   };
 
   const anonymousLogin = () => {
