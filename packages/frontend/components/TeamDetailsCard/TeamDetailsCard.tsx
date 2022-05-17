@@ -1,9 +1,7 @@
-import TeamDetails from '../../types/TeamDetails';
-import { Card, Text, Row } from '@nextui-org/react';
+import { Text, Row } from '@nextui-org/react';
 import MemberCard from '../MemberCard';
-import { UserPlus, Edit, Trash } from 'tabler-icons-react';
+import { UserPlus } from 'tabler-icons-react';
 import { ActionIcon } from '@mantine/core';
-import styles from './TeamDetailsCard.module.css';
 import { MouseEventHandler } from 'react';
 import DeleteIcon from '../../assets/Delete.svg';
 import EditIcon from '../../assets/Edit.svg';
@@ -14,7 +12,7 @@ function TeamDetailsCard(props: {
   editTeam: (param?: any) => void;
   deleteTeam: (param?: any) => void;
   addUser: MouseEventHandler<SVGElement>;
-  deleteUser: (param?: any) => void;
+  deleteUser?: (param?: any) => void;
 }) {
   const { editTeam, deleteTeam, addUser, deleteUser, team } = props;
   return (
@@ -54,7 +52,7 @@ function TeamDetailsCard(props: {
       <div className="overflow-y-scroll flex flex-col gap-2 p-[5px] mt-2 h-[80%]">
         {props.team.membersList &&
           props.team.membersList.map((member, index) => (
-            <MemberCard key={index} member={member} deleteUser={deleteUser} />
+            <MemberCard key={index} member={member} />
           ))}
       </div>
     </div>

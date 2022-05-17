@@ -1,5 +1,5 @@
 import { Group } from '@mantine/core';
-import React, { useState } from 'react';
+import React from 'react';
 import { Search } from 'tabler-icons-react';
 
 interface SearchBarProp {

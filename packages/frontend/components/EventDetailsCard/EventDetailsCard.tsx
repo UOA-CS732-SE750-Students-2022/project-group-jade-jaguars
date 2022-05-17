@@ -1,4 +1,3 @@
-import { Select } from '@mantine/core';
 import { Avatar } from '@nextui-org/react';
 import React from 'react';
 import DeleteIcon from '../../assets/Delete.svg';

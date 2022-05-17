@@ -9,7 +9,6 @@ interface NavbarLinkProps {
 }
 export const NavbarLink = ({
   icon: Icon,
-  label,
   active,
   onClick,
 }: NavbarLinkProps) => {

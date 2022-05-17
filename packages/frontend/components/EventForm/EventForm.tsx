@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { DateRangePicker } from '@mantine/dates';
 import {
   Box,
@@ -14,7 +14,6 @@ import {
 import { TimePicker } from 'antd';
 import moment from 'moment';
 import { UseForm } from '@mantine/hooks/lib/use-form/use-form';
-import Event from '../../types/Event';
 export interface FormValues {
   title: string;
   dateRange: [Date | null, Date | null];
@@ -200,7 +199,6 @@ const EventForm = ({
                 checked={form.values.recurring}
                 onChange={(event) => {
                   form.setFieldValue('recurring', event.currentTarget.checked);
-                  console.log(form.values.recurring);
                 }}
               />
               <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-0   rounded-full peer dark:bg-gray-300 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-primary"></div>

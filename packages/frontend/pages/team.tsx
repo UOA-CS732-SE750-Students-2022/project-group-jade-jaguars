@@ -9,13 +9,11 @@ import {
 import { useForm } from '@mantine/hooks';
 import { Loading } from '@nextui-org/react';
 import type { NextPage } from 'next';
-import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import TeamCard from '../components/TeamCard/TeamCard';
 import TeamDetailsCard from '../components/TeamDetailsCard/TeamDetailsCard';
 import {
   deleteTeam,
-  deleteUserFromTeam,
   getAllUsers,
   getUser,
   getUserTeamsById,
@@ -40,8 +38,6 @@ const Team: NextPage = () => {
   const [deleteTeamModalOpen, setDeleteTeamModalOpen] = useState(false);
   const [addMemberModalOpen, setAddMemberModalOpen] = useState(false);
   const [detailModalOpen, setDetailModalOpen] = useState(false);
-
-  const router = useRouter();
 
   const teamForm = useForm({
     initialValues: {
@@ -152,19 +148,11 @@ const Team: NextPage = () => {
       } else {
         payload = { ...selectedTeam, members: [userId] };
       }
-      console.log(payload);
       await updateTeam(selectedTeam?._id, payload);
       setAddMemberModalOpen(false);
       setDetailModalOpen(false);
       getTeams();
     }
-  };
-
-  const handleDeleteUser = async (user: User) => {
-    await deleteUserFromTeam(selectedTeam!._id!, user);
-    setEditTeamModalOpen(false);
-    setDetailModalOpen(false);
-    getTeams();
   };
 
   return (
@@ -176,7 +164,6 @@ const Team: NextPage = () => {
             {!loading && teamsList != undefined ? (
               Object.values(teamsList).length > 0 ? (
                 Object.values(teamsList).map((team, index) => {
-                  console.log(team.membersList);
                   return (
                     <TeamCard
                       key={index}
@@ -208,9 +195,6 @@ const Team: NextPage = () => {
                 }}
                 deleteTeam={() => handleDeleteTeam(selectedTeam)}
                 addUser={() => setAddMemberModalOpen(true)}
-                deleteUser={() => {
-                  console.log('delete');
-                }}
               />
             )}
           </div>

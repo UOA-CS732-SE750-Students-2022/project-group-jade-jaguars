@@ -8,8 +8,8 @@ import {
 } from '@mantine/core';
 import { useForm } from '@mantine/hooks';
 import { NextPage } from 'next';
-import Router, { useRouter } from 'next/router';
-import React, { useEffect, useState } from 'react';
+import { useRouter } from 'next/router';
+import React from 'react';
 
 const JoinPage: NextPage = () => {
   const form = useForm({

@@ -195,9 +195,7 @@ const Event: NextPage = () => {
                 }
                 onEdit={() => handleEdit()}
                 onDelete={() => handleDelete()}
-                onParticipantClick={() => {
-                  console.log('participants');
-                }}
+                onParticipantClick={() => {}}
               />
             )}
           </div>
