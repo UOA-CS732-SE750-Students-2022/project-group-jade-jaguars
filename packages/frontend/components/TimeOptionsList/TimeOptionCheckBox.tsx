@@ -19,14 +19,20 @@ export const TimeOptionCheckBox = ({
       }`}
     >
       <Group className="pl-5">
-        <input
-          type={'checkbox'}
+        <Checkbox
           checked={active}
-          className={`rounded focus:ring-0 ${
-            active ? ' text-primary ' : 'border-black'
-          }`}
+          color={'transparent'}
+          classNames={{
+            icon: 'text-black',
+          }}
+          styles={{
+            input: {
+              cursor: 'pointer',
+              backgroundColor: 'white',
+              color: 'white',
+            },
+          }}
         />
-
         {option}
       </Group>
     </div>

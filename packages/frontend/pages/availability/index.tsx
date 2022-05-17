@@ -296,7 +296,7 @@ const Availability: NextPage = () => {
             <section className="flex flex-row gap-5 justify-center w-[500px]">
               <div>
                 <div className="flex flex-row ml-12 w-[84%] justify-center">
-                  <h2 className="font-medium text-xl">Group Availability</h2>
+                  <p className="font-medium text-xl">Group Availability</p>
                 </div>
 
                 <GroupAvailability
