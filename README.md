@@ -14,6 +14,9 @@
   <a href="https://lerna.js.org/">
     <img alt="Lerna" src="https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg">
   </a>
+  <a href="https://countmein750.netlify.app/login">
+    <img alt="Netlify" src="https://badges.netlify.app/api/countmein750.svg?branch=main">
+  </a>
 </p>
 
 ## Features:
