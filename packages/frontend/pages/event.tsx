@@ -15,6 +15,7 @@ import { useAuth } from '../src/context/AuthContext';
 import Event from '../types/Event';
 import Member from '../types/Member';
 import { useRouter } from 'next/router';
+import { Loading } from '@nextui-org/react';
 
 export interface EventUser {
   firstName: string;
@@ -35,10 +36,6 @@ const Event: NextPage = () => {
 
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
-  const router = useRouter();
-  // useEffect(() => {
-  //   !signedIn && router.push('/login');
-  // }, [signedIn]);
 
   let form = useForm<FormValues>({
     initialValues: {
@@ -101,7 +98,8 @@ const Event: NextPage = () => {
       await deleteEvent(selectedEvent.id);
     }
     setDeleteModalOpen(false);
-    refresh();
+    setDisplayDetail(false);
+    getEvents();
   };
 
   const handleEditSubmit = async (value: any) => {
@@ -128,14 +126,12 @@ const Event: NextPage = () => {
       delete payload.location;
     }
 
-    const res = await updateEvent(eventId, payload);
+    await updateEvent(eventId, payload);
     form.reset();
 
-    refresh();
-  };
+    setDisplayDetail(false);
 
-  const refresh = () => {
-    window.location.reload();
+    getEvents();
   };
 
   return (
@@ -145,27 +141,36 @@ const Event: NextPage = () => {
           <h1>Events</h1>
           <div className="flex flex-col gap-8">
             {!loading && events != undefined ? (
-              events.map((event, index) => {
-                return (
-                  <EventCard
-                    key={index}
-                    title={event.title}
-                    date={event.date ? event.date : new Date(event.startDate)}
-                    timeRange={[
-                      new Date(event.startDate),
-                      new Date(event.endDate),
-                    ]}
-                    participants={event.participants ? event.participants : []}
-                    description={event.description}
-                    onClick={() => {
-                      handleCardOnClick(event);
-                    }}
-                    size={Sizes.large}
-                  />
-                );
-              })
+              events.length > 0 ? (
+                events.map((event, index) => {
+                  return (
+                    <EventCard
+                      key={index}
+                      title={event.title}
+                      date={event.date ? event.date : new Date(event.startDate)}
+                      timeRange={[
+                        new Date(event.startDate),
+                        new Date(event.endDate),
+                      ]}
+                      participants={
+                        event.participants ? event.participants : []
+                      }
+                      description={event.description}
+                      onClick={() => {
+                        handleCardOnClick(event);
+                      }}
+                      size={Sizes.large}
+                    />
+                  );
+                })
+              ) : (
+                <div>No events found, create one now!</div>
+              )
             ) : (
-              <div>Loading...</div>
+              <div className="flex flex-row gap-2">
+                <Loading color={'warning'} type="points" />
+                Loading...
+              </div>
             )}
           </div>
         </section>
@@ -190,15 +195,14 @@ const Event: NextPage = () => {
                 }
                 onEdit={() => handleEdit()}
                 onDelete={() => handleDelete()}
-                onParticipantClick={() => {
-                  console.log('participants');
-                }}
+                onParticipantClick={() => {}}
               />
             )}
           </div>
         </section>
         <section>
           <Modal
+            centered
             opened={editModalOpen}
             onClose={() => setEditModalOpen(false)}
             size={'800px'}

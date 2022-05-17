@@ -1,4 +1,4 @@
-import { Group, Tooltip } from '@mantine/core';
+import { Tooltip } from '@mantine/core';
 import { useClipboard } from '@mantine/hooks';
 import React from 'react';
 import { Copy } from 'tabler-icons-react';
@@ -23,7 +23,9 @@ export const ShareLinkButton = ({ eventLink, text }: ShareLinkButtonProp) => {
         className=" text-black border border-1 pl-3 w-fit max-w-[300px] cursor-pointer rounded-md px-2 py-1 text-sm font-base bg-secondarylight border-black hover:bg-secondary "
       >
         <div className="flex flex-row">
-          <p className="truncate ...">{text ? text : 'Share Event'}</p>
+          <p className="truncate ...">
+            {text ? text : 'Event Invitation Code'}
+          </p>
           <div className="h-5 ml-1 mb-1">
             <Copy />
           </div>

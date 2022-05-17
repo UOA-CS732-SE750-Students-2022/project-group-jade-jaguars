@@ -16,10 +16,10 @@ function TeamCard(team: TeamDetails) {
       <div className="mt-8 ml-2">
         {members && members.length > 0 && (
           <Avatar.Group
-            count={members.length - 12 > 0 ? members.length - 12 : undefined}
+            count={members.length - 8 > 0 ? members.length - 8 : undefined}
             animated={false}
           >
-            {members.slice(0, 4).map((participant, index) => (
+            {members.slice(0, 8).map((participant, index) => (
               <Avatar
                 key={index}
                 size="lg"

@@ -12,7 +12,7 @@ const CustomButton = (props: CustomButtonInterface) => {
   return (
     <div>
       <button
-        className="px-3 py-1 rounded-lg text-sm bg-secondary text-black hover:bg-primary hover:text-white"
+        className="px-3 py-1 rounded-lg text-sm bg-secondary text-black hover:bg-secondarylight"
         onClick={onClick}
       >
         <span>{text}</span>

@@ -7,14 +7,13 @@ import {
   TextInput,
 } from '@mantine/core';
 import { useForm } from '@mantine/hooks';
+import { Loading } from '@nextui-org/react';
 import type { NextPage } from 'next';
-import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import TeamCard from '../components/TeamCard/TeamCard';
 import TeamDetailsCard from '../components/TeamDetailsCard/TeamDetailsCard';
 import {
   deleteTeam,
-  deleteUserFromTeam,
   getAllUsers,
   getUser,
   getUserTeamsById,
@@ -29,23 +28,16 @@ const Team: NextPage = () => {
   const { userId, signedIn } = useAuth();
 
   const [teamsList, setTeamsList] = useState<Team[]>();
+  const [usersList, setUsersList] = useState<SelectItem[]>();
 
   const [loading, setLoading] = useState(true);
 
   const [selectedTeam, setSelectedTeam] = useState<Team>();
 
   const [editTeamModalOpen, setEditTeamModalOpen] = useState(false);
-
   const [deleteTeamModalOpen, setDeleteTeamModalOpen] = useState(false);
-
   const [addMemberModalOpen, setAddMemberModalOpen] = useState(false);
-
-  const [usersList, setUsersList] = useState<SelectItem[]>();
-
-  const router = useRouter();
-  // useEffect(() => {
-  //   !signedIn && router.push('/login');
-  // }, [signedIn]);
+  const [detailModalOpen, setDetailModalOpen] = useState(false);
 
   const teamForm = useForm({
     initialValues: {
@@ -82,7 +74,6 @@ const Team: NextPage = () => {
           }
         }),
       );
-      console.log(teams);
       setTeamsList(teams);
       setLoading(false);
     }
@@ -97,7 +88,6 @@ const Team: NextPage = () => {
           label: user.firstName + ' ' + user.lastName,
         };
       });
-      console.log(usersList);
       setUsersList(usersList);
     }
   };
@@ -109,13 +99,9 @@ const Team: NextPage = () => {
     }
   }, [signedIn]);
 
-  const refresh = () => {
-    window.location.reload();
-  };
-
   const handleCardOnClick = (team: Team) => {
     setSelectedTeam(team);
-    console.log(team);
+    setDetailModalOpen(true);
   };
 
   const handleDeleteTeam = async (team: Team) => {
@@ -126,7 +112,8 @@ const Team: NextPage = () => {
     if (team._id) {
       await deleteTeam(team._id);
       setDeleteTeamModalOpen(false);
-      refresh();
+      setDetailModalOpen(false);
+      getTeams();
     }
   };
 
@@ -144,7 +131,8 @@ const Team: NextPage = () => {
       }
       await updateTeam(selectedTeam._id, value);
       setEditTeamModalOpen(false);
-      refresh();
+      setDetailModalOpen(false);
+      getTeams();
     }
   };
 
@@ -160,17 +148,11 @@ const Team: NextPage = () => {
       } else {
         payload = { ...selectedTeam, members: [userId] };
       }
-      console.log(payload);
-      const res = await updateTeam(selectedTeam?._id, payload);
+      await updateTeam(selectedTeam?._id, payload);
       setAddMemberModalOpen(false);
-      refresh();
+      setDetailModalOpen(false);
+      getTeams();
     }
-  };
-
-  const handleDeleteUser = async (user: User) => {
-    await deleteUserFromTeam(selectedTeam!._id!, user);
-    setEditTeamModalOpen(false);
-    refresh();
   };
 
   return (
@@ -180,26 +162,32 @@ const Team: NextPage = () => {
           <h1>Teams</h1>
           <div className="flex flex-row flex-wrap gap-8">
             {!loading && teamsList != undefined ? (
-              Object.values(teamsList).map((team, index) => {
-                console.log(team.membersList);
-                return (
-                  <TeamCard
-                    key={index}
-                    title={team.title}
-                    description={team.description}
-                    members={team.membersList}
-                    onClick={() => handleCardOnClick(team)}
-                  />
-                );
-              })
+              Object.values(teamsList).length > 0 ? (
+                Object.values(teamsList).map((team, index) => {
+                  return (
+                    <TeamCard
+                      key={index}
+                      title={team.title}
+                      description={team.description}
+                      members={team.membersList}
+                      onClick={() => handleCardOnClick(team)}
+                    />
+                  );
+                })
+              ) : (
+                <div>No teams found, create one now!</div>
+              )
             ) : (
-              <div>Loading ...</div>
+              <div className="flex flex-row gap-2">
+                <Loading color={'warning'} type="points" />
+                Loading ...
+              </div>
             )}
           </div>
         </section>
         <section className="flex flex-auto w-fit">
           <div className="fixed mt-16">
-            {!loading && selectedTeam && (
+            {!loading && detailModalOpen && selectedTeam && (
               <TeamDetailsCard
                 team={selectedTeam}
                 editTeam={() => {
@@ -207,9 +195,6 @@ const Team: NextPage = () => {
                 }}
                 deleteTeam={() => handleDeleteTeam(selectedTeam)}
                 addUser={() => setAddMemberModalOpen(true)}
-                deleteUser={() => {
-                  console.log('delete');
-                }}
               />
             )}
           </div>

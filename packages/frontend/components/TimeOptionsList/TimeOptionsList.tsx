@@ -7,10 +7,12 @@ import { formatTimeBracket, getTZDate } from '../../helpers/timeFormatter';
 interface TimeOptionsListProp {
   options: TimeBracket[];
   setCheckedTime: Dispatch<SetStateAction<TimeBracket | undefined>>;
+  isCustomTime: boolean;
 }
 
 export const TimeOptionsList = ({
   options,
+  isCustomTime,
   setCheckedTime,
 }: TimeOptionsListProp) => {
   const [active, setActive] = useState(0);
@@ -31,15 +33,15 @@ export const TimeOptionsList = ({
   }, [options]);
 
   return (
-    <div className="mt-[50px]">
-      <ScrollArea style={{ maxHeight: 300, width: 400 }}>
+    <div>
+      <ScrollArea style={{ overflow: 'scroll', maxHeight: 300, width: 400 }}>
         {stringOptions.map((option, index) => (
           <TimeOptionCheckBox
             onClick={() => {
               handleClick(index);
               setActive(index);
             }}
-            active={index === active}
+            active={isCustomTime ? false : index === active}
             key={index}
             option={option}
           ></TimeOptionCheckBox>

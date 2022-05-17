@@ -13,138 +13,97 @@ import { TeamCheckBox } from '../components/TeamCheckBox';
 import {
   getEvent,
   getEventParticipants,
-  getEventsByUserId,
-  getTeam,
   getUserTeams,
   searchEvent,
 } from '../helpers/apiCalls/apiCalls';
 import { useAuth } from '../src/context/AuthContext';
-import Event from '../types/Event';
 import Member from '../types/Member';
 import Team from '../types/Team';
 import { EventUser } from './event';
 
-interface TeamCheckedItem {
-  checked: boolean;
-  teamId: string;
-}
-interface TeamCheckedList {
-  [name: string]: TeamCheckedItem;
+interface TeamMap {
+  [teamId: string]: {
+    title: string;
+    events: EventInterface[];
+    checked?: boolean;
+  };
 }
 
 const Dashboard: NextPage = () => {
   const router = useRouter();
-
-  const [eventsList, setEventsList] = useState<EventInterface[]>();
-
   const { userId, signedIn } = useAuth();
 
-  const [teamsList, setTeamsList] = useState<Team[]>();
-
-  const [teamCalendar, setTeamCalendar] = useState<EventInterface[]>([]);
-
+  const [teamMap, setTeamMap] = useState<TeamMap>({});
+  const [eventsList, setEventsList] = useState<EventInterface[]>([]);
+  const [initialChecked, setInitialChecked] = useState(true);
   const [loading, setLoading] = useState(true);
 
   const [searchPopUp, setSearchPopUp] = useState(false);
-
-  const [eventSelected, setEventSelected] = useState<EventInterface>();
-  const [modalOpen, setModalOpen] = useState(false);
-
+  const [searchEvents, setSearchEvents] = useState<EventInterface[]>();
   const [searchValue, setSearchValue] = useState<string>('');
 
-  const [teamCheckedList, setTeamCheckedList] = useState<TeamCheckedList>({});
+  const [modalOpen, setModalOpen] = useState(false);
 
-  const [initialChecked, setInitialChecked] = useState(true);
+  const [eventSelected, setEventSelected] = useState<EventInterface>();
 
-  const [searchEvents, setSearchEvents] = useState<EventInterface[]>();
-
-  // useEffect(() => {
-  //   !signedIn && router.push('/login');
-  // }, [signedIn]);
+  useEffect(() => {
+    if (userId) {
+      getTeams();
+    }
+  }, [signedIn]);
 
   const handleEventCardOnclick = (event: EventInterface) => {
     setEventSelected(event);
     setModalOpen(true);
   };
 
-  const getEvents = async () => {
-    setLoading(true);
-    const events: Event[] = await getEventsByUserId(userId);
-    if (events) {
-      const eventList = await getCalendarFormatEvents(events);
+  const getTeams = async () => {
+    const teams = await getUserTeams(userId);
+    if (teams) {
+      const teamsList: Team = teams.teams;
+      const eventList: any[] = [];
+      await Promise.all(
+        Object.values(teamsList).map(async (team) => {
+          const events = await getTeamEvents(team.events);
+          eventList.push(...events);
+          teamMap[team._id] = {
+            title: team.title,
+            events: events,
+            checked: true,
+          };
+        }),
+      );
       setEventsList(eventList);
+      setTeamMap(teamMap);
       setLoading(false);
     }
   };
 
-  const getCalendarFormatEvents = async (events: Event[]) => {
-    await Promise.all(
-      Object.values(events).map(async (event: Event) => {
-        if (event && event.id != undefined) {
-          const eventId = event.id;
-          const users: EventUser[] = await getEventParticipants(eventId);
-          let participants: Member[] = [];
-          Object.values(users).map((user: EventUser) => {
-            participants.push({
-              name: user.firstName + ' ' + user.lastName,
-            });
-          });
-          event.participants = participants;
-        }
-      }),
-    );
-    Object.values(events).map(async (event: any, index) => {
-      if (event != undefined) {
-        event.id = index;
-        event.start = new Date(event.startDate.replace('Z', ''));
-        event.end = new Date(event.endDate.replace('Z', ''));
-        event.date = undefined;
-        event.team = event.team;
-      }
-    });
-    const eventList: EventInterface[] = events.map((event: any) => {
-      return {
-        id: event.id,
-        title: event.title,
-        start: new Date(event.startDate.replace('Z', '')),
-        end: new Date(event.endDate.replace('Z', '')),
-        date: event.date ? event.date : undefined,
-        description: event.description ? event.description : '',
-        location: event.location ? event.location : '',
-        participants: event.participants,
-        team: event.team,
-      };
-    });
-    return eventList;
-  };
-
-  const getTeams = async () => {
-    const teams = await getUserTeams(userId);
-    if (teams) {
-      setTeamsList(teams.teams);
-      const teamCheckedList: TeamCheckedList = {};
-
-      teams.teams.map((team: Team) => {
-        teamCheckedList[team.title] = {
-          checked: true,
-          teamId: team._id!,
-        };
-      });
-      setTeamCheckedList(teamCheckedList);
-      getTeamCalendars(teamCheckedList);
-    }
-  };
-
-  const getTeamEvents = async (teamId: string) => {
-    const team: Team = await getTeam(teamId);
-    const teamEventIds = team.events;
-    let calendarEvents: Event[] = [];
+  const getTeamEvents = async (teamEvents: string[]) => {
+    const teamEventIds = teamEvents;
+    let calendarEvents: EventInterface[] = [];
     if (teamEventIds && teamEventIds?.length > 0) {
-      const teamEvents = await Promise.all(
-        Object.values(teamEventIds).map(async (eventId) => {
-          const res = await getEvent(eventId);
-          if (res != undefined) {
-            calendarEvents.push(res);
+      await Promise.all(
+        Object.values(teamEventIds).map(async (eventId, index) => {
+          const event = await getEvent(eventId);
+          if (event != undefined) {
+            const eventId = event.id;
+            const users: EventUser[] = await getEventParticipants(eventId);
+            let participants: Member[] = [];
+            Object.values(users).map((user: EventUser) => {
+              participants.push({
+                name: user.firstName + ' ' + user.lastName,
+              });
+            });
+            event.participants = participants;
+            event.id = index;
+            event.start = new Date(event.startDate.replace('Z', ''));
+            event.end = new Date(event.endDate.replace('Z', ''));
+            event.date = event.date;
+            event.team = event.team;
+            event.description = event.description ? event.description : '';
+            event.location = event.location ? event.location : '';
+            calendarEvents.push(event);
           }
         }),
       );
@@ -152,75 +111,59 @@ const Dashboard: NextPage = () => {
     return calendarEvents;
   };
 
-  const getTeamCalendars = async (teamCheckedList: TeamCheckedList) => {
-    setLoading(true);
-    await Promise.all(
-      Object.values(teamCheckedList).map(async (team) => {
-        if (team.checked) {
-          const events: Event[] = await getTeamEvents(team.teamId);
-          const calendarEvents = await getCalendarFormatEvents(events);
-          setEventsList(
-            eventsList ? eventsList.concat(calendarEvents) : calendarEvents,
-          );
-        }
-      }),
-    );
-    setLoading(false);
+  const getCalendarFormatEvents = async (event: any) => {
+    const eventId = event.id;
+    const users: EventUser[] = await getEventParticipants(eventId);
+    let participants: Member[] = [];
+    Object.values(users).map((user: EventUser) => {
+      participants.push({
+        name: user.firstName + ' ' + user.lastName,
+      });
+    });
+    event.participants = participants;
+    event.start = new Date(event.startDate.replace('Z', ''));
+    event.end = new Date(event.endDate.replace('Z', ''));
+    event.date = event.date;
+    event.team = event.team;
+    event.description = event.description ? event.description : '';
+    event.location = event.location ? event.location : '';
+
+    return event;
   };
 
-  useEffect(() => {
-    if (userId) {
-      getEvents();
-      getTeams();
-    }
-  }, [signedIn]);
+  const getCalendarEvents = (teamMap: any) => {
+    const eventList: any[] = [];
+    Object.keys(teamMap).map((teamId) => {
+      const team = teamMap[teamId];
+      if (team.checked) {
+        eventList.push(...team.events);
+      }
+    });
+    return eventList;
+  };
 
-  useEffect(() => {
-    setTeamsCalendar();
-  });
-
-  const setTeamsCalendar = () => {
-    if (teamsList && eventsList && teamsList.length == 0) {
-      teamsList.push({
-        title: 'My Events',
-        eventsList: eventsList,
-        admin: userId,
-      });
-      setTeamCalendar(eventsList);
+  const handleTeamEvent = (checked: boolean, label: string, teamId: string) => {
+    if (checked) {
+      teamMap[teamId].checked = true;
+    } else {
+      teamMap[teamId].checked = false;
     }
+    const updatedList = getCalendarEvents(teamMap);
+    setEventsList(updatedList);
   };
 
   const handleSearch = async (value: string) => {
-    const res = await searchEvent({ titleSubStr: value });
-    const events = await getCalendarFormatEvents(res);
-    setSearchPopUp(true);
-    setSearchEvents(events);
-  };
-
-  const handleTeamEvent = async (
-    checked: boolean,
-    label: string,
-    teamId: string,
-  ) => {
-    if (checked) {
-      teamCheckedList[label] = {
-        checked: true,
-        teamId: teamId,
-      };
-      setTeamCheckedList(teamCheckedList);
-      await getTeamCalendars(teamCheckedList);
-    } else {
-      teamCheckedList[label] = {
-        checked: false,
-        teamId: teamId,
-      };
-      let events = eventsList;
-      setEventsList(
-        events!.filter(function (event: EventInterface) {
-          return event.team != teamId;
+    if (value) {
+      const events = await searchEvent({ titleSubStr: value });
+      const processedEvents: EventInterface[] = [];
+      await Promise.all(
+        Object.values(events).map(async (event) => {
+          const res = await getCalendarFormatEvents(event);
+          processedEvents.push(res);
         }),
       );
-      setTeamCheckedList(teamCheckedList);
+      setSearchPopUp(true);
+      setSearchEvents(processedEvents);
     }
   };
 
@@ -240,7 +183,7 @@ const Dashboard: NextPage = () => {
           <div className="h-[79vh] min-h-[500px] w-full mt-10">
             <CustomCalendar
               events={eventsList ? eventsList : []}
-              onParticipantClick={() => console.log('clicked')}
+              onParticipantClick={() => {}}
             />
           </div>
         </section>
@@ -293,8 +236,9 @@ const Dashboard: NextPage = () => {
               />
             </div>
             <div className="my-6 flex flex-col gap-2 h-3/4 overflow-scroll">
-              {teamsList &&
-                teamsList.map((team, index) => {
+              {!loading ? (
+                teamMap &&
+                Object.keys(teamMap).map((teamId, index) => {
                   return (
                     <TeamCheckBox
                       key={index}
@@ -303,12 +247,15 @@ const Dashboard: NextPage = () => {
                         handleTeamEvent(checked, label, teamId);
                         setInitialChecked(false);
                       }}
-                      label={team.title}
+                      label={teamMap[teamId].title}
                       order={index}
-                      teamId={team._id!}
+                      teamId={teamId}
                     />
                   );
-                })}
+                })
+              ) : (
+                <div>Loading ...</div>
+              )}
             </div>
           </div>
         </section>

@@ -72,13 +72,11 @@ it('TeamCard details render and display correctly', async () => {
   const title = screen.getByText(/SOFTENG 750/i); // regular expression, ignores cases
   const description = screen.getByText(/A short description/i);
   const firstImage = document.querySelector('img') as HTMLImageElement;
-  const number = screen.getByText(/3/i);
   const images = await screen.findAllByRole('img');
 
   // test if the elements above are in the documentation
   expect(title).toBeInTheDocument();
   expect(description).toBeInTheDocument();
-  expect(number).toBeInTheDocument();
   expect(firstImage.src).toBe(
     'https://media-exp1.licdn.com/dms/image/C4E0BAQHUo_h0JGtwYw/company-logo_200_200/0/1606490589727?e=2147483647&v=beta&t=TO869IrmjUEr7VSFzSHaqcEN4_-TTctFucuyBv8cqDA',
   );

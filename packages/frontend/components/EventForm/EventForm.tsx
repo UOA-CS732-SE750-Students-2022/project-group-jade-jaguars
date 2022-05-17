@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { DateRangePicker } from '@mantine/dates';
 import {
   Box,
@@ -14,7 +14,6 @@ import {
 import { TimePicker } from 'antd';
 import moment from 'moment';
 import { UseForm } from '@mantine/hooks/lib/use-form/use-form';
-import Event from '../../types/Event';
 export interface FormValues {
   title: string;
   dateRange: [Date | null, Date | null];
@@ -55,7 +54,7 @@ const EventForm = ({
             <TextInput
               required
               label="Event Title"
-              placeholder="add event title"
+              placeholder="Add event title"
               value={form.values.title}
               onChange={(e) =>
                 form.setFieldValue('title', e.currentTarget.value)
@@ -92,6 +91,7 @@ const EventForm = ({
                   <TextInput
                     required
                     label="New Team Name"
+                    placeholder="Add team name"
                     value={form.values.newTeamName}
                     onChange={(e) =>
                       form.setFieldValue('newTeamName', e.currentTarget.value)
@@ -100,6 +100,7 @@ const EventForm = ({
                   <TextInput
                     required
                     label="New Team Description"
+                    placeholder="Add team description"
                     value={form.values.newTeamDescription}
                     onChange={(e) =>
                       form.setFieldValue(
@@ -113,6 +114,7 @@ const EventForm = ({
                 <Select
                   data={teamData.map((team) => team.label)}
                   label="Select a Team"
+                  placeholder="Select a Team"
                   value={form.values.teamName}
                   onChange={(e) => form.setFieldValue('teamName', e!)}
                 />
@@ -163,7 +165,7 @@ const EventForm = ({
             <Textarea
               required
               label="Description"
-              placeholder="event details"
+              placeholder="Add event details"
               autosize
               minRows={2}
               maxRows={4}
@@ -177,7 +179,7 @@ const EventForm = ({
             <TextInput
               required
               label="Location"
-              placeholder="location or meeting link"
+              placeholder="Add location or meeting link"
               value={form.values.location}
               onChange={(e) =>
                 form.setFieldValue('location', e.currentTarget.value)
@@ -197,7 +199,6 @@ const EventForm = ({
                 checked={form.values.recurring}
                 onChange={(event) => {
                   form.setFieldValue('recurring', event.currentTarget.checked);
-                  console.log(form.values.recurring);
                 }}
               />
               <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-0   rounded-full peer dark:bg-gray-300 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-primary"></div>
@@ -215,12 +216,13 @@ const EventForm = ({
                 classNames={{
                   filled: 'bg-[#FFDF74] hover:bg-[#FFDF74]',
                   label: 'text-black',
+                  root: 'hover:bg-[#ffeeb0]',
                 }}
                 onClick={() =>
                   onSubmit({ form: form.values, eventId: eventId })
                 }
               >
-                Done
+                <p className="font-medium">Done</p>
               </Button>
             </Group>
           </Grid.Col>

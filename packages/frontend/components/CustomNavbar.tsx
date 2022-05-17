@@ -1,4 +1,4 @@
-import { Affix, Avatar, Button, Group, Image, Navbar } from '@mantine/core';
+import { Affix, Group, Navbar } from '@mantine/core';
 import { useViewportSize } from '@mantine/hooks';
 import React, { useEffect, useState } from 'react';
 import {
@@ -9,31 +9,46 @@ import {
 } from 'tabler-icons-react';
 import { useAuth } from '../src/context/AuthContext';
 import { NavbarLink } from './NavbarLink';
-import { getAuth } from 'firebase/auth';
 import { useRouter } from 'next/router';
 import { Logout, Plus } from 'tabler-icons-react';
 
 const linkData = [
-  { icon: LayoutDashboard, label: 'Dashboard', address: '/dashboard' },
-  { icon: CalendarEvent, label: 'Events', address: '/event' },
-  { icon: Users, label: 'Teams', address: '/team' },
-  { icon: ArrowsJoin, label: 'Join', address: '/join' },
+  {
+    icon: LayoutDashboard,
+    label: 'Dashboard',
+    address: '/dashboard',
+    active: true,
+  },
+  { icon: CalendarEvent, label: 'Events', address: '/event', active: false },
+  { icon: Users, label: 'Teams', address: '/team', active: false },
+  { icon: ArrowsJoin, label: 'Join', address: '/join', active: false },
 ];
 export const CustomNavbar = () => {
-  const { height, width } = useViewportSize();
+  const { height } = useViewportSize();
   const [active, setActive] = useState(0);
-  const { user, setUser, logout } = useAuth();
+  const { user, logout, setAuthToken, authToken, setUser } = useAuth();
+
   const router = useRouter();
+  const [currentRoute, setCurrentRoute] = useState(router.pathname);
+
   const [isLogin, setIsLogin] = useState(false);
+
+  useEffect(() => {
+    linkData.map((data, index) => {
+      if (data.address === currentRoute) {
+        setActive(index);
+      }
+    });
+  }, []);
+
   useEffect(() => {
     user ? setIsLogin(true) : setIsLogin(false);
-    !user && router.push('/login');
   }, [user]);
 
-  return isLogin ? (
+  return isLogin && !router.pathname.includes('/login') ? (
     <Navbar height={height} width={{ base: 100 }} className="border-1">
       <Navbar.Section>
-        <div className="w-[100px]">
+        <div className="w-[100px] mt-10">
           <Group direction="column" align="center" mt={10}>
             <img src="/logo.svg" width={50} />
           </Group>
@@ -60,7 +75,12 @@ export const CustomNavbar = () => {
         <Group direction="column" align="center" spacing="xs" mb={40}>
           <div
             className="w-[70px] cursor-pointer flex items-center justify-center h-[70px] rounded-xl  hover:bg-secondary"
-            onClick={logout}
+            onClick={() => {
+              logout;
+              setAuthToken('');
+              setUser(null);
+              router.push('/login');
+            }}
           >
             <Logout />
           </div>
@@ -70,7 +90,7 @@ export const CustomNavbar = () => {
         <Affix position={{ bottom: 40, right: 40 }}>
           <Group direction="column" align="center" spacing="xs">
             <div
-              className="rounded-xl p-4 cursor-pointer bg-secondary "
+              className="rounded-xl p-4 hover:bg-secondarylight cursor-pointer bg-secondary "
               onClick={() => router.push('/create')}
             >
               <Plus strokeWidth={2} size={35} />

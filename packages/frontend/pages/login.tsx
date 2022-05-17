@@ -1,4 +1,4 @@
-import { Container, Grid, Group } from '@mantine/core';
+import { Container } from '@mantine/core';
 import type { NextPage } from 'next';
 import { useEffect } from 'react';
 import { useAuth } from '../src/context/AuthContext';
@@ -15,10 +15,6 @@ const Login: NextPage = () => {
   const { user, userId, authToken, login, signedIn, anonymousLogin } =
     useAuth();
   const router = useRouter();
-
-  const BASE_URL =
-    process.env.NEXT_PUBLIC_SOCKET_URL! +
-    (process.env.NEXT_PUBLIC_BASE_URL ?? 'api/v1');
 
   useEffect(() => {
     const checkUserOnMongo = async () => {
@@ -54,8 +50,7 @@ const Login: NextPage = () => {
       }
     };
     userId && checkUserOnMongo();
-    signedIn ? router.push('/dashboard') : router.push('/login');
-  }, [signedIn]);
+  }, [signedIn, authToken, user]);
 
   return (
     <Container>

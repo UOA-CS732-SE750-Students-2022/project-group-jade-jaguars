@@ -8,8 +8,6 @@ import { CustomNavbar } from '../components/CustomNavbar';
 
 export default function App(props: AppProps) {
   const { Component, pageProps } = props;
-  const { signedIn } = useAuth();
-  console.log(signedIn);
 
   return (
     <div className="bg-backgroundgrey m-0">
@@ -26,7 +24,6 @@ export default function App(props: AppProps) {
         withGlobalStyles
         withNormalizeCSS
         theme={{
-          /** Put your mantine theme override here */
           colorScheme: 'light',
           fontFamily: 'Poppins, sans-serif',
           colors: {

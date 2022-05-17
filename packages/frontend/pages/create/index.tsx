@@ -1,4 +1,5 @@
-import { Container, Grid } from '@mantine/core';
+import { Alert, Container } from '@mantine/core';
+import { Loading, Modal } from '@nextui-org/react';
 import { useForm } from '@mantine/hooks';
 import { NextPage } from 'next';
 import React, { useEffect, useState } from 'react';
@@ -6,9 +7,9 @@ import EventForm, { FormValues } from '../../components/EventForm/EventForm';
 import { useAuth } from '../../src/context/AuthContext';
 import { createTeam, createEvent } from '../../helpers/apiCalls/apiCalls';
 import { EventResponseDTO } from '../../types/Event';
-
 import { useRouter } from 'next/router';
 import { getTZDate } from '../../helpers/timeFormatter';
+import { AlertCircle } from 'tabler-icons-react';
 
 interface Team {
   id: string;
@@ -23,6 +24,10 @@ const CreateEventPage: NextPage = () => {
   const defaultEndTime = new Date();
   defaultStartTime.setHours(9, 0, 0, 0);
   defaultEndTime.setHours(17, 0, 0, 0);
+  const [showAlert, setShowAlert] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
+
+  const [loading, setLoading] = useState(false);
 
   const newDate = new Date();
   newDate.setSeconds(0);
@@ -94,7 +99,9 @@ const CreateEventPage: NextPage = () => {
     const res = await createEvent(data);
     return res;
   };
+
   const onCreateEvent = async () => {
+    setLoading(true);
     let teamId;
     if (form.values.newTeam) {
       if (form.values.newTeamName != '') {
@@ -109,17 +116,40 @@ const CreateEventPage: NextPage = () => {
       // Otherwise team is left as undefined in event (has no associated team)
     }
     const response: EventResponseDTO = await createEventMethod(teamId);
-    console.log(response);
-    await router.push({
-      pathname: '/availability/',
-      query: { eventId: response.id },
-    });
+    if (response) {
+      router.push({
+        pathname: '/availability/',
+        query: { eventId: response.id },
+      });
+    } else {
+      setLoading(false);
+      setShowAlert(true);
+    }
   };
   return (
-    <Container className="flex flex-col w-screen h-screen">
-      <div className="flex flex-col h-full w-full items-center justify-center">
+    <Container style={{ maxWidth: '100vw' }} className="m-0 p-0">
+      <div className="min-w-[1200px] flex flex-col h-full py-28 w-full items-center justify-center">
         <h1 className="mb-6">Create an event</h1>
-        <EventForm teamData={teamList} form={form} onSubmit={onCreateEvent} />
+        <div>
+          <EventForm teamData={teamList} form={form} onSubmit={onCreateEvent} />
+          <div className="w-[700px] text-center fixed bottom-14">
+            {showAlert && (
+              <Alert icon={<AlertCircle size={16} />} color={'red'}>
+                {
+                  'Please fill in all required details, description and team name length should be at least 3 characters long :)'
+                }
+              </Alert>
+            )}
+          </div>
+        </div>
+      </div>
+      <div className="h-full flex items-center">
+        <Modal open={loading}>
+          <div className="flex flex-row gap-2 h-[100px] items-center justify-center w-full">
+            <Loading color={'warning'} type="points" />
+            Creading event...
+          </div>
+        </Modal>
       </div>
     </Container>
   );

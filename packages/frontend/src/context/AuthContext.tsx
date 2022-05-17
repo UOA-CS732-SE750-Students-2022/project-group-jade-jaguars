@@ -55,6 +55,8 @@ export const AuthProvider: React.FC<{}> = ({ children }) => {
         const token = credential?.accessToken;
         // The signed-in user info.
         const user = result.user;
+        user && router.push('/dashboard');
+        setUser(user);
         console.log({ credential, token, user });
       })
       .catch((error) => {
@@ -70,13 +72,13 @@ export const AuthProvider: React.FC<{}> = ({ children }) => {
 
   const logout = () => {
     auth.signOut();
-    router.push('/login');
-    console.log('logout');
   };
 
   const anonymousLogin = () => {
     signInAnonymously(auth).then((user) => {
       // * logs in and sets user in firebase
+      user.user && router.push('/dashboard');
+      setUser(user.user);
     });
   };
 

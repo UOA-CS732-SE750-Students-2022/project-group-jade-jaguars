@@ -9,7 +9,6 @@ interface NavbarLinkProps {
 }
 export const NavbarLink = ({
   icon: Icon,
-  label,
   active,
   onClick,
 }: NavbarLinkProps) => {
@@ -17,7 +16,7 @@ export const NavbarLink = ({
     <div className="cont">
       <div
         onClick={onClick}
-        className={`w-full cursor-pointer flex items-center justify-center h-[80px] rounded-md  hover:text-white ${
+        className={`w-full cursor-pointer flex items-center justify-center h-[80px] hover:text-white ${
           active ? 'border-r-8 border-[#99C08B] text-[#99C08B]' : ''
         }`}
       >

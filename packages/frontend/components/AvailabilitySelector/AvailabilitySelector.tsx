@@ -377,7 +377,7 @@ function AvailabilitySelector(props: {
                   ) {
                     return 'bg-secondary';
                   } else {
-                    return 'bg-white';
+                    return 'bg-[#FFFCF4]';
                   }
                 })()
               }

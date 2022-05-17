@@ -17,7 +17,7 @@ module.exports = {
       primary: '#99C08B', // primary green
       primarylight: '#EFF5ED', // light green
       secondary: '#FFE074', // secondary yellow
-      secondarylight: '#FFF6D7',
+      secondarylight: '#ffeeb0',
       highlight: '#FAF1E6',
       backgroundgrey: '#F9F9F9',
       cardgrey: '#FAFAFA',
