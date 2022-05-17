@@ -214,120 +214,130 @@ const Availability: NextPage = () => {
   };
 
   return (
-    <Container>
-      <div className="flex flex-col w-full gap-20 justify-center py-28 items-center">
-        <div className="mb-[10px] flex flex-row gap-10 w-full justify-start mr-52">
-          <h1 className="mr-[30px] my-0 leading-none">
-            <span className="font-normal text-[25px]">Event name: </span>
-            {eventTitle}
-          </h1>
-          <ShareLinkButton eventLink={eventId} />
-        </div>
+    <Container style={{ maxWidth: '100vw' }} className="m-0 p-0">
+      <div className="min-w-[1200px] flex flex-col w-full gap-20 justify-center py-28 items-center">
+        <div className="flex flex-col ml-[150px] justify-center items-center">
+          <div className="mb-20 flex flex-row gap-10 w-full justify-start">
+            <h1 className="mr-[30px] my-0 leading-none">
+              <span className="font-normal text-[25px]">Event name: </span>
+              {eventTitle}
+            </h1>
+            <ShareLinkButton eventLink={eventId} />
+          </div>
 
-        <div className="flex flex-row gap-20 ml-[150px] justify-center items-start">
-          <section className="w-[500px]">
-            <div className="w-full">
-              <div className="flex flex-row items-center ml-14 w-[84%] justify-between">
-                <p className="font-medium text-xl">Your Availability</p>
-                <div className="flex flex-row gap-2">
-                  <button
-                    className={
-                      'bg-primary text-black w-[100px] cursor-pointer text-sm rounded-lg px-2 py-2 font-medium hover:bg-primarylight ' +
-                      (status === AvailabilityStatusStrings.Available
-                        ? 'border-black'
-                        : '')
-                    }
-                    onClick={() =>
-                      setStatus(AvailabilityStatusStrings.Available)
-                    }
-                  >
-                    <p>Available</p>
-                  </button>
-                  <button
-                    className={
-                      'bg-secondary text-black w-[100px] cursor-pointer text-sm rounded-lg px-2 py-2 font-medium hover:bg-secondarylight ' +
-                      (status === AvailabilityStatusStrings.Tentative
-                        ? 'border-black'
-                        : '')
-                    }
-                    onClick={() =>
-                      setStatus(AvailabilityStatusStrings.Tentative)
-                    }
-                  >
-                    <p>Maybe</p>
-                  </button>
+          <div className="flex flex-row gap-20">
+            <section className="w-[500px]">
+              <div className="w-full">
+                <div className="flex flex-row items-center ml-14 w-[84%] justify-between">
+                  <p className="font-medium text-xl">Your Availability</p>
+                  <div className="flex flex-row items-center gap-2">
+                    <span className="ml-3 text-sm font-medium text-black ">
+                      Available
+                    </span>
+                    <label
+                      htmlFor="default-toggle"
+                      className="inline-flex relative items-center cursor-pointer"
+                    >
+                      <input
+                        type="checkbox"
+                        value=""
+                        id="default-toggle"
+                        className="sr-only peer"
+                        onChange={(event) => {
+                          if (event.currentTarget.checked) {
+                            setStatus(AvailabilityStatusStrings.Tentative);
+                          } else {
+                            setStatus(AvailabilityStatusStrings.Available);
+                          }
+                        }}
+                      />
+                      <div className="w-11 h-6 bg-primary peer-focus:outline-none peer-focus:ring-0 rounded-full peer dark:bg-primary peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-primarylight after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-primarylight peer-checked:bg-secondary"></div>
+                      <span className="ml-3 text-sm font-medium text-black ">
+                        Maybe
+                      </span>
+                    </label>
+                  </div>
+                </div>
+                <div className="flex flex-col items-center w-[500px]">
+                  <AvailabilitySelector
+                    timeOptions={timeOptions}
+                    availability={myAvailability}
+                    status={status}
+                    pageNum={pageNum}
+                    selectionHandler={handleSelection}
+                    deletionHandler={handleDeletion}
+                  />
+                  <div className="flex flex-row ml-5 w-[84%] justify-between">
+                    {pageNum > 1 && (
+                      <button
+                        className={
+                          'bg-secondary text-black w-[30px] cursor-pointer rounded-md flex items-center justify-center py-1 font-semibold hover:bg-secondarylight'
+                        }
+                        onClick={() => handlePageChange(pageNum - 1)}
+                      >
+                        <LeftArrow />
+                      </button>
+                    )}
+                    {pageNum < numPages && (
+                      <button
+                        className={
+                          'bg-secondary text-black w-[30px] cursor-pointer rounded-md pl-1 flex items-center justify-center py-1 font-semibold hover:bg-secondarylight'
+                        }
+                        onClick={() => handlePageChange(pageNum + 1)}
+                      >
+                        <RightArrow />
+                      </button>
+                    )}
+                  </div>
                 </div>
               </div>
-              <div className="flex flex-col items-center w-[500px]">
-                <AvailabilitySelector
+            </section>
+
+            <section className="flex flex-row gap-5 justify-center w-[500px]">
+              <div>
+                <div className="flex flex-row ml-12 w-[84%] justify-center">
+                  <h2 className="font-medium text-xl">Group Availability</h2>
+                </div>
+
+                <GroupAvailability
                   timeOptions={timeOptions}
-                  availability={myAvailability}
-                  status={status}
+                  availabilities={allAvailabilities}
                   pageNum={pageNum}
-                  selectionHandler={handleSelection}
-                  deletionHandler={handleDeletion}
+                  onHover={handleHover}
                 />
-                <div className="flex flex-row ml-5 w-[84%] justify-between">
-                  {pageNum > 1 && (
-                    <button
-                      className={
-                        'bg-secondary text-black w-[30px] cursor-pointer rounded-md flex items-center justify-center py-1 font-semibold hover:bg-secondarylight'
-                      }
-                      onClick={() => handlePageChange(pageNum - 1)}
-                    >
-                      <LeftArrow />
-                    </button>
-                  )}
-                  {pageNum < numPages && (
-                    <button
-                      className={
-                        'bg-secondary text-black w-[30px] cursor-pointer rounded-md pl-1 flex items-center justify-center py-1 font-semibold hover:bg-secondarylight'
-                      }
-                      onClick={() => handlePageChange(pageNum + 1)}
-                    >
-                      <RightArrow />
-                    </button>
-                  )}
-                </div>
               </div>
-            </div>
-          </section>
 
-          <section className="flex flex-row gap-5 justify-center w-[500px]">
-            <div>
-              <div className="flex flex-row ml-14 w-[84%] justify-between">
-                <h2 className="font-medium text-xl">Group Availability</h2>
-                <h2 className="ml-[50px]">
+              <div className="w-fit flex flex-col items-center h-fit">
+                <h2 className="flex flex-row mt-24 justify-between w-full mb-8">
+                  <p>Participants: </p>
                   {isAvailabilityEmpty() ? '0' : allAvailabilities.length}
                 </h2>
+                <div className="max-h-[500px] overflow-y-scroll">
+                  {info.length > 0 ? (
+                    info.flatMap((val) => {
+                      return val;
+                    })
+                  ) : (
+                    <div className="text-center text-[15px]">
+                      Hover to view availability information
+                    </div>
+                  )}
+                </div>
               </div>
-
-              <GroupAvailability
-                timeOptions={timeOptions}
-                availabilities={allAvailabilities}
-                pageNum={pageNum}
-                onHover={handleHover}
-              />
-
-              <div className="flex flex-col items-end justify-end mr-7">
-                <button
-                  className={
-                    'bg-secondary text-black w-[100px] cursor-pointer rounded-md px-2 py-3 font-medium hover:bg-secondarylight' +
-                    (isAdmin && !isAvailabilityEmpty() ? 'block' : 'hidden')
-                  }
-                  onClick={() => finaliseTimes()}
-                >
-                  <p>Finalise</p>
-                </button>
-              </div>
-            </div>
-
-            <div className="w-[200px] h-fit max-h-[500px] overflow-scroll">
-              {info.flatMap((val) => {
-                return val;
-              })}
-            </div>
-          </section>
+            </section>
+          </div>
+          <div className="flex flex-row w-full items-end mt-3 justify-end">
+            {isAdmin && !isAvailabilityEmpty() && (
+              <button
+                className={
+                  'bg-secondary text-black w-[100px] cursor-pointer rounded-md px-2 py-3 font-medium hover:bg-secondarylight'
+                }
+                onClick={() => finaliseTimes()}
+              >
+                <p>Finalise</p>
+              </button>
+            )}
+          </div>
         </div>
       </div>
     </Container>
