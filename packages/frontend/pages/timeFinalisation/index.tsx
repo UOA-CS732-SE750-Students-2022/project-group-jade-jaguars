@@ -21,6 +21,8 @@ import { DatePicker } from '@mantine/dates';
 import { Container, Grid, InputWrapper } from '@mantine/core';
 import { TimePicker } from 'antd';
 import moment from 'moment';
+import LeftArrow from '../../assets/Left.svg';
+import RightArrow from '../../assets/Right.svg';
 
 const BASE_URL = process.env.NEXT_PUBLIC_SOCKET_URL;
 
@@ -155,7 +157,10 @@ const TimeFinalisation: NextPage = () => {
   };
 
   return (
-    <Container style={{ maxWidth: '100vw' }} className="m-0 ml-[100px] p-0">
+    <Container
+      style={{ maxWidth: '100vw', maxHeight: '100vh', overflow: 'scroll' }}
+      className="m-0 ml-[100px] p-0"
+    >
       <div className="min-w-[1200px] flex flex-col w-full gap-20 items-center py-28">
         <div className="w-full flex flex-col items-center">
           <h1 className="mr-[30px] my-0 leading-none">
@@ -200,25 +205,28 @@ const TimeFinalisation: NextPage = () => {
                   </div>
                 </div>
               </div>
-
-              <button
-                className={
-                  'bg-secondary text-black w-[30px] cursor-pointer rounded-md px-2 py-1 font-semibold hover:bg-secondarylight absolute right-[80px] ' +
-                  (pageNum > 1 ? 'block' : 'hidden')
-                }
-                onClick={() => handlePageChange(pageNum - 1)}
-              >
-                {'<'}
-              </button>
-              <button
-                className={
-                  'bg-secondary text-black w-[30px] cursor-pointer rounded-md px-2 py-1 font-semibold hover:bg-secondarylight absolute right-0 mr-[30px] ' +
-                  (pageNum < numPages ? 'block' : 'hidden')
-                }
-                onClick={() => handlePageChange(pageNum + 1)}
-              >
-                {'>'}
-              </button>
+              <div className="flex flex-row ml-5 w-[84%] justify-between">
+                {pageNum > 1 && (
+                  <button
+                    className={
+                      'bg-secondary text-black w-[30px] cursor-pointer rounded-md flex items-center justify-center py-1 font-semibold hover:bg-secondarylight'
+                    }
+                    onClick={() => handlePageChange(pageNum - 1)}
+                  >
+                    <LeftArrow />
+                  </button>
+                )}
+                {pageNum < numPages && (
+                  <button
+                    className={
+                      'bg-secondary text-black w-[30px] cursor-pointer rounded-md pl-1 flex items-center justify-center py-1 font-semibold hover:bg-secondarylight'
+                    }
+                    onClick={() => handlePageChange(pageNum + 1)}
+                  >
+                    <RightArrow />
+                  </button>
+                )}
+              </div>
             </div>
           </section>
 
@@ -235,14 +243,14 @@ const TimeFinalisation: NextPage = () => {
             <div className="flex flex-col mt-5 gap-2 w-full">
               <button
                 className={
-                  'bg-secondary text-black w-[180px] cursor-pointer rounded-md mt-2 px-2 py-2 font-base hover:bg-secondarylight absolute'
+                  'bg-secondary text-black w-[180px] cursor-pointer rounded-md mt-2 px-2 py-2 font-base hover:bg-secondarylight'
                 }
                 onClick={() => setCustomEvent(!customEvent)}
               >
                 <p>Custom Event Time</p>
               </button>
 
-              <div className="mt-16 flex gap-2 flex-row w-[85%]">
+              <div className="mt-5 flex gap-2 flex-row w-[85%]">
                 <DatePicker
                   classNames={{
                     input: 'py-[20.5px] text-[16px]',

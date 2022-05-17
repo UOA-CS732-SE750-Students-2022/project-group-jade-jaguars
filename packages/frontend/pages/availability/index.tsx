@@ -213,8 +213,11 @@ const Availability: NextPage = () => {
   };
 
   return (
-    <Container style={{ maxWidth: '100vw' }} className="m-0 p-0">
-      <div className="min-w-[1200px] flex flex-col w-full gap-20 justify-center py-28 items-center">
+    <Container
+      style={{ maxWidth: '100vw', maxHeight: '100vh', overflow: 'scroll' }}
+      className="m-0 p-0"
+    >
+      <div className="min-w-[1200px] h-full flex flex-col w-full gap-20 justify-center py-28 items-center">
         <div className="flex flex-col ml-[150px] justify-center items-center">
           <div className="mb-20 flex flex-row gap-10 w-full justify-start">
             <h1 className="mr-[30px] my-0 leading-none">

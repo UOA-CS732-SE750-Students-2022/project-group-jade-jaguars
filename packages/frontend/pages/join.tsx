@@ -19,12 +19,14 @@ const JoinPage: NextPage = () => {
   });
   const router = useRouter();
   const onClick = () => {
-    router.push({
-      pathname: '/availability',
-      query: {
-        eventId: form.values.code,
-      },
-    });
+    if (form.values.code) {
+      router.push({
+        pathname: '/availability',
+        query: {
+          eventId: form.values.code,
+        },
+      });
+    }
   };
 
   return (
