@@ -26,7 +26,7 @@ const linkData = [
 export const CustomNavbar = () => {
   const { height } = useViewportSize();
   const [active, setActive] = useState(0);
-  const { user, logout, setAuthToken, authToken } = useAuth();
+  const { user, logout, setAuthToken, authToken, setUser } = useAuth();
 
   const router = useRouter();
   const [currentRoute, setCurrentRoute] = useState(router.pathname);
@@ -42,8 +42,8 @@ export const CustomNavbar = () => {
   }, []);
 
   useEffect(() => {
-    authToken ? setIsLogin(true) : setIsLogin(false);
-  }, [authToken]);
+    user ? setIsLogin(true) : setIsLogin(false);
+  }, [user]);
 
   return isLogin ? (
     <Navbar height={height} width={{ base: 100 }} className="border-1">
@@ -78,6 +78,7 @@ export const CustomNavbar = () => {
             onClick={() => {
               logout;
               setAuthToken('');
+              setUser(null);
               router.push('/login');
             }}
           >
