@@ -70,7 +70,7 @@ export const CustomNavbar = () => {
         <Affix position={{ bottom: 40, right: 40 }}>
           <Group direction="column" align="center" spacing="xs">
             <div
-              className="rounded-xl p-4 cursor-pointer bg-secondary "
+              className="rounded-xl p-4 hover:bg-secondarylight cursor-pointer bg-secondary "
               onClick={() => router.push('/create')}
             >
               <Plus strokeWidth={2} size={35} />
