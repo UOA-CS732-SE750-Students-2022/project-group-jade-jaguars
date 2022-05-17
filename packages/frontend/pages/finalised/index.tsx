@@ -77,18 +77,34 @@ const FinalisedEventPage: NextPage = () => {
               </Grid.Col>
               <Grid.Col>
                 <Group position="center" mt="lg">
-                  <Button
-                    classNames={{
-                      filled: 'bg-secondary',
-                      label: 'text-black',
-                      root: 'hover:bg-[#fff6d7]',
-                    }}
-                    onClick={onClickAddToCalendar}
-                  >
-                    <p className="font-medium text-[15px]">
-                      Export all events to calendar
-                    </p>
-                  </Button>
+                  <div className="flex flex-col gap-3">
+                    <Button
+                      classNames={{
+                        filled: 'bg-secondary',
+                        label: 'text-black',
+                        root: 'hover:bg-[#ffeeb0]',
+                      }}
+                      onClick={onClickAddToCalendar}
+                    >
+                      <p className="font-medium text-[15px]">
+                        Export all events to calendar
+                      </p>
+                    </Button>
+                    <Button
+                      classNames={{
+                        filled: 'bg-primary',
+                        label: 'text-white',
+                        root: 'hover:bg-[#b8d6ad]',
+                      }}
+                      onClick={() => {
+                        router.push('/dashboard');
+                      }}
+                    >
+                      <p className="font-medium text-[15px]">
+                        Back to dashboard
+                      </p>
+                    </Button>
+                  </div>
                 </Group>
               </Grid.Col>
             </Grid>
