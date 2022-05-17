@@ -1,11 +1,11 @@
-import { Avatar, Card, User } from '@nextui-org/react';
+import { Avatar } from '@nextui-org/react';
 import { CloseButton } from '@mantine/core';
-import { MouseEventHandler, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import Member from '../types/Member';
 
 function MemberCard(props: {
   member: Member;
-  deleteUser: (param?: any) => void;
+  deleteUser?: (param?: any) => void;
 }) {
   const [profilePic, setProfilePic] = useState<string>(
     'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png',
@@ -30,9 +30,7 @@ function MemberCard(props: {
         <p className="w-36 overflow-hidden truncate ...">{props.member.name}</p>
       </div>
 
-      <div>
-        <CloseButton onClick={() => props.deleteUser(props.member)} />
-      </div>
+      <div>{props.deleteUser && <CloseButton onClick={() => {}} />}</div>
     </div>
   );
 }

@@ -1,4 +1,4 @@
-import { Container, Grid, Group } from '@mantine/core';
+import { Container } from '@mantine/core';
 import type { NextPage } from 'next';
 import { useEffect } from 'react';
 import { useAuth } from '../src/context/AuthContext';

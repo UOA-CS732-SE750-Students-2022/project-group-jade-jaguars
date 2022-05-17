@@ -1,10 +1,9 @@
 import { NextPage } from 'next';
 import { useRouter } from 'next/router';
-import { Row, Col, Text } from '@nextui-org/react';
+import { Text } from '@nextui-org/react';
 import { useState, useEffect } from 'react';
 import { AttendeeStatus } from '../../types/Availability';
 import GroupAvailability from '../../components/GroupAvailability/GroupAvailability';
-import { useAuth } from '../../src/context/AuthContext';
 import { AvailabilityStatusStrings } from '../../types/Availability';
 import {
   TimeBracket,
@@ -46,8 +45,6 @@ const TimeFinalisation: NextPage = () => {
   const [timeRange, setTimeRange] = useState<Date[] | undefined>();
   const [customEvent, setCustomEvent] = useState<boolean>(false);
   const [dtError, setDtError] = useState<boolean>(false);
-
-  const { userId } = useAuth();
 
   const router = useRouter();
   const {

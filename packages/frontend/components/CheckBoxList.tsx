@@ -1,4 +1,4 @@
-import { Checkbox, ScrollArea } from '@mantine/core';
+import { ScrollArea } from '@mantine/core';
 import React, { useState } from 'react';
 import { TeamCheckBox } from './TeamCheckBox';
 

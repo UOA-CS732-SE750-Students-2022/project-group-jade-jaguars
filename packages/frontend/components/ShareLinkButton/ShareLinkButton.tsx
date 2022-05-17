@@ -1,4 +1,4 @@
-import { Group, Tooltip } from '@mantine/core';
+import { Tooltip } from '@mantine/core';
 import { useClipboard } from '@mantine/hooks';
 import React from 'react';
 import { Copy } from 'tabler-icons-react';
